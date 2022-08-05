@@ -4,6 +4,7 @@ import cn.lili.common.enums.ClientTypeEnum;
 import cn.lili.common.security.sensitive.Sensitive;
 import cn.lili.common.security.sensitive.enums.SensitiveStrategy;
 import cn.lili.mybatis.BaseEntity;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -90,11 +91,24 @@ public class Member extends BaseEntity {
     private Date lastLoginDate;
 
     @ApiModelProperty(value = "会员等级ID")
-    private String gradeId;
+    private Long gradeId;
 
     @Min(message = "必须为数字", value = 0)
     @ApiModelProperty(value = "经验值数量")
     private Long experience;
+
+    @ApiModelProperty(value = "SSD卷冻结数量")
+    @TableField(value = "frozen_SSD")
+    private Long frozenSSD;
+    @ApiModelProperty(value = "SSD卷数量")
+    @TableField(value = "SSD")
+    private Long SSD;
+    @ApiModelProperty(value = "区块地址")
+    private String blockAddress;
+    @ApiModelProperty(value = "区块密钥")
+    private String privateKey;
+    @ApiModelProperty(value = "邀请人ID")
+    private Long inviteeId;
 
 
     public Member(String username, String password, String mobile) {

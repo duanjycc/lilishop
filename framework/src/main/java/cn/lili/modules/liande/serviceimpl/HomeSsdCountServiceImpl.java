@@ -2,7 +2,7 @@ package cn.lili.modules.liande.serviceimpl;
 
 import cn.lili.modules.liande.entity.vos.HomeSsdCount;
 import cn.lili.modules.liande.mapper.DestroyDetailMapper;
-import cn.lili.modules.liande.service.HomeSsdCountService;
+import cn.lili.modules.liande.service.IHomeSsdCountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
  *
  */
 @Service
-public class HomeSsdCountServiceImpl implements HomeSsdCountService {
+public class HomeSsdCountServiceImpl implements IHomeSsdCountService {
 
     @Autowired
     private DestroyDetailMapper destroyDetailMapper;

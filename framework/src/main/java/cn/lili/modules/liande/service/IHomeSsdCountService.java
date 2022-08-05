@@ -8,7 +8,7 @@ import cn.lili.modules.liande.entity.vos.HomeSsdCount;
  * @author Chopper
  * @since 2020/11/17 3:44 下午
  */
-public interface HomeSsdCountService {
+public interface IHomeSsdCountService {
 
 
     HomeSsdCount count();

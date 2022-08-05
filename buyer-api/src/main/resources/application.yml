@@ -134,6 +134,7 @@ ignored:
     - /buyer/other/pageData/**
     - /buyer/other/article/**
     - /buyer/goods/**
+    - /buyer/home/**
     - /buyer/store/**
     - /buyer/passport/connect/**
     - /buyer/members/**

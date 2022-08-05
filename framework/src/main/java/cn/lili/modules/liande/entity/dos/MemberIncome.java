@@ -1,0 +1,83 @@
+/*
+ * Copyright © 2022- ~ hc R&D 电信支撑部/产品研发中心 All rights reserved.
+ */
+package cn.lili.modules.liande.entity.dos;
+
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+
+import java.time.LocalDateTime;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+/**
+ * <p>
+ * 会员收益表
+ * </p>
+ *
+ * @author zh
+ * @since 2022-08-05
+ */
+@Data
+@EqualsAndHashCode(callSuper = false)
+@TableName("w_member_income")
+@ApiModel(value = "MemberIncome对象", description = "会员收益表")
+public class MemberIncome extends Model<MemberIncome> {
+
+    private static final long serialVersionUID = 1L;
+
+
+    /**
+     * ID
+     */
+    @ApiModelProperty(value = "ID")
+    private Long id;
+
+
+    /**
+     * 消费会员id
+     */
+    @ApiModelProperty(value = "消费会员id")
+    private Long consumerUserid;
+
+
+    /**
+     * 会员ID
+     */
+    @ApiModelProperty(value = "会员ID")
+    private Long userId;
+
+
+    /**
+     * 创建时间
+     */
+    @ApiModelProperty(value = "创建时间")
+    private LocalDateTime creationTime;
+
+
+    /**
+     * 收益数量
+     */
+    @ApiModelProperty(value = "收益数量")
+    private Double quantity;
+
+
+    /**
+     * 当前收益百分比
+     */
+    @TableField("Income_proportion")
+    @ApiModelProperty(value = "当前收益百分比")
+    private String incomeProportion;
+
+
+    /**
+     * 做单ID
+     */
+    @ApiModelProperty(value = "做单ID")
+    private String orderId;
+
+}

@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Min;
@@ -109,6 +110,17 @@ public class Member extends BaseEntity {
     private String privateKey;
     @ApiModelProperty(value = "邀请人ID")
     private Long inviteeId;
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "我的区域ID")
+    private String myRegionId;
+    @TableField(exist = false)
+    @ApiModelProperty(value = "我的区域")
+    private String myRegion;
+    @TableField(exist = false)
+    @ApiModelProperty(value = "上级区域")
+    private String myParentRegion;
+
 
 
     public Member(String username, String password, String mobile) {

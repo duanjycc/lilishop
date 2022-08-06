@@ -144,6 +144,14 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
         return user;
     }
 
+    @Override
+    public AdminUser findByMobile(String mobile) {
+        AdminUser user = getOne(new LambdaQueryWrapper<AdminUser>().eq(AdminUser::getMobile, mobile));
+        if (user == null) {
+            return null;
+        }
+        return user;
+    }
 
     @Override
     @SystemLogPoint(description = "修改管理员", customerLog = "'修改管理员:'+#adminUser.username")

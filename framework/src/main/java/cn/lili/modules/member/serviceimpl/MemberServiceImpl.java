@@ -31,6 +31,12 @@ import cn.lili.modules.member.mapper.MemberMapper;
 import cn.lili.modules.member.service.MemberService;
 import cn.lili.modules.member.token.MemberTokenGenerate;
 import cn.lili.modules.member.token.StoreTokenGenerate;
+import cn.lili.modules.permission.entity.dos.AdminUser;
+import cn.lili.modules.permission.entity.dos.Department;
+import cn.lili.modules.permission.entity.dos.Role;
+import cn.lili.modules.permission.service.AdminUserService;
+import cn.lili.modules.permission.service.DepartmentService;
+import cn.lili.modules.permission.service.RoleService;
 import cn.lili.modules.store.entity.dos.Store;
 import cn.lili.modules.store.entity.enums.StoreStatusEnum;
 import cn.lili.modules.store.service.StoreService;
@@ -43,6 +49,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -93,6 +100,13 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
      */
     @Autowired
     private RocketMQTemplate rocketMQTemplate;
+
+    @Autowired
+    private AdminUserService adminUserService;
+
+    @Autowired
+    private DepartmentService departmentService;
+
     /**
      * 缓存
      */
@@ -229,6 +243,15 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         QueryWrapper<Member> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("mobile", mobilePhone);
         Member member = this.baseMapper.selectOne(queryWrapper);
+        AdminUser adminUser = adminUserService.findByMobile(mobilePhone);
+        if (ObjectUtils.isNotEmpty(adminUser)){
+            Department dept = departmentService.getById(adminUser.getDepartmentId());
+            Department parentDept = departmentService.getById(dept.getParentId());
+            member.setMyRegionId(dept.getId());
+            member.setMyRegion(dept.getTitle());
+            member.setMyParentRegion(ObjectUtils.isEmpty(parentDept) ? null : parentDept.getTitle());
+        }
+
         //如果手机号不存在则自动注册用户
         if (member == null) {
             member = new Member(mobilePhone, UuidUtils.getUUID(), mobilePhone);
@@ -426,6 +449,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         queryWrapper.like(CharSequenceUtil.isNotBlank(memberSearchVO.getNickName()), "nick_name", memberSearchVO.getNickName());
         //按照电话号码查询
         queryWrapper.like(CharSequenceUtil.isNotBlank(memberSearchVO.getMobile()), "mobile", memberSearchVO.getMobile());
+        //按照邀请认查询
+        queryWrapper.eq(ObjectUtils.isNotEmpty(memberSearchVO.getInviteeId()),"invitee_id",memberSearchVO.getInviteeId());
         //按照会员状态查询
         queryWrapper.eq(CharSequenceUtil.isNotBlank(memberSearchVO.getDisabled()), "disabled",
                 memberSearchVO.getDisabled().equals(SwitchEnum.OPEN.name()) ? 1 : 0);

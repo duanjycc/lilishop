@@ -33,4 +33,7 @@ public class Department extends BaseEntity {
 
     @ApiModelProperty(value = "排序值")
     private Double sortOrder;
+
+    @ApiModelProperty(value = "区域code")
+    private String areaCode;
 }

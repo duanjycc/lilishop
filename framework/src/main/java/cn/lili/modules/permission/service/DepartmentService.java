@@ -23,6 +23,7 @@ public interface DepartmentService extends IService<Department> {
      */
     List<DepartmentVO> tree(QueryWrapper<Department> initWrapper);
 
+
     /**
      * 删除部门
      *

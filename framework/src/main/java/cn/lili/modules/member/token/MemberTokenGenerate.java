@@ -57,6 +57,7 @@ public class MemberTokenGenerate extends AbstractTokenGenerate<Member> {
         rocketMQTemplate.asyncSend(destination, member, RocketmqSendCallbackBuilder.commonCallback());
 
         AuthUser authUser = new AuthUser(member.getUsername(), member.getId(), member.getNickName(), member.getFace(), UserEnums.MEMBER);
+        authUser.setMember(member);
         //登陆成功生成token
         return tokenUtil.createToken(member.getUsername(), authUser, longTerm, UserEnums.MEMBER);
     }

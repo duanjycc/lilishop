@@ -193,15 +193,15 @@ lili:
   #短信模版配置
   sms:
     #登录
-    LOGIN: SMS_205755300
+    LOGIN: SMS_247595324
     #注册
-    REGISTER: SMS_205755298
+    REGISTER: SMS_247595324
     #找回密码
-    FIND_USER: SMS_205755301
+    FIND_USER: SMS_247595324
     #设置密码
-    UPDATE_PASSWORD: SMS_205755297
+    UPDATE_PASSWORD: SMS_247595324
     #支付密码
-    WALLET_PASSWORD: SMS_205755301
+    WALLET_PASSWORD: SMS_247595324
   system:
     isTestModel: true
   statistics:

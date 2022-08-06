@@ -54,6 +54,7 @@ public class StoreBuyerController {
     @ApiOperation(value = "获取店铺列表分页")
     @GetMapping
     public ResultMessage<IPage<StoreVO>> getByPage(StoreSearchParams entity, PageVO page) {
+        entity.setMemberId(UserContext.getCurrentUser().getId());
         return ResultUtil.data(storeService.findByConditionPage(entity, page));
     }
 

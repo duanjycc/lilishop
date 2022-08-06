@@ -21,6 +21,9 @@ public class StoreSearchParams extends PageVO implements Serializable {
 
     private static final long serialVersionUID = 6916054310764833369L;
 
+    @ApiModelProperty(value = "会员店铺")
+    private String memberId;
+
     @ApiModelProperty(value = "会员名称")
     private String memberName;
 
@@ -45,6 +48,9 @@ public class StoreSearchParams extends PageVO implements Serializable {
         }
         if (StringUtils.isNotEmpty(memberName)) {
             queryWrapper.like("member_name", memberName);
+        }
+        if (StringUtils.isNotEmpty(memberId)){
+            queryWrapper.eq("member_id",Long.parseLong(memberId));
         }
         if (StringUtils.isNotEmpty(storeDisable)) {
             queryWrapper.eq("store_disable", storeDisable);

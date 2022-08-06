@@ -27,4 +27,7 @@ public class MemberSearchVO {
      */
     @ApiModelProperty(value = "会员状态")
     private String disabled;
+
+    @ApiModelProperty(value = "邀请人ID")
+    private Long inviteeId;
 }

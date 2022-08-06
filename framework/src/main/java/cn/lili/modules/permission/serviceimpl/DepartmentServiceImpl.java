@@ -2,6 +2,7 @@ package cn.lili.modules.permission.serviceimpl;
 
 import cn.lili.common.enums.ResultCode;
 import cn.lili.common.exception.ServiceException;
+import cn.lili.common.vo.PageVO;
 import cn.lili.modules.permission.entity.dos.AdminUser;
 import cn.lili.modules.permission.entity.dos.Department;
 import cn.lili.modules.permission.entity.vo.DepartmentVO;
@@ -10,6 +11,7 @@ import cn.lili.modules.permission.service.AdminUserService;
 import cn.lili.modules.permission.service.DepartmentRoleService;
 import cn.lili.modules.permission.service.DepartmentService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
      */
     @Autowired
     private DepartmentRoleService departmentRoleService;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)

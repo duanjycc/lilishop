@@ -39,6 +39,13 @@ public interface AdminUserService extends IService<AdminUser> {
      * @return
      */
     AdminUser findByUsername(String username);
+    /**
+     * 通过手机号获取用户
+     *
+     * @param mobile
+     * @return
+     */
+    AdminUser findByMobile(String mobile);
 
 
     /**

@@ -266,7 +266,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
      *
      * @param member
      */
-    private void registerHandler(Member member) {
+    @Override
+    public void registerHandler(Member member) {
         member.setId(SnowFlake.getIdStr());
         //保存会员
         this.save(member);

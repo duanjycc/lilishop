@@ -3,6 +3,7 @@ package cn.lili.modules.member.entity.dos;
 import cn.lili.common.enums.ClientTypeEnum;
 import cn.lili.common.security.sensitive.Sensitive;
 import cn.lili.common.security.sensitive.enums.SensitiveStrategy;
+import cn.lili.common.utils.UuidUtils;
 import cn.lili.mybatis.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -17,6 +18,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * 会员
@@ -100,10 +102,10 @@ public class Member extends BaseEntity {
 
     @ApiModelProperty(value = "SSD卷冻结数量")
     @TableField(value = "frozen_SSD")
-    private Long frozenSSD;
+    private Double frozenSSD;
     @ApiModelProperty(value = "SSD卷数量")
     @TableField(value = "SSD")
-    private Long SSD;
+    private Double SSD;
     @ApiModelProperty(value = "区块地址")
     private String blockAddress;
     @ApiModelProperty(value = "区块密钥")
@@ -133,6 +135,8 @@ public class Member extends BaseEntity {
         this.sex = 0;
         this.point = 0L;
         this.totalPoint = 0L;
+        this.blockAddress = UuidUtils.getUUID();
+        this.privateKey = UuidUtils.getUUID();
         this.lastLoginDate = new Date();
     }
 
@@ -147,6 +151,8 @@ public class Member extends BaseEntity {
         this.sex = 0;
         this.point = 0L;
         this.totalPoint = 0L;
+        this.blockAddress = UuidUtils.getUUID();
+        this.privateKey = UuidUtils.getUUID();
         this.lastLoginDate = new Date();
     }
 
@@ -161,6 +167,8 @@ public class Member extends BaseEntity {
         this.sex = sex;
         this.point = 0L;
         this.totalPoint = 0L;
+        this.blockAddress = UuidUtils.getUUID();
+        this.privateKey = UuidUtils.getUUID();
         this.lastLoginDate = new Date();
     }
 }

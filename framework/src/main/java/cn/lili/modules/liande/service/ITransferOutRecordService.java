@@ -2,6 +2,7 @@
 package cn.lili.modules.liande.service;
 
 import cn.lili.modules.liande.entity.dos.TransferOutRecord;
+import cn.lili.modules.liande.entity.dto.TransferDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 
@@ -16,4 +17,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ITransferOutRecordService extends IService<TransferOutRecord> {
 
+    /**
+     * 转账
+     * @param transfer
+     */
+    Boolean out(TransferDTO transfer);
 }

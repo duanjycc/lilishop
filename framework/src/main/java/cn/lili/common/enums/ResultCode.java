@@ -476,7 +476,10 @@ public enum ResultCode {
     CONNECT_NOT_EXIST(90000, "登录方式不存在！"),
     ELASTICSEARCH_INDEX_INIT_ERROR(90003, "索引初始化失败！"),
     PURCHASE_ORDER_DEADLINE_ERROR(90004, "供求单，已超过报名截止时间"),
-    INDEX_BUILDING(90005, "索引正在生成");
+    INDEX_BUILDING(90005, "索引正在生成"),
+
+    /**转账相关*/
+    TRANSFER_COUNT_ERROR(100001, "转账SSD数量，不能大于账号SSD数量（不包括被冻结的SSD数量)");
 
     private final Integer code;
     private final String message;

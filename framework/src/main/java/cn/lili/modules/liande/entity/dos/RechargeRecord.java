@@ -3,13 +3,14 @@
  */
 package cn.lili.modules.liande.entity.dos;
 
-import com.baomidou.mybatisplus.annotation.TableName;
+import cn.lili.common.security.context.UserContext;
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
-
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-
+import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -125,4 +126,22 @@ public class RechargeRecord extends Model<RechargeRecord> {
     @ApiModelProperty(value = "备注")
     private String remark;
 
+
+    /**
+     * 内部转账构造函数
+     */
+    public RechargeRecord(String acceptMemId, String intoAddress, String contractAddress, Double amount) {
+        this.id =
+        this.userId = Long.parseLong(acceptMemId);
+        this.orderNo = Long.parseLong(new SimpleDateFormat("yyyyMMddHHmmsss").format(new Date()));
+        this.paymentAddress = UserContext.getCurrentUser().getMember().getBlockAddress();
+        this.intoAddress = intoAddress;
+        this.contractAddress = contractAddress;
+        this.rechargeAmount = amount;
+        this.arrivalAmount = amount;
+        this.serviceCharge = 0.00;
+        this.rechargeTime = LocalDateTime.now();
+        this.intoTime = LocalDateTime.now();
+        this.type = "0";
+    }
 }

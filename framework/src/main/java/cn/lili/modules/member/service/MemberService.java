@@ -38,6 +38,13 @@ public interface MemberService extends IService<Member> {
     Member getUserInfo();
 
     /**
+     * 注册
+     *
+     * @return 会员信息
+     */
+    void registerHandler(Member member);
+
+    /**
      * 是否可以通过手机获取用户
      *
      * @param uuid   UUID

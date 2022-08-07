@@ -3,12 +3,16 @@
  */
 package cn.lili.modules.liande.entity.dos;
 
+import cn.lili.common.security.context.UserContext;
+import cn.lili.modules.liande.entity.enums.DelStatusEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
@@ -32,97 +36,59 @@ public class TransferOutRecord extends Model<TransferOutRecord> {
 
     private static final long serialVersionUID = 1L;
 
-
-    /**
-     * id
-     */
-    @TableId(value = "id", type = IdType.AUTO)
     @ApiModelProperty(value = "id")
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-
-    /**
-     * 转出人用户ID
-     */
     @ApiModelProperty(value = "转出人用户ID")
     private Long userId;
 
-
-    /**
-     * 订单号
-     */
     @TableField("orderNo")
     @ApiModelProperty(value = "订单号")
     private Long orderNo;
 
-
-    /**
-     * 付款地址
-     */
     @ApiModelProperty(value = "付款地址")
     private String paymentAddress;
 
-
-    /**
-     * 到账地址
-     */
     @ApiModelProperty(value = "到账地址")
     private String intoAddress;
 
-
-    /**
-     * 合约地址
-     */
     @ApiModelProperty(value = "合约地址")
     private String contractAddress;
 
-
-    /**
-     * 金额
-     */
     @ApiModelProperty(value = "金额")
     private Double rechargeAmount;
 
-
-    /**
-     * 到账金额
-     */
     @ApiModelProperty(value = "到账金额")
     private Double arrivalAmount;
 
-
-    /**
-     * 手续费
-     */
     @ApiModelProperty(value = "手续费")
     private Double serviceCharge;
 
-
-    /**
-     * 转出时间
-     */
     @ApiModelProperty(value = "转出时间")
     private LocalDateTime rechargeTime;
 
-
-    /**
-     * 0已经到账，1正在转
-     */
     @ApiModelProperty(value = "0已经到账，1正在转")
     private String receiptStatus;
 
-
-    /**
-     * 到账时间
-     */
     @ApiModelProperty(value = "到账时间")
     private LocalDateTime intoTime;
 
-
-    /**
-     * 备注
-     */
     @ApiModelProperty(value = "备注")
     private String remark;
 
+    // 内转
+    public TransferOutRecord(Long orderNo,String intoAddress, String contractAddress, Double amount) {
+        this.userId = Long.parseLong(UserContext.getCurrentUser().getMember().getId());
+        this.orderNo = orderNo;
+        this.paymentAddress = UserContext.getCurrentUser().getMember().getBlockAddress();
+        this.intoAddress = intoAddress;
+        this.contractAddress = contractAddress;
+        this.rechargeAmount = amount;
+        this.arrivalAmount = amount;
+        this.serviceCharge = 0.00;
+        this.rechargeTime = LocalDateTime.now();
+        this.receiptStatus = DelStatusEnum.USE.getType();
+        this.intoTime = LocalDateTime.now();
+    }
 }

@@ -250,6 +250,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             member.setMyRegionId(dept.getId());
             member.setMyRegion(dept.getTitle());
             member.setMyParentRegion(ObjectUtils.isEmpty(parentDept) ? null : parentDept.getTitle());
+            member.setInviteeMobile(ObjectUtils.isEmpty(member) ? null : baseMapper.selectById(member.getInviteeId()).getMobile());
         }
 
         //如果手机号不存在则自动注册用户
@@ -336,8 +337,29 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             this.update(lambdaUpdateWrapper);
         }
         throw new ServiceException(ResultCode.UNINITIALIZED_PASSWORD);
-
     }
+
+
+    /**
+     * 设置支付密码
+     *
+     * @param paymentPassword 密码
+     * @return 操作结果
+     */
+    @Override
+    public void setUpPaymentPassword(String paymentPassword) {
+        AuthUser tokenUser = UserContext.getCurrentUser();
+        if (tokenUser == null) {
+            throw new ServiceException(ResultCode.USER_NOT_LOGIN);
+        }
+        Member member = this.getById(tokenUser.getId());
+        member.setPaymentPassword(paymentPassword);
+        LambdaUpdateWrapper<Member> lambdaUpdateWrapper = Wrappers.lambdaUpdate();
+        lambdaUpdateWrapper.eq(Member::getId, member.getId());
+        lambdaUpdateWrapper.set(Member::getPaymentPassword, new BCryptPasswordEncoder().encode(paymentPassword));
+        this.update(lambdaUpdateWrapper);
+    }
+
 
     @Override
     public void cancellation(String password) {

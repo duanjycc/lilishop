@@ -132,6 +132,10 @@ public class Member extends BaseEntity {
     @ApiModelProperty(value = "上级区域")
     private String myParentRegion;
 
+    @ApiModelProperty(value = "邀请我的人")
+    @TableField(exist = false)
+    private String inviteeMobile;
+
 
 
     public Member(String username, String password, String mobile) {

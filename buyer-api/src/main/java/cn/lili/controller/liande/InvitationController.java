@@ -45,6 +45,14 @@ public class InvitationController {
         return ResultUtil.data(ObjectUtils.isEmpty(member.getInviteeId())? false : true);
     }
 
+    @ApiOperation(value = "查询我的邀请人")
+    @GetMapping("/queryMyInvitee")
+    public ResultMessage<Object> queryMyInvitee() {
+        AuthUser currentUser = UserContext.getCurrentUser();
+        MemberVO member = memberService.getMember(String.valueOf(currentUser.getMember().getInviteeId()));
+        return ResultUtil.data(member);
+    }
+
     @ApiOperation(value = "查询我的邀请人列表")
     @GetMapping("/queryInvitation")
     public ResultMessage<IPage<MemberVO>> queryInvitation(PageVO page) {

@@ -3,10 +3,13 @@ package cn.lili.controller.passport;
 import cn.lili.common.enums.ResultCode;
 import cn.lili.common.enums.ResultUtil;
 import cn.lili.common.exception.ServiceException;
+import cn.lili.common.security.AuthUser;
+import cn.lili.common.security.context.UserContext;
 import cn.lili.common.security.enums.UserEnums;
 import cn.lili.common.vo.ResultMessage;
 import cn.lili.modules.member.entity.dos.Member;
 import cn.lili.modules.member.entity.dto.MemberEditDTO;
+import cn.lili.modules.member.entity.vo.MemberVO;
 import cn.lili.modules.member.service.MemberService;
 import cn.lili.modules.sms.SmsUtil;
 import cn.lili.modules.verification.entity.enums.VerificationEnums;
@@ -15,10 +18,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.Optional;
 
 /**
  * 买家端,会员接口
@@ -184,6 +189,22 @@ public class MemberBuyerController {
     @GetMapping("/refresh/{refreshToken}")
     public ResultMessage<Object> refreshToken(@NotNull(message = "刷新token不能为空") @PathVariable String refreshToken) {
         return ResultUtil.data(this.memberService.refreshToken(refreshToken));
+    }
+
+    @ApiOperation(value = "检测是否补充支付密码")
+    @GetMapping("/check/payment/password")
+    public ResultMessage<Object> checkPaymentPassword() {
+        AuthUser currentUser = UserContext.getCurrentUser();
+        Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
+        Member member = memberService.getUserInfo();
+        return ResultUtil.data(ObjectUtils.isEmpty(member.getPaymentPassword())? false : true);
+    }
+
+    @ApiOperation(value = "补充支付密码")
+    @GetMapping("/setUp/payment/password")
+    public ResultMessage<Object> setUpPaymentPassword(@NotNull(message = "补充支付密码") @RequestParam String paymentPassword) {
+        memberService.setUpPaymentPassword(paymentPassword);
+        return ResultUtil.success();
     }
 
 }

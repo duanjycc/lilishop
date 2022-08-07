@@ -4,6 +4,8 @@
 package cn.lili.modules.liande.entity.dos;
 
 import cn.lili.common.security.context.UserContext;
+import cn.lili.modules.liande.entity.enums.DelStatusEnum;
+import cn.lili.trigger.enums.DelayTypeEnums;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -105,7 +107,8 @@ public class RechargeRecord extends Model<RechargeRecord> {
     @ApiModelProperty(value = "转入时间")
     private LocalDateTime rechargeTime;
 
-
+    @ApiModelProperty(value = "状态：0已经到账，1正在转")
+    private String rechargeStatus;
     /**
      * 到账时间
      */
@@ -140,6 +143,7 @@ public class RechargeRecord extends Model<RechargeRecord> {
         this.rechargeAmount = amount;
         this.arrivalAmount = amount;
         this.serviceCharge = 0.00;
+        this.rechargeStatus = DelStatusEnum.USE.getType();
         this.rechargeTime = LocalDateTime.now();
         this.intoTime = LocalDateTime.now();
         this.type = "0";

@@ -269,6 +269,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     @Override
     public void registerHandler(Member member) {
         member.setId(SnowFlake.getIdStr());
+        member.setBlockAddress(UuidUtils.getUUID());
+        member.setPrivateKey(UuidUtils.getUUID());
         //保存会员
         this.save(member);
         String destination = rocketmqCustomProperties.getMemberTopic() + ":" + MemberTagsEnum.MEMBER_REGISTER.name();

@@ -2,7 +2,7 @@ package cn.lili.controller.liande;
 
 import cn.lili.common.enums.ResultUtil;
 import cn.lili.common.vo.ResultMessage;
-import cn.lili.modules.liande.entity.vos.HomeSsdCount;
+import cn.lili.modules.liande.entity.vo.HomeSsdCountVO;
 import cn.lili.modules.liande.service.IHomeSsdCountService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,7 +25,7 @@ public class HomeSsdController {
 
     @ApiOperation(value = "首页ssd统计")
     @GetMapping
-    public ResultMessage<HomeSsdCount> count() {
+    public ResultMessage<HomeSsdCountVO> count() {
         return ResultUtil.data(IHomeSsdCountService.count());
     }
 }

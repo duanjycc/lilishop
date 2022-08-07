@@ -180,6 +180,8 @@ jasypt:
     password: lili
 
 lili:
+  contract:
+    address: 4a971f4f4ff9637cd9286a0197b05
   #验证码设置
   verification-code:
     #图形验证码有效时间 秒 包含滑块验证码有效时间， 以及验证通过之后，缓存中存储的验证结果有效时间

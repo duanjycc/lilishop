@@ -3,7 +3,7 @@ package cn.lili.modules.liande.serviceimpl;
 
 import cn.lili.modules.liande.entity.dos.MakeAccount;
 import cn.lili.modules.liande.entity.dto.MakeAccountDTO;
-import cn.lili.modules.liande.entity.vos.MakeAccountVOS;
+import cn.lili.modules.liande.entity.vo.MakeAccountVO;
 import cn.lili.modules.liande.mapper.MakeAccountMapper;
 import cn.lili.modules.liande.service.IMakeAccountService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeAccount> implements IMakeAccountService {
 
     @Override
-    public MakeAccountVOS makeAccount(MakeAccountDTO makeAccountDTO) {
+    public MakeAccountVO makeAccount(MakeAccountDTO makeAccountDTO) {
         return null;
     }
 }

@@ -20,6 +20,7 @@ public enum VerificationEnums {
     REGISTER,
     FIND_USER,
     UPDATE_PASSWORD,
+    TRANSFER,
     WALLET_PASSWORD;
 }
 

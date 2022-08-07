@@ -14,6 +14,7 @@ import javax.validation.constraints.Size;
 @Data
 @AllArgsConstructor
 public class TransferDTO {
+
     @ApiModelProperty(value = "接收地址")
     @NotBlank(message = "请输入接收地址或扫描接收地址二维码")
     private String acceptAddress;
@@ -31,5 +32,8 @@ public class TransferDTO {
     @ApiModelProperty(value = "二级密码")
     @NotBlank(message = "请输入二级密码")
     private String secondPassword;
+
+    @ApiModelProperty(value = "")
+    private String uuid;
 
 }

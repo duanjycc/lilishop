@@ -479,7 +479,9 @@ public enum ResultCode {
     INDEX_BUILDING(90005, "索引正在生成"),
 
     /**转账相关*/
-    TRANSFER_COUNT_ERROR(100001, "转账SSD数量，不能大于账号SSD数量（不包括被冻结的SSD数量)");
+    TRANSFER_COUNT_ERROR(100001, "转账SSD数量，不能大于账号SSD数量（不包括被冻结的SSD数量)"),
+    TRANSFER_VERIFICATION_CODE_ERROR(100002, "验证码错误"),
+    TRANSFER_SECOND_PASSWORD_ERROR(100003, "二级密码错误");
 
     private final Integer code;
     private final String message;

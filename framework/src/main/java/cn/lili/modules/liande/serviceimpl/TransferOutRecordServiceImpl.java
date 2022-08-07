@@ -18,6 +18,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,9 +54,14 @@ public class TransferOutRecordServiceImpl extends ServiceImpl<TransferOutRecordM
     @Override
     public Boolean out(TransferDTO transfer) {
         Member acceptMember = queryMember(transfer.getAcceptAddress());
-
         Member transferorMember = queryMember(UserContext.getCurrentUser().getMember().getBlockAddress());
-        if (transfer.getTransferCount() > acceptMember.getSSD())
+
+        if (!new BCryptPasswordEncoder().matches(transfer.getSecondPassword(), transferorMember.getPaymentPassword()))
+            throw new ServiceException(ResultCode.TRANSFER_SECOND_PASSWORD_ERROR);
+
+        if (!transfer.getSecondPassword().equals(transferorMember.getPaymentPassword()))
+            throw new ServiceException(ResultCode.TRANSFER_SECOND_PASSWORD_ERROR);
+        if (transfer.getTransferCount() > transferorMember.getSSD())
             throw new ServiceException(ResultCode.TRANSFER_COUNT_ERROR);
 
         // 内部转账

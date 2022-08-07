@@ -8,6 +8,7 @@ import cn.lili.mybatis.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -38,6 +39,7 @@ public class Member extends BaseEntity {
     private String username;
 
     @ApiModelProperty(value = "会员密码")
+    @JsonIgnore
     private String password;
 
     @ApiModelProperty(value = "昵称")
@@ -57,6 +59,10 @@ public class Member extends BaseEntity {
 
     @ApiModelProperty(value = "会员地址")
     private String region;
+
+    @ApiModelProperty(value = "二级密码")
+    @JsonIgnore
+    private String paymentPassword;
 
     @NotEmpty(message = "手机号码不能为空")
     @ApiModelProperty(value = "手机号码", required = true)
@@ -103,12 +109,15 @@ public class Member extends BaseEntity {
     @ApiModelProperty(value = "SSD卷冻结数量")
     @TableField(value = "frozen_SSD")
     private Double frozenSSD;
+
     @ApiModelProperty(value = "SSD卷数量")
     @TableField(value = "SSD")
     private Double SSD;
     @ApiModelProperty(value = "区块地址")
     private String blockAddress;
+
     @ApiModelProperty(value = "区块密钥")
+    @JsonIgnore
     private String privateKey;
     @ApiModelProperty(value = "邀请人ID")
     private Long inviteeId;

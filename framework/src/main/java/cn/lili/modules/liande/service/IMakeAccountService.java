@@ -1,11 +1,9 @@
 
 package cn.lili.modules.liande.service;
 
-import cn.lili.common.security.context.UserContext;
 import cn.lili.modules.liande.entity.dos.MakeAccount;
 import cn.lili.modules.liande.entity.dto.MakeAccountDTO;
-import cn.lili.modules.liande.entity.vos.MakeAccountVOS;
-import cn.lili.modules.member.entity.dos.Member;
+import cn.lili.modules.liande.entity.vo.MakeAccountVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -19,5 +17,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface IMakeAccountService extends IService<MakeAccount> {
 
 
-    MakeAccountVOS makeAccount(MakeAccountDTO makeAccountDTO);
+    MakeAccountVO makeAccount(MakeAccountDTO makeAccountDTO);
 }

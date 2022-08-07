@@ -134,7 +134,6 @@ public class RechargeRecord extends Model<RechargeRecord> {
      * 内部转账构造函数
      */
     public RechargeRecord(String acceptMemId, String intoAddress, String contractAddress, Double amount) {
-        this.id =
         this.userId = Long.parseLong(acceptMemId);
         this.orderNo = Long.parseLong(new SimpleDateFormat("yyyyMMddHHmmsss").format(new Date()));
         this.paymentAddress = UserContext.getCurrentUser().getMember().getBlockAddress();

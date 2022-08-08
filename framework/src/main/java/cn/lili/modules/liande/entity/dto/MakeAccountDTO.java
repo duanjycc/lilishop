@@ -47,6 +47,7 @@ public class MakeAccountDTO {
      * 让利金额
      */
     @ApiModelProperty(value = "让利金额")
+    @NotBlank(message = "让利金额")
     private Double surrenderPrice;
 
 
@@ -54,6 +55,7 @@ public class MakeAccountDTO {
      * 让利比例
      */
     @ApiModelProperty(value = "让利比例")
+    @NotBlank(message = "让利比例")
     private Double surrenderRatio;
 
 
@@ -61,6 +63,7 @@ public class MakeAccountDTO {
      * 会员手机号
      */
     @ApiModelProperty(value = "会员手机号")
+    @NotBlank(message = "会员手机号")
     private String vipPhone;
 
 
@@ -96,6 +99,7 @@ public class MakeAccountDTO {
      * 做单时want单价
      */
     @ApiModelProperty(value = "做单时want单价")
+    @NotBlank(message = "做单时want单价")
     private String wantPrice;
 
 }

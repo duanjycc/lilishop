@@ -158,39 +158,56 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         String[]  strs=addressId.split(",");
         addressId=strs[strs.length-2];
         addressId= addressId.replace("\"/","");
+
         //根据区域ID查找部门
         QueryWrapper<Department> departmentQueryWrapper = new QueryWrapper();
         departmentQueryWrapper.eq("area_Code",addressId);
         Department department=separtmentMapper.selectOne(departmentQueryWrapper);
+        if(department !=null){
+            //根据部门ID查找区域负责人
+            QueryWrapper<AdminUser> adminUserQueryWrapper = new QueryWrapper();
+            adminUserQueryWrapper.eq("department_id",department.getId());
+            AdminUser adminUser=adminUserMapper.selectOne(adminUserQueryWrapper);
 
-        //根据部门ID查找区域负责人
-        QueryWrapper<AdminUser> adminUserQueryWrapper = new QueryWrapper();
-        adminUserQueryWrapper.eq("department_id",department.getId());
-        AdminUser adminUser=adminUserMapper.selectOne(adminUserQueryWrapper);
+            if(adminUser !=null){
+                //根据部门负责人查找角色
+                QueryWrapper<Role> RoleWrapper = new QueryWrapper();
+                RoleWrapper.eq("id",adminUser.getRoleIds());
+                Role role=roleMapper.selectOne(RoleWrapper);
+                if(role !=null){
+                    //根据角色分配比列给当前服务商分ssd
+                    QueryWrapper<Member> memberWrapper = new QueryWrapper();
+                    memberWrapper.eq("mobile",adminUser.getUsername());
+                    Member memberfws=memberMapper.selectOne(memberWrapper);
+                    memberfws.setSSD(memberfws.getSSD()+wantsum*Double.parseDouble(role.getDescription()));
+                    memberMapper.update(memberfws,memberWrapper);
 
-        //根据父部门ID查找上级服务商
-        QueryWrapper<AdminUser> sjadminUserQueryWrapper = new QueryWrapper();
-        sjadminUserQueryWrapper.eq("department_id",department.getParentId());
-        AdminUser sjadminUser=adminUserMapper.selectOne(sjadminUserQueryWrapper);
+                    if(department.getParentId() !=null){
+                        //根据父部门ID查找上级服务商
+                        QueryWrapper<AdminUser> sjadminUserQueryWrapper = new QueryWrapper();
+                        sjadminUserQueryWrapper.eq("department_id",department.getParentId());
+                        AdminUser sjadminUser=adminUserMapper.selectOne(sjadminUserQueryWrapper);
 
-        //根据部门负责人查找角色
-        QueryWrapper<Role> RoleWrapper = new QueryWrapper();
-        RoleWrapper.eq("id",adminUser.getRoleIds());
-        Role role=roleMapper.selectOne(RoleWrapper);
+                        if(sjadminUser !=null){
+                            //根据角色分配比列给当前服务商上级分ssd
+                            QueryWrapper<Member> sjmemberWrapper = new QueryWrapper();
+                            sjmemberWrapper.eq("mobile",sjadminUser.getUsername());
+                            Member sjmemberfws=memberMapper.selectOne(sjmemberWrapper);
+                            sjmemberfws.setSSD(sjmemberfws.getSSD()+wantsum*Double.parseDouble(role.getDescriptionParent()));
+                            memberMapper.update(sjmemberfws,sjmemberWrapper);
+                        }
 
-        //根据角色分配比列给当前服务商分ssd
-        QueryWrapper<Member> memberWrapper = new QueryWrapper();
-        memberWrapper.eq("mobile",adminUser.getUsername());
-        Member memberfws=memberMapper.selectOne(memberWrapper);
-        memberfws.setSSD(memberfws.getSSD()+wantsum*Double.parseDouble(role.getDescription()));
-        memberMapper.update(memberfws,memberWrapper);
 
-        //根据角色分配比列给当前服务商上级分ssd
-        QueryWrapper<Member> sjmemberWrapper = new QueryWrapper();
-        sjmemberWrapper.eq("mobile",sjadminUser.getUsername());
-        Member sjmemberfws=memberMapper.selectOne(sjmemberWrapper);
-        sjmemberfws.setSSD(sjmemberfws.getSSD()+wantsum*Double.parseDouble(role.getDescriptionParent()));
-        memberMapper.update(sjmemberfws,sjmemberWrapper);
+                    }
+
+                }
+
+            }
+
+
+        }
+
+
 
         return ResultUtil.success();
     }

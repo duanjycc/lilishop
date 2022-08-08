@@ -33,7 +33,4 @@ public class TransferDTO {
     @NotBlank(message = "请输入二级密码")
     private String secondPassword;
 
-    @ApiModelProperty(value = "")
-    private String uuid;
-
 }

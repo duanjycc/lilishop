@@ -4,6 +4,7 @@ import cn.lili.common.enums.ClientTypeEnum;
 import cn.lili.common.security.sensitive.Sensitive;
 import cn.lili.common.security.sensitive.enums.SensitiveStrategy;
 import cn.lili.common.utils.UuidUtils;
+import cn.lili.modules.permission.entity.dos.Role;
 import cn.lili.mybatis.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -19,6 +20,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -135,6 +137,10 @@ public class Member extends BaseEntity {
     @ApiModelProperty(value = "邀请我的人")
     @TableField(exist = false)
     private String inviteeMobile;
+
+    @ApiModelProperty(value = "角色")
+    @TableField(exist = false)
+    private List<Role> roles;
 
 
 

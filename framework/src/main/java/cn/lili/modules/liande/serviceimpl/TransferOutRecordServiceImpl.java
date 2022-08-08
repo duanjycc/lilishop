@@ -107,8 +107,6 @@ public class TransferOutRecordServiceImpl extends ServiceImpl<TransferOutRecordM
         if (!new BCryptPasswordEncoder().matches(transfer.getSecondPassword(), transferorMember.getPaymentPassword()))
             throw new ServiceException(ResultCode.TRANSFER_SECOND_PASSWORD_ERROR);
 
-        if (!transfer.getSecondPassword().equals(transferorMember.getPaymentPassword()))
-            throw new ServiceException(ResultCode.TRANSFER_SECOND_PASSWORD_ERROR);
         if (transfer.getTransferCount() > transferorMember.getSSD())
             throw new ServiceException(ResultCode.TRANSFER_COUNT_ERROR);
 

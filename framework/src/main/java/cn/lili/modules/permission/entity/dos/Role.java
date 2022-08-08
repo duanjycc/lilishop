@@ -31,4 +31,7 @@ public class Role extends BaseEntity {
     @ApiModelProperty(value = "备注")
     private String description;
 
+    @ApiModelProperty(value = "角色图标地址")
+    private String imgUrl;
+
 }

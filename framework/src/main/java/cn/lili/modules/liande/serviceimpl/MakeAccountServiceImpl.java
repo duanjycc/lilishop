@@ -79,10 +79,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         shWrapper.eq("type","merchantPoints");
         Configure sh=iConfigureService.getOne(shWrapper);
 
-        //邀请人获得SSD卷数
-        QueryWrapper<Configure> yqWrapper = new QueryWrapper();
-        yqWrapper.eq("type","invitation");
-        Configure yq=iConfigureService.getOne(yqWrapper);
+
 
         //当前登陆会员
         Member member = UserContext.getCurrentUser().getMember();
@@ -118,33 +115,39 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
             m.setInviteeId(Long.valueOf(member.getId()));
             memberService.registerHandler(me);
         }
+        //邀请人获得SSD卷数
+        QueryWrapper<Configure> yqWrapper = new QueryWrapper();
+        yqWrapper.eq("type","invitation");
+        Configure yq=iConfigureService.getOne(yqWrapper);
 
         //会员获得积分
         QueryWrapper<Member> userWrapper = new QueryWrapper();
         userWrapper.eq("mobile",makeAccountDTO.getVipPhone());
-        Member userMember=new Member();
+        Member userMember=memberMapper.selectOne(userWrapper);
         long jfh=(long)(jf.getNumericalAlue()*makeAccountDTO.getSurrenderPrice());
         userMember.setPoint(userMember.getPoint()+jfh);
         memberMapper.update(userMember,userWrapper);
         //商户获得积分
         QueryWrapper<Member> shangWrapper = new QueryWrapper();
-        userWrapper.eq("username",member.getUsername());
-        Member shnghMember=new Member();
+        shangWrapper.eq("username",member.getUsername());
+        Member shnghMember=memberMapper.selectOne(shangWrapper);
         long jfs=(long)(sh.getNumericalAlue()*makeAccountDTO.getSurrenderPrice());
         shnghMember.setPoint(shnghMember.getPoint()+jfs);
         memberMapper.update(shnghMember,shangWrapper);
 
         //邀请人获得SSD卷
         QueryWrapper<Member> yqrWrapper = new QueryWrapper();
-        queryWrapper.eq("mobile",makeAccountDTO.getVipPhone());
-        Member hy= memberMapper.selectOne(queryWrapper);
+        yqrWrapper.eq("mobile",makeAccountDTO.getVipPhone());
+        Member hy= memberMapper.selectOne(yqrWrapper);
 
         QueryWrapper<Member> yqrssdWrapper = new QueryWrapper();
         yqrssdWrapper.eq("id",hy.getInviteeId());
-        Member yqrMember=new Member();
+        Member yqrMember=memberMapper.selectOne(yqrssdWrapper);
+        if(yqrMember !=null){
+            yqrMember.setSSD(yqrMember.getSSD()+wantsum*(yq.getNumericalAlue().doubleValue()));
+            memberMapper.update(yqrMember,yqrssdWrapper);
+        }
 
-        yqrMember.setSSD(yqrMember.getSSD()+wantsum*(yq.getNumericalAlue().doubleValue()));
-        memberMapper.update(yqrMember,yqrssdWrapper);
 
         //区域服务商获得SSD卷
         //查出店铺所属服务商
@@ -154,25 +157,40 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         String addressId=st.getStoreAddressIdPath();
         String[]  strs=addressId.split(",");
         addressId=strs[strs.length-2];
-
+        addressId= addressId.replace("\"/","");
         //根据区域ID查找部门
         QueryWrapper<Department> departmentQueryWrapper = new QueryWrapper();
-        storeWrapper.eq("areaCode",addressId);
+        departmentQueryWrapper.eq("area_Code",addressId);
         Department department=separtmentMapper.selectOne(departmentQueryWrapper);
+
         //根据部门ID查找区域负责人
         QueryWrapper<AdminUser> adminUserQueryWrapper = new QueryWrapper();
-        storeWrapper.eq("departmentId",department.getId());
+        adminUserQueryWrapper.eq("department_id",department.getId());
         AdminUser adminUser=adminUserMapper.selectOne(adminUserQueryWrapper);
+
+        //根据父部门ID查找上级服务商
+        QueryWrapper<AdminUser> sjadminUserQueryWrapper = new QueryWrapper();
+        sjadminUserQueryWrapper.eq("department_id",department.getParentId());
+        AdminUser sjadminUser=adminUserMapper.selectOne(sjadminUserQueryWrapper);
 
         //根据部门负责人查找角色
         QueryWrapper<Role> RoleWrapper = new QueryWrapper();
-        storeWrapper.eq("id",adminUser.getRoleIds());
+        RoleWrapper.eq("id",adminUser.getRoleIds());
         Role role=roleMapper.selectOne(RoleWrapper);
 
         //根据角色分配比列给当前服务商分ssd
-
+        QueryWrapper<Member> memberWrapper = new QueryWrapper();
+        memberWrapper.eq("mobile",adminUser.getUsername());
+        Member memberfws=memberMapper.selectOne(memberWrapper);
+        memberfws.setSSD(memberfws.getSSD()+wantsum*Double.parseDouble(role.getDescription()));
+        memberMapper.update(memberfws,memberWrapper);
 
         //根据角色分配比列给当前服务商上级分ssd
+        QueryWrapper<Member> sjmemberWrapper = new QueryWrapper();
+        sjmemberWrapper.eq("mobile",sjadminUser.getUsername());
+        Member sjmemberfws=memberMapper.selectOne(sjmemberWrapper);
+        sjmemberfws.setSSD(sjmemberfws.getSSD()+wantsum*Double.parseDouble(role.getDescriptionParent()));
+        memberMapper.update(sjmemberfws,sjmemberWrapper);
 
         return ResultUtil.success();
     }

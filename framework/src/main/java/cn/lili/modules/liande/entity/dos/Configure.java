@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>
@@ -19,6 +20,7 @@ import lombok.EqualsAndHashCode;
  * @since 2022-08-05
  */
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @TableName("w_configure")
 @ApiModel(value = "Configure对象", description = "")
@@ -52,6 +54,6 @@ public class Configure extends Model<Configure> {
      * 说明
      */
     @ApiModelProperty(value = "说明")
-    private String explain;
+    private String remark;
 
 }

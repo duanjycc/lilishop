@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>
@@ -28,6 +29,7 @@ import lombok.EqualsAndHashCode;
  * @since 2022-08-05
  */
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @TableName("w_recharge_record")
 @ApiModel(value = "RechargeRecord对象", description = "转入明细")
@@ -105,7 +107,7 @@ public class RechargeRecord extends Model<RechargeRecord> {
      * 转入时间
      */
     @ApiModelProperty(value = "转入时间")
-    private LocalDateTime rechargeTime;
+    private Date rechargeTime;
 
     @ApiModelProperty(value = "状态：0已经到账，1正在转")
     private String rechargeStatus;
@@ -113,7 +115,7 @@ public class RechargeRecord extends Model<RechargeRecord> {
      * 到账时间
      */
     @ApiModelProperty(value = "到账时间")
-    private LocalDateTime intoTime;
+    private Date intoTime;
 
 
     /**
@@ -143,8 +145,8 @@ public class RechargeRecord extends Model<RechargeRecord> {
         this.arrivalAmount = amount;
         this.serviceCharge = 0.00;
         this.rechargeStatus = DelStatusEnum.USE.getType();
-        this.rechargeTime = LocalDateTime.now();
-        this.intoTime = LocalDateTime.now();
+        this.rechargeTime =  new Date();
+        this.intoTime = new Date();
         this.type = "0";
     }
 }

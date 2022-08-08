@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
@@ -56,7 +57,7 @@ public class ServiceProviderIncome extends Model<ServiceProviderIncome> {
      * 创建时间
      */
     @ApiModelProperty(value = "创建时间")
-    private LocalDateTime creationTime;
+    private Date creationTime;
 
 
     /**

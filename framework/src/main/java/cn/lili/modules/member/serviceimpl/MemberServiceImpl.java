@@ -250,7 +250,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             member.setMyRegionId(dept.getId());
             member.setMyRegion(dept.getTitle());
             member.setMyParentRegion(ObjectUtils.isEmpty(parentDept) ? null : parentDept.getTitle());
-            member.setInviteeMobile(ObjectUtils.isEmpty(member) ? null : baseMapper.selectById(member.getInviteeId()).getMobile());
+            member.setInviteeMobile(ObjectUtils.isEmpty(member.getInviteeId()) ? null : baseMapper.selectById(member.getInviteeId()).getMobile());
         }
 
         //如果手机号不存在则自动注册用户
@@ -259,7 +259,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             registerHandler(member);
         }
         loginBindUser(member);
-        return memberTokenGenerate.createToken(member, false);
+        return memberTokenGenerate.createToken(member, true);
     }
 
     /**

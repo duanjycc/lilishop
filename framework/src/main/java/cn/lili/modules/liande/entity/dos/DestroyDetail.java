@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -47,7 +48,7 @@ public class DestroyDetail extends Model<DestroyDetail> {
      * 销毁时间
      */
     @ApiModelProperty(value = "销毁时间")
-    private LocalDateTime destroyTime;
+    private Date destroyTime;
 
 
     /**
@@ -82,7 +83,7 @@ public class DestroyDetail extends Model<DestroyDetail> {
      * 创建时间
      */
     @ApiModelProperty(value = "创建时间")
-    private LocalDateTime createTime;
+    private Date createTime;
 
 
     /**

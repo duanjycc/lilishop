@@ -28,7 +28,11 @@ public class Role extends BaseEntity {
     @ApiModelProperty(value = "是否为注册默认角色")
     private Boolean defaultRole;
 
-    @ApiModelProperty(value = "备注")
+    @ApiModelProperty(value = "备注服务商获取比例")
     private String description;
+
+
+    @ApiModelProperty(value = "备注服务商上级获取比例")
+    private String description_d;
 
 }

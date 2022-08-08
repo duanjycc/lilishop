@@ -1,14 +1,39 @@
 
 package cn.lili.modules.liande.serviceimpl;
 
+import cn.lili.common.enums.ResultCode;
+import cn.lili.common.enums.ResultUtil;
+import cn.lili.common.security.AuthUser;
+import cn.lili.common.security.context.UserContext;
+import cn.lili.common.vo.ResultMessage;
+import cn.lili.modules.liande.entity.dos.Configure;
 import cn.lili.modules.liande.entity.dos.MakeAccount;
 import cn.lili.modules.liande.entity.dto.MakeAccountDTO;
 import cn.lili.modules.liande.entity.vos.MakeAccountVOS;
 import cn.lili.modules.liande.mapper.MakeAccountMapper;
+import cn.lili.modules.liande.service.IConfigureService;
 import cn.lili.modules.liande.service.IMakeAccountService;
+import cn.lili.modules.member.entity.dos.Member;
+import cn.lili.modules.member.entity.vo.GoodsCollectionVO;
+import cn.lili.modules.member.entity.vo.MemberVO;
+import cn.lili.modules.member.mapper.MemberMapper;
+import cn.lili.modules.member.service.MemberService;
+import cn.lili.modules.permission.entity.dos.AdminUser;
+import cn.lili.modules.permission.entity.dos.Department;
+import cn.lili.modules.permission.entity.dos.Role;
+import cn.lili.modules.permission.mapper.AdminUserMapper;
+import cn.lili.modules.permission.mapper.DepartmentMapper;
+import cn.lili.modules.permission.mapper.RoleMapper;
+import cn.lili.modules.store.entity.dos.Store;
+import cn.lili.modules.store.mapper.StoreMapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.UUID;
 
 /**
  * <p>
@@ -22,8 +47,134 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeAccount> implements IMakeAccountService {
 
+    @Autowired
+    private MemberMapper memberMapper;
+
+    @Autowired
+    private MemberService memberService;
+
+    @Autowired
+    private IConfigureService iConfigureService;
+
+    @Autowired
+    StoreMapper storeMapper;
+
+    @Autowired
+    DepartmentMapper separtmentMapper;
+
+    @Autowired
+    AdminUserMapper adminUserMapper;
+
+    @Autowired
+    RoleMapper roleMapper;
     @Override
-    public MakeAccountVOS makeAccount(MakeAccountDTO makeAccountDTO) {
-        return null;
+    public ResultMessage<Boolean> makeAccount(MakeAccountDTO makeAccountDTO) {
+
+        //用户积分倍数
+        QueryWrapper<Configure> jfWrapper = new QueryWrapper();
+        jfWrapper.eq("type","userPoints");
+        Configure jf=iConfigureService.getOne(jfWrapper);
+
+        //商户积分倍数
+        QueryWrapper<Configure> shWrapper = new QueryWrapper();
+        shWrapper.eq("type","merchantPoints");
+        Configure sh=iConfigureService.getOne(shWrapper);
+
+        //邀请人获得SSD卷数
+        QueryWrapper<Configure> yqWrapper = new QueryWrapper();
+        yqWrapper.eq("type","invitation");
+        Configure yq=iConfigureService.getOne(yqWrapper);
+
+        //当前登陆会员
+        Member member = UserContext.getCurrentUser().getMember();
+
+
+        //计算需要卷的数量
+        Double wantPrice=Double.valueOf(makeAccountDTO.getWantPrice());
+        Double wantsum=makeAccountDTO.getSurrenderPrice()/wantPrice;
+        if(wantsum>member.getSSD()){
+            return ResultUtil.error(ResultCode.INSUFFICIENT_QUANTITY_ERROR);
+        }
+
+        //查找做单会员用户存不存在，不存在就注册一个
+        QueryWrapper<Member> queryWrapper = new QueryWrapper();
+        queryWrapper.eq("mobile",makeAccountDTO.getVipPhone());
+        Member m= memberMapper.selectOne(queryWrapper);
+        if(m==null){
+            //注册用户后继续做单
+            Member me=new Member();
+            me.setUsername(makeAccountDTO.getVipPhone());
+            String password=new BCryptPasswordEncoder().encode(makeAccountDTO.getVipPhone().substring(makeAccountDTO.getVipPhone().length() - 6));
+            me.setPassword(password);
+            me.setNickName(makeAccountDTO.getVipPhone());
+            me.setSex(1);
+            me.setMobile(makeAccountDTO.getVipPhone());
+            me.setPoint(0l);
+            me.setDisabled(true);
+            me.setHaveStore(false);
+            m.setFrozenSSD(0.0);
+            m.setSSD(0.0);
+            m.setBlockAddress(UUID.randomUUID().toString());
+            m.setPrivateKey(UUID.randomUUID().toString());
+            m.setInviteeId(Long.valueOf(member.getId()));
+            memberService.registerHandler(me);
+        }
+
+        //会员获得积分
+        QueryWrapper<Member> userWrapper = new QueryWrapper();
+        userWrapper.eq("mobile",makeAccountDTO.getVipPhone());
+        Member userMember=new Member();
+        long jfh=(long)(jf.getNumericalAlue()*makeAccountDTO.getSurrenderPrice());
+        userMember.setPoint(userMember.getPoint()+jfh);
+        memberMapper.update(userMember,userWrapper);
+        //商户获得积分
+        QueryWrapper<Member> shangWrapper = new QueryWrapper();
+        userWrapper.eq("username",member.getUsername());
+        Member shnghMember=new Member();
+        long jfs=(long)(sh.getNumericalAlue()*makeAccountDTO.getSurrenderPrice());
+        shnghMember.setPoint(shnghMember.getPoint()+jfs);
+        memberMapper.update(shnghMember,shangWrapper);
+
+        //邀请人获得SSD卷
+        QueryWrapper<Member> yqrWrapper = new QueryWrapper();
+        queryWrapper.eq("mobile",makeAccountDTO.getVipPhone());
+        Member hy= memberMapper.selectOne(queryWrapper);
+
+        QueryWrapper<Member> yqrssdWrapper = new QueryWrapper();
+        yqrssdWrapper.eq("id",hy.getInviteeId());
+        Member yqrMember=new Member();
+
+        yqrMember.setSSD(yqrMember.getSSD()+wantsum*(yq.getNumericalAlue().doubleValue()));
+        memberMapper.update(yqrMember,yqrssdWrapper);
+
+        //区域服务商获得SSD卷
+        //查出店铺所属服务商
+        QueryWrapper<Store> storeWrapper = new QueryWrapper();
+        storeWrapper.eq("id",makeAccountDTO.getMerId());
+        Store st =storeMapper.selectOne(storeWrapper);
+        String addressId=st.getStoreAddressIdPath();
+        String[]  strs=addressId.split(",");
+        addressId=strs[strs.length-2];
+
+        //根据区域ID查找部门
+        QueryWrapper<Department> departmentQueryWrapper = new QueryWrapper();
+        storeWrapper.eq("areaCode",addressId);
+        Department department=separtmentMapper.selectOne(departmentQueryWrapper);
+        //根据部门ID查找区域负责人
+        QueryWrapper<AdminUser> adminUserQueryWrapper = new QueryWrapper();
+        storeWrapper.eq("departmentId",department.getId());
+        AdminUser adminUser=adminUserMapper.selectOne(adminUserQueryWrapper);
+
+        //根据部门负责人查找角色
+        QueryWrapper<Role> RoleWrapper = new QueryWrapper();
+        storeWrapper.eq("id",adminUser.getRoleIds());
+        Role role=roleMapper.selectOne(RoleWrapper);
+
+        //根据角色分配比列给当前服务商分ssd
+
+
+        //根据角色分配比列给当前服务商上级分ssd
+
+        return ResultUtil.success();
     }
 }

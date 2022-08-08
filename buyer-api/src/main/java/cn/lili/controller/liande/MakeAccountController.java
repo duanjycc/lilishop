@@ -30,9 +30,9 @@ public class MakeAccountController {
 
     @ApiOperation(value = "做单")
     @GetMapping("/makeAccount")
-    public ResultMessage<MakeAccountVOS> makeAccount(MakeAccountDTO makeAccountDTO) {
+    public ResultMessage<Boolean> makeAccount(MakeAccountDTO makeAccountDTO) {
 
-        MakeAccountVOS m=iMakeAccountService.makeAccount(makeAccountDTO);
-        return null;
+        ResultMessage<Boolean> b=iMakeAccountService.makeAccount(makeAccountDTO);
+        return ResultUtil.success();
     }
 }

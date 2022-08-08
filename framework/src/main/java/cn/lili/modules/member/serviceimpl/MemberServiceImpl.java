@@ -733,10 +733,4 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             throw new ServiceException(ResultCode.USER_EXIST);
         }
     }
-
-    public static void main(String[] args) {
-        String s = "1553590408433025025,155359040843302502334";
-        List<String> strings = Arrays.asList(s.split(","));
-        System.out.println(  strings.size() );
-    }
 }

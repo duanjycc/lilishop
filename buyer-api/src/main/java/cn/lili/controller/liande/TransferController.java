@@ -32,10 +32,10 @@ public class TransferController {
     @ApiOperation(value = "转账")
     @PostMapping("/accounts")
     public ResultMessage<Object> accounts(@RequestBody TransferDTO transfer, @RequestHeader String uuid) {
-        if (!smsUtil.verifyCode(UserContext.getCurrentUser().getMember().getMobile(), VerificationEnums.TRANSFER, uuid, transfer.getVerificationCode())) {
-            throw new ServiceException(ResultCode.TRANSFER_VERIFICATION_CODE_ERROR);
+        if (smsUtil.verifyCode(UserContext.getCurrentUser().getMember().getMobile(), VerificationEnums.TRANSFER, uuid, transfer.getVerificationCode())) {
+            return ResultUtil.data(transferService.accounts(transfer));
         }
-        return ResultUtil.data(transferService.accounts(transfer));
+        throw new ServiceException(ResultCode.TRANSFER_VERIFICATION_CODE_ERROR);
     }
 
 

@@ -3,6 +3,7 @@ package cn.lili.modules.liande.service;
 
 import cn.lili.modules.liande.entity.dos.Configure;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.apache.poi.ss.formula.functions.T;
 
 /**
  * <p>
@@ -18,5 +19,6 @@ public interface IConfigureService extends IService<Configure> {
      * 获取SSD单价
      * @return
      */
-    Double querySssUnitPrice();
+    Object queryConfigureByType(String type);
+
 }

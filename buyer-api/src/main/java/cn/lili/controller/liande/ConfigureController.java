@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -21,9 +22,9 @@ public class ConfigureController {
     @Autowired
     private IConfigureService configureService;
 
-    @ApiOperation(value = "获取SSD单价")
-    @GetMapping("/querySssUnitPrice")
-    public ResultMessage<Double> querySssUnitPrice() {
-        return ResultUtil.data(configureService.querySssUnitPrice());
+    @ApiOperation(value = "根据类型获取配置")
+    @GetMapping("/queryConfigureByType")
+    public ResultMessage<Object> queryConfigureByType(@RequestParam String type) {
+        return ResultUtil.data(configureService.queryConfigureByType(type));
     }
 }

@@ -246,7 +246,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         if (ObjectUtils.isNotEmpty(adminUser)) {
             Department dept = departmentService.getById(adminUser.getDepartmentId());
             Department parentDept = departmentService.getById(dept.getParentId());
-            List<Role> roles = roleService.list(new QueryWrapper<Role>().lambda().in(Role::getId,Arrays.asList(adminUser.getRoleIds().split(","))));
+            List<Role> roles = roleService.list(new QueryWrapper<Role>().lambda().eq(Role::getDeleteFlag,false).in(Role::getId,Arrays.asList(adminUser.getRoleIds().split(","))));
             member.setMyRegionId(dept.getId());
             member.setMyRegion(dept.getTitle());
             member.setMyParentRegion(ObjectUtils.isEmpty(parentDept) ? null : parentDept.getTitle());

@@ -8,6 +8,7 @@ import cn.lili.modules.liande.mapper.ConfigureMapper;
 import cn.lili.modules.liande.service.IConfigureService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,8 +29,8 @@ public class ConfigureServiceImpl extends ServiceImpl<ConfigureMapper, Configure
      * @return
      */
     @Override
-    public Double querySssUnitPrice() {
-        Configure unitPrice = baseMapper.selectOne(new QueryWrapper<Configure>().lambda().eq(Configure::getType, "unitPrice"));
+    public Object queryConfigureByType(String type) {
+        Configure unitPrice = baseMapper.selectOne(new QueryWrapper<Configure>().lambda().eq(Configure::getType, type));
         return unitPrice.getNumericalAlue();
     }
 }

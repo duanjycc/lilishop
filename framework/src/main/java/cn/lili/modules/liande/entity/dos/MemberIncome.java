@@ -14,6 +14,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>
@@ -24,6 +25,7 @@ import lombok.EqualsAndHashCode;
  * @since 2022-08-05
  */
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @TableName("w_member_income")
 @ApiModel(value = "MemberIncome对象", description = "会员收益表")

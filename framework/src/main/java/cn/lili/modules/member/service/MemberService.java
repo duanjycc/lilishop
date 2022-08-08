@@ -120,6 +120,14 @@ public interface MemberService extends IService<Member> {
     void initPass(String password);
 
     /**
+     * 设置支付密码
+     *
+     * @param password 密码
+     * @return 操作结果
+     */
+    void setUpPaymentPassword(String password);
+
+    /**
      * 注销账号
      *
      * @param password 密码

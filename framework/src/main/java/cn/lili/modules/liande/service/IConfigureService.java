@@ -14,4 +14,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IConfigureService extends IService<Configure> {
 
+    /**
+     * 获取SSD单价
+     * @return
+     */
+    Double querySssUnitPrice();
 }

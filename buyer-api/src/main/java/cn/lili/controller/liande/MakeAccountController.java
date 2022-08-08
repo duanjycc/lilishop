@@ -34,5 +34,8 @@ public class MakeAccountController {
 
         ResultMessage<Boolean> b=iMakeAccountService.makeAccount(makeAccountDTO);
         return ResultUtil.success();
+    public ResultMessage<MakeAccountVO> makeAccount(MakeAccountDTO makeAccountDTO) {
+        MakeAccountVO m = makeAccountService.makeAccount(makeAccountDTO);
+        return null;
     }
 }

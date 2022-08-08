@@ -1,6 +1,6 @@
 package cn.lili.modules.liande.serviceimpl;
 
-import cn.lili.modules.liande.entity.vos.HomeSsdCount;
+import cn.lili.modules.liande.entity.vo.HomeSsdCountVO;
 import cn.lili.modules.liande.mapper.DestroyDetailMapper;
 import cn.lili.modules.liande.service.IHomeSsdCountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +21,8 @@ public class HomeSsdCountServiceImpl implements IHomeSsdCountService {
      * @return
      */
     @Override
-    public HomeSsdCount count() {
-        HomeSsdCount count = new HomeSsdCount();
+    public HomeSsdCountVO count() {
+        HomeSsdCountVO count = new HomeSsdCountVO();
         count.setSum( destroyDetailMapper.sum());
         count.setYesterdayCount( destroyDetailMapper.yesterdaySum() );
         return count;

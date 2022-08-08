@@ -1,6 +1,6 @@
 package cn.lili.modules.liande.service;
 
-import cn.lili.modules.liande.entity.vos.HomeSsdCount;
+import cn.lili.modules.liande.entity.vo.HomeSsdCountVO;
 
 /**
  * 首页ssd统计业务层
@@ -11,5 +11,5 @@ import cn.lili.modules.liande.entity.vos.HomeSsdCount;
 public interface IHomeSsdCountService {
 
 
-    HomeSsdCount count();
+    HomeSsdCountVO count();
 }

@@ -20,10 +20,10 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface DestroyDetailMapper extends BaseMapper<DestroyDetail> {
 
-    @Select("select SUM(want_count) from w_destroy_detail where status = '0' ")
+    @Select("select IFNULL(SUM(want_count),0)  from w_destroy_detail where status = '0' ")
     Double sum();
 
-    @Select("select SUM(want_count) from w_destroy_detail where status = '0' and  left(destroy_time,10) = left(now(),10) ")
+    @Select("select IFNULL(SUM(want_count),0)  from w_destroy_detail where status = '0' and  left(destroy_time,10) = left(now(),10) ")
     Double yesterdaySum();
 
 }

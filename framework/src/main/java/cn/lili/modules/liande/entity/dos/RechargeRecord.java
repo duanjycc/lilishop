@@ -4,6 +4,8 @@
 package cn.lili.modules.liande.entity.dos;
 
 import cn.lili.common.security.context.UserContext;
+import cn.lili.modules.liande.entity.enums.DelStatusEnum;
+import cn.lili.trigger.enums.DelayTypeEnums;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -16,6 +18,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>
@@ -26,6 +29,7 @@ import lombok.EqualsAndHashCode;
  * @since 2022-08-05
  */
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @TableName("w_recharge_record")
 @ApiModel(value = "RechargeRecord对象", description = "转入明细")
@@ -103,14 +107,15 @@ public class RechargeRecord extends Model<RechargeRecord> {
      * 转入时间
      */
     @ApiModelProperty(value = "转入时间")
-    private LocalDateTime rechargeTime;
+    private Date rechargeTime;
 
-
+    @ApiModelProperty(value = "状态：0已经到账，1正在转")
+    private String rechargeStatus;
     /**
      * 到账时间
      */
     @ApiModelProperty(value = "到账时间")
-    private LocalDateTime intoTime;
+    private Date intoTime;
 
 
     /**
@@ -131,7 +136,6 @@ public class RechargeRecord extends Model<RechargeRecord> {
      * 内部转账构造函数
      */
     public RechargeRecord(String acceptMemId, String intoAddress, String contractAddress, Double amount) {
-        this.id =
         this.userId = Long.parseLong(acceptMemId);
         this.orderNo = Long.parseLong(new SimpleDateFormat("yyyyMMddHHmmsss").format(new Date()));
         this.paymentAddress = UserContext.getCurrentUser().getMember().getBlockAddress();
@@ -140,8 +144,9 @@ public class RechargeRecord extends Model<RechargeRecord> {
         this.rechargeAmount = amount;
         this.arrivalAmount = amount;
         this.serviceCharge = 0.00;
-        this.rechargeTime = LocalDateTime.now();
-        this.intoTime = LocalDateTime.now();
+        this.rechargeStatus = DelStatusEnum.USE.getType();
+        this.rechargeTime =  new Date();
+        this.intoTime = new Date();
         this.type = "0";
     }
 }

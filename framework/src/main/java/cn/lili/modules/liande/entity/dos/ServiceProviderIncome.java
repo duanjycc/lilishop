@@ -7,12 +7,14 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>
@@ -23,6 +25,7 @@ import lombok.EqualsAndHashCode;
  * @since 2022-08-05
  */
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @TableName("w_service_provider_income")
 @ApiModel(value = "ServiceProviderIncome对象", description = "服务商收益表")
@@ -56,7 +59,7 @@ public class ServiceProviderIncome extends Model<ServiceProviderIncome> {
      * 创建时间
      */
     @ApiModelProperty(value = "创建时间")
-    private LocalDateTime creationTime;
+    private Date creationTime;
 
 
     /**

@@ -19,5 +19,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IMakeAccountService extends IService<MakeAccount> {
 
+
+    MakeAccountVO makeAccount(MakeAccountDTO makeAccountDTO);
     ResultMessage<Boolean> makeAccount(MakeAccountDTO makeAccountDTO);
 }

@@ -6,9 +6,14 @@ package cn.lili.modules.liande.serviceimpl;
 import cn.lili.modules.liande.entity.dos.Configure;
 import cn.lili.modules.liande.mapper.ConfigureMapper;
 import cn.lili.modules.liande.service.IConfigureService;
+import cn.lili.modules.member.entity.dos.Member;
+import cn.lili.modules.member.mapper.MemberMapper;
+import cn.lili.modules.member.service.MemberService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.poi.ss.formula.functions.T;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,13 +29,23 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class ConfigureServiceImpl extends ServiceImpl<ConfigureMapper, Configure> implements IConfigureService {
 
+
+    @Autowired
+    private MemberMapper memberMapper;
+
     /**
      * 获取SSD单价
      * @return
      */
     @Override
-    public Object queryConfigureByType(String type) {
+    public Object queryConfigureByType(String type,String blockAddress) {
+        Member member = queryMember(blockAddress);
         Configure unitPrice = baseMapper.selectOne(new QueryWrapper<Configure>().lambda().eq(Configure::getType, type));
-        return unitPrice.getNumericalAlue();
+        return ObjectUtils.isEmpty(member) ? 0 : unitPrice.getNumericalAlue();
+    }
+
+    private Member queryMember(String address) {
+        return memberMapper.selectOne(new QueryWrapper<Member>().lambda().eq(Member::getBlockAddress, address)
+                .eq(Member::getDeleteFlag, false));
     }
 }

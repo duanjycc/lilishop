@@ -178,6 +178,8 @@ jasypt:
     password: lili
 
 lili:
+  contract:
+    address: 4a971f4f4ff9637cd9286a0197b05
   system:
     isDemoSite: true
   statistics:

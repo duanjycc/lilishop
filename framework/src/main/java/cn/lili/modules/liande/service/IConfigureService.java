@@ -19,6 +19,6 @@ public interface IConfigureService extends IService<Configure> {
      * 获取SSD单价
      * @return
      */
-    Object queryConfigureByType(String type);
+    Object queryConfigureByType(String type,String blockAddress);
 
 }

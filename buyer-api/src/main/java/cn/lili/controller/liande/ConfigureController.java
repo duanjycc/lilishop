@@ -24,7 +24,7 @@ public class ConfigureController {
 
     @ApiOperation(value = "根据类型获取配置")
     @GetMapping("/queryConfigureByType")
-    public ResultMessage<Object> queryConfigureByType(@RequestParam String type) {
-        return ResultUtil.data(configureService.queryConfigureByType(type));
+    public ResultMessage<Object> queryConfigureByType(@RequestParam String type,@RequestParam String blockAddress) {
+        return ResultUtil.data(configureService.queryConfigureByType(type ,blockAddress));
     }
 }

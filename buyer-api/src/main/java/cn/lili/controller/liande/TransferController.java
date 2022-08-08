@@ -33,9 +33,9 @@ public class TransferController {
     @PostMapping("/accounts")
     public ResultMessage<Object> accounts(@RequestBody TransferDTO transfer, @RequestHeader String uuid) {
         if (smsUtil.verifyCode(UserContext.getCurrentUser().getMember().getMobile(), VerificationEnums.TRANSFER, uuid, transfer.getVerificationCode())) {
-            throw new ServiceException(ResultCode.TRANSFER_VERIFICATION_CODE_ERROR);
+            return ResultUtil.data(transferService.accounts(transfer));
         }
-        return ResultUtil.data(transferService.accounts(transfer));
+        throw new ServiceException(ResultCode.TRANSFER_VERIFICATION_CODE_ERROR);
     }
 
 

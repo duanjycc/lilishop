@@ -2,6 +2,7 @@ package cn.lili.common.security;
 
 import cn.lili.common.security.enums.UserEnums;
 import cn.lili.modules.member.entity.dos.Member;
+import cn.lili.modules.permission.entity.dos.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -65,6 +66,7 @@ public class AuthUser implements Serializable {
     private Boolean isSuper = false;
 
     private Member member;
+    private Role roles;
 
     public AuthUser(String username, String id, String nickName, String face, UserEnums role) {
         this.username = username;

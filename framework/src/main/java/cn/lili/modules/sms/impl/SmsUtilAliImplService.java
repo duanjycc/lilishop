@@ -86,6 +86,10 @@ public class SmsUtilAliImplService implements SmsUtil, AliSmsUtil {
                 templateCode = smsTemplateProperties.getLOGIN();
                 break;
             }
+            case TRANSFER:{
+                templateCode = smsTemplateProperties.getLOGIN();
+                break;
+            }
             //注册
             case REGISTER: {
                 templateCode = smsTemplateProperties.getREGISTER();

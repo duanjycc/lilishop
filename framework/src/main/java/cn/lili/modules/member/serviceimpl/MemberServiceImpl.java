@@ -56,10 +56,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 会员接口业务层实现
@@ -106,6 +103,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
     @Autowired
     private DepartmentService departmentService;
+    @Autowired
+    private RoleService roleService;
 
     /**
      * 缓存
@@ -244,13 +243,15 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         queryWrapper.eq("mobile", mobilePhone);
         Member member = this.baseMapper.selectOne(queryWrapper);
         AdminUser adminUser = adminUserService.findByMobile(mobilePhone);
-        if (ObjectUtils.isNotEmpty(adminUser)){
+        if (ObjectUtils.isNotEmpty(adminUser)) {
             Department dept = departmentService.getById(adminUser.getDepartmentId());
             Department parentDept = departmentService.getById(dept.getParentId());
+            List<Role> roles = roleService.list(new QueryWrapper<Role>().lambda().in(Role::getId,Arrays.asList(adminUser.getRoleIds().split(","))));
             member.setMyRegionId(dept.getId());
             member.setMyRegion(dept.getTitle());
             member.setMyParentRegion(ObjectUtils.isEmpty(parentDept) ? null : parentDept.getTitle());
             member.setInviteeMobile(ObjectUtils.isEmpty(member.getInviteeId()) ? null : baseMapper.selectById(member.getInviteeId()).getMobile());
+            member.setRoles(roles);
         }
 
         //如果手机号不存在则自动注册用户
@@ -475,7 +476,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         //按照电话号码查询
         queryWrapper.like(CharSequenceUtil.isNotBlank(memberSearchVO.getMobile()), "mobile", memberSearchVO.getMobile());
         //按照邀请认查询
-        queryWrapper.eq(ObjectUtils.isNotEmpty(memberSearchVO.getInviteeId()),"invitee_id",memberSearchVO.getInviteeId());
+        queryWrapper.eq(ObjectUtils.isNotEmpty(memberSearchVO.getInviteeId()), "invitee_id", memberSearchVO.getInviteeId());
         //按照会员状态查询
         queryWrapper.eq(CharSequenceUtil.isNotBlank(memberSearchVO.getDisabled()), "disabled",
                 memberSearchVO.getDisabled().equals(SwitchEnum.OPEN.name()) ? 1 : 0);

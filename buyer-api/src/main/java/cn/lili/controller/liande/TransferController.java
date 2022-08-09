@@ -41,14 +41,14 @@ public class TransferController {
 
     @ApiOperation(value = "转出明细")
     @PostMapping("/out/details")
-    public ResultMessage<IPage<TransferOutRecord>> transferOutDetails(PageVO pageVo, @RequestBody QueryTransferDTO dto) {
-        return ResultUtil.data(transferService.transferOutDetails(pageVo, dto));
+    public ResultMessage<IPage<TransferOutRecord>> transferOutDetails(PageVO pageVo, @RequestParam String beginDate,@RequestParam String endDate) {
+        return ResultUtil.data(transferService.transferOutDetails(pageVo, beginDate,endDate));
     }
 
 
     @ApiOperation(value = "转入明细")
     @PostMapping("/in/details")
-    public ResultMessage<IPage<RechargeRecord>> transferInDetails(PageVO pageVo, @RequestBody QueryTransferDTO dto) {
-        return ResultUtil.data(transferService.transferInDetails(pageVo, dto));
+    public ResultMessage<IPage<RechargeRecord>> transferInDetails(PageVO pageVo,  @RequestParam String beginDate,@RequestParam String endDate){
+        return ResultUtil.data(transferService.transferInDetails(pageVo, beginDate,endDate));
     }
 }

@@ -729,9 +729,10 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
      */
     @Override
     public void logout(UserEnums userEnums) {
-        String currentUserToken = UserContext.getCurrentUserToken();
-        if (CharSequenceUtil.isNotEmpty(currentUserToken)) {
-            cache.remove(CachePrefix.ACCESS_TOKEN.getPrefix(userEnums) + currentUserToken);
+        String mobile = UserContext.getCurrentUser().getMember().getMobile();
+        String key = CachePrefix.ACCESS_TOKEN.getPrefix(userEnums)+":"+ mobile;
+        if (CharSequenceUtil.isNotEmpty(mobile)) {
+            cache.remove(key);
         }
     }
 

@@ -9,6 +9,7 @@ import cn.lili.modules.liande.entity.dto.TransferDTO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.Date;
 
 
 /**
@@ -29,13 +30,17 @@ public interface ITransferOutRecordService extends IService<TransferOutRecord> {
 
     /**
      * 转出明细
-     * @param dto
+     * @param pageVo
+     * @param beginDate
+     * @param endDate
      */
-    IPage<TransferOutRecord> transferOutDetails(PageVO pageVo,QueryTransferDTO dto);
+    IPage<TransferOutRecord> transferOutDetails(PageVO pageVo, String beginDate, String endDate);
 
     /**
      * 转入明细
-     * @param dto
+     * @param pageVo
+     * @param beginDate
+     * @param endDate
      */
-    IPage<RechargeRecord> transferInDetails(PageVO pageVo, QueryTransferDTO dto);
+    IPage<RechargeRecord> transferInDetails(PageVO pageVo, String beginDate,String endDate);
 }

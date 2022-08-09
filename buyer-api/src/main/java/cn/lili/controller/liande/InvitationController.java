@@ -1,6 +1,9 @@
 package cn.lili.controller.liande;
 
+import cn.lili.common.enums.ResultCode;
 import cn.lili.common.enums.ResultUtil;
+import cn.lili.common.enums.SwitchEnum;
+import cn.lili.common.exception.ServiceException;
 import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.context.UserContext;
 import cn.lili.common.vo.PageVO;
@@ -18,10 +21,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.constraints.NotNull;
+import java.util.Optional;
 
 
 /**
@@ -45,10 +48,18 @@ public class InvitationController {
         return ResultUtil.data(ObjectUtils.isEmpty(member.getInviteeId())? false : true);
     }
 
+    @ApiOperation(value = "绑定邀请人")
+    @GetMapping("/bind/invitee")
+    public ResultMessage<Object> bindInvitee(@NotNull(message = "手机号") @RequestParam String mobile) {
+        return ResultUtil.data(memberService.bindInvitee(mobile));
+    }
+
+
     @ApiOperation(value = "查询我的邀请人")
     @GetMapping("/queryMyInvitee")
     public ResultMessage<Object> queryMyInvitee() {
         AuthUser currentUser = UserContext.getCurrentUser();
+        Optional.ofNullable(currentUser.getMember().getInviteeId()).orElseThrow(() -> new ServiceException(ResultCode.INVITATION_NOT_EXIST_ERROR));
         MemberVO member = memberService.getMember(String.valueOf(currentUser.getMember().getInviteeId()));
         return ResultUtil.data(member);
     }
@@ -59,6 +70,7 @@ public class InvitationController {
         AuthUser currentUser = UserContext.getCurrentUser();
         MemberSearchVO member = new MemberSearchVO();
         member.setInviteeId(Long.parseLong(currentUser.getId()));
+        member.setDisabled(SwitchEnum.OPEN.name());
         return ResultUtil.data(memberService.getMemberPage(member,page));
     }
 

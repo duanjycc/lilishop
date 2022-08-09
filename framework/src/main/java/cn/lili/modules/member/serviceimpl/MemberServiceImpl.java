@@ -21,6 +21,7 @@ import cn.lili.modules.connect.config.ConnectAuthEnum;
 import cn.lili.modules.connect.entity.Connect;
 import cn.lili.modules.connect.entity.dto.ConnectAuthUser;
 import cn.lili.modules.connect.service.ConnectService;
+import cn.lili.modules.liande.entity.enums.DelStatusEnum;
 import cn.lili.modules.member.aop.annotation.PointLogPoint;
 import cn.lili.modules.member.entity.dos.Member;
 import cn.lili.modules.member.entity.dto.*;
@@ -125,6 +126,20 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         AuthUser tokenUser = UserContext.getCurrentUser();
         if (tokenUser != null) {
             return this.findByUsername(tokenUser.getUsername());
+        }
+        throw new ServiceException(ResultCode.USER_NOT_LOGIN);
+    }
+
+    /**
+     * 获取当前登录的用户信息 - 缓存
+     *
+     * @return 会员信息
+     */
+    @Override
+    public AuthUser getUserInfoByCache() {
+        AuthUser tokenUser = UserContext.getCurrentUser();
+        if (tokenUser != null) {
+            return tokenUser;
         }
         throw new ServiceException(ResultCode.USER_NOT_LOGIN);
     }
@@ -307,6 +322,25 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         lambdaUpdateWrapper.set(Member::getPassword, new BCryptPasswordEncoder().encode(newPassword));
         this.update(lambdaUpdateWrapper);
         return member;
+    }
+
+
+    /**
+     * 绑定邀请人
+     *
+     * @param mobile
+     * @return
+     */
+    @Override
+    public boolean bindInvitee(String mobile) {
+        Member member = baseMapper.selectOne(new QueryWrapper<Member>().lambda().eq(Member::getMobile, mobile)
+                .eq(Member::getDeleteFlag, DelStatusEnum.USE.getType()));
+        Optional.ofNullable(member).orElseThrow(() -> new ServiceException(ResultCode.INVITATION_MEMBER_NOT_EXIST_ERROR));
+
+        int update = baseMapper.update(null, new UpdateWrapper<Member>().lambda()
+                .set(Member::getInviteeId, member.getId())
+                .eq(Member::getId, UserContext.getCurrentUser().getId()));
+        return update == 0 ? false: true;
     }
 
     @Override
@@ -718,6 +752,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
     @Override
     public MemberVO getMember(String id) {
+        Member member = this.getById(id);
         return new MemberVO(this.getById(id));
     }
 

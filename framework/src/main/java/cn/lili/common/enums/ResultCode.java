@@ -478,14 +478,20 @@ public enum ResultCode {
     PURCHASE_ORDER_DEADLINE_ERROR(90004, "供求单，已超过报名截止时间"),
     INDEX_BUILDING(90005, "索引正在生成"),
 
-    /**做单相关*/
-    INSUFFICIENT_QUANTITY_ERROR(110001, "SSD数量不够"),
-    DISTRIBUTION_ERROR(110001, "SSD数量不够"),
+
 
     /**转账相关*/
     TRANSFER_COUNT_ERROR(100001, "转账SSD数量，不能大于账号SSD数量（不包括被冻结的SSD数量)"),
     TRANSFER_VERIFICATION_CODE_ERROR(100002, "验证码错误"),
-    TRANSFER_SECOND_PASSWORD_ERROR(100003, "二级密码错误");
+    TRANSFER_SECOND_PASSWORD_ERROR(100003, "二级密码错误"),
+
+    /**做单相关*/
+    INSUFFICIENT_QUANTITY_ERROR(110001, "SSD数量不够"),
+    DISTRIBUTION_ERROR(110001, "SSD数量不够"),
+
+    /**邀请相关*/
+    INVITATION_NOT_EXIST_ERROR(120001, "会员未填写邀请人"),
+    INVITATION_MEMBER_NOT_EXIST_ERROR(120002, "输入的邀请人不存在") ;
 
 
 

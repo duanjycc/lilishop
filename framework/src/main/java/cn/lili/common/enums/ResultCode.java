@@ -491,7 +491,8 @@ public enum ResultCode {
 
     /**邀请相关*/
     INVITATION_NOT_EXIST_ERROR(120001, "会员未填写邀请人"),
-    INVITATION_MEMBER_NOT_EXIST_ERROR(120002, "输入的邀请人不存在") ;
+    INVITATION_MEMBER_NOT_EXIST_ERROR(120002, "输入的邀请人不存在") ,
+    INVITATION_BIND_ERROR(120003, "绑定邀请人失败") ;
 
 
 

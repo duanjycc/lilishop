@@ -14,6 +14,7 @@ import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.context.UserContext;
 import cn.lili.common.security.enums.UserEnums;
 import cn.lili.common.security.token.Token;
+import cn.lili.common.security.token.TokenUtil;
 import cn.lili.common.sensitive.SensitiveWordsFilter;
 import cn.lili.common.utils.*;
 import cn.lili.common.vo.PageVO;
@@ -276,7 +277,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             registerHandler(member);
         }
         loginBindUser(member);
-        return memberTokenGenerate.createToken(member, true);
+        return memberTokenGenerate.createAppToken(member, true);
     }
 
     /**
@@ -333,7 +334,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
      * @return
      */
     @Override
-    public boolean bindInvitee(String mobile) {
+    public Token bindInvitee(String mobile) {
         Member member = baseMapper.selectOne(new QueryWrapper<Member>().lambda().eq(Member::getMobile, mobile)
                 .eq(Member::getDeleteFlag, DelStatusEnum.USE.getType()));
         Optional.ofNullable(member).orElseThrow(() -> new ServiceException(ResultCode.INVITATION_MEMBER_NOT_EXIST_ERROR));
@@ -341,7 +342,14 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         int update = baseMapper.update(null, new UpdateWrapper<Member>().lambda()
                 .set(Member::getInviteeId, member.getId())
                 .eq(Member::getId, UserContext.getCurrentUser().getId()));
-        return update == 0 ? false: true;
+        if (update == 1){
+            Member currentMember = UserContext.getCurrentUser().getMember();
+            currentMember.setInviteeId(Long.parseLong(member.getId()));
+            currentMember.setInviteeMobile(mobile);
+            return  memberTokenGenerate.refreshAppToken(currentMember);
+        }else {
+            throw new ServiceException(ResultCode.INVITATION_BIND_ERROR);
+        }
     }
 
     @Override

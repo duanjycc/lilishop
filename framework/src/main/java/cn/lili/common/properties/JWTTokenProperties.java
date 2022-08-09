@@ -19,4 +19,8 @@ public class JWTTokenProperties {
      * token默认过期时间
      */
     private long tokenExpireTime = 60;
+    /**
+     * app_token默认过期时间
+     */
+    private long appTokenExpireTime = 21600;
 }

@@ -8,6 +8,7 @@ import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.enums.SecurityEnum;
 import cn.lili.common.security.enums.UserEnums;
 import cn.lili.common.properties.JWTTokenProperties;
+import cn.lili.modules.member.entity.dos.Member;
 import com.google.gson.Gson;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
@@ -57,6 +58,51 @@ public class TokenUtil {
         token.setRefreshToken(refreshToken);
         return token;
     }
+
+    public Token appCreateToken(String mobile,Object claim,UserEnums userEnums){
+        Token token = new Token();
+        String accessToken = createToken(mobile, claim, tokenProperties.getAppTokenExpireTime());
+
+        String key = CachePrefix.ACCESS_TOKEN.getPrefix(userEnums)+":"+ mobile;
+        cache.put(key,accessToken,tokenProperties.getAppTokenExpireTime(),TimeUnit.MINUTES);
+        token.setAccessToken(accessToken);
+        token.setRefreshToken(accessToken);
+        return token;
+    }
+    /**
+     * 刷新appToken
+     *
+     * @param member 刷新token
+     * @param userEnums 用户枚举
+     * @return token
+     */
+    public Token refreshAppToken(Member member, UserEnums userEnums) {
+        Token token = new Token();
+        String mo = member.getMobile();
+        String key = CachePrefix.ACCESS_TOKEN.getPrefix(userEnums)+":"+ mo;
+        String oldToken = (String) cache.get(key);
+        Claims claims;
+        try {
+            claims = Jwts.parser()
+                    .setSigningKey(SecretKeyUtil.generalKeyByDecoders())
+                    .parseClaimsJws(oldToken).getBody();
+        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
+            //token 过期 认证失败等
+            throw new ServiceException(ResultCode.USER_AUTH_EXPIRED);
+        }
+
+        String json = claims.get(SecurityEnum.USER_CONTEXT.getValue()).toString();
+        AuthUser authUser = new Gson().fromJson(json, AuthUser.class);
+        authUser.setMember(member);
+
+        String accessToken = createToken(mo, authUser, tokenProperties.getAppTokenExpireTime());
+
+        cache.put(key,accessToken,tokenProperties.getAppTokenExpireTime(),TimeUnit.MINUTES);
+        token.setAccessToken(accessToken);
+        token.setRefreshToken(accessToken);
+        return token;
+    }
+
 
     /**
      * 刷新token

@@ -56,6 +56,29 @@ public class ManagerTokenGenerate extends AbstractTokenGenerate<AdminUser> {
     }
 
     /**
+     * 生成appToken
+     *
+     * @param user     用户名
+     * @param longTerm 是否长时间有效
+     * @return TOKEN对象
+     */
+    @Override
+    public Token createAppToken(AdminUser user, Boolean longTerm) {
+        return null;
+    }
+
+    /**
+     * 刷新 appToken
+     *
+     * @param user 用户名
+     * @return TOKEN对象
+     */
+    @Override
+    public Token refreshAppToken(AdminUser user) {
+        return null;
+    }
+
+    /**
      * 获取用户权限
      *
      * @param userMenuVOList

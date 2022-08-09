@@ -34,6 +34,9 @@ public class MemberTokenGenerate extends AbstractTokenGenerate<Member> {
     @Autowired
     private RocketMQTemplate rocketMQTemplate;
 
+
+
+
     @Override
     public Token createToken(Member member, Boolean longTerm) {
 
@@ -62,9 +65,53 @@ public class MemberTokenGenerate extends AbstractTokenGenerate<Member> {
         return tokenUtil.createToken(member.getUsername(), authUser, longTerm, UserEnums.MEMBER);
     }
 
+
+    /**
+     * 生成appToken
+     *
+     * @return TOKEN对象
+     */
     @Override
-    public Token refreshToken(String refreshToken) {
-        return tokenUtil.refreshToken(refreshToken, UserEnums.MEMBER);
+    public Token createAppToken(Member member, Boolean longTerm) {
+
+        //获取客户端类型
+        String clientType = ThreadContextHolder.getHttpRequest().getHeader("clientType");
+        ClientTypeEnum clientTypeEnum;
+        try {
+            //如果客户端为空，则缺省值为PC，pc第三方登录时不会传递此参数
+            if (clientType == null) {
+                clientTypeEnum = ClientTypeEnum.PC;
+            } else {
+                clientTypeEnum = ClientTypeEnum.valueOf(clientType);
+            }
+        } catch (IllegalArgumentException e) {
+            clientTypeEnum = ClientTypeEnum.UNKNOWN;
+        }
+        //记录最后登录时间，客户端类型
+        member.setLastLoginDate(new Date());
+        member.setClientEnum(clientTypeEnum.name());
+
+        AuthUser authUser = new AuthUser(member.getUsername(), member.getId(), member.getNickName(), member.getFace(), UserEnums.MEMBER);
+        authUser.setMember(member);
+        //登陆成功生成token
+        return tokenUtil.appCreateToken(member.getMobile(), authUser, UserEnums.MEMBER);
+    }
+
+
+    /**
+     * 刷新 appToken
+     *
+     * @param user 用户名
+     * @return TOKEN对象
+     */
+    @Override
+    public Token refreshAppToken(Member user) {
+        return tokenUtil.refreshAppToken(user, UserEnums.MEMBER);
+    }
+
+    @Override
+    public Token refreshToken(String mobile) {
+        return tokenUtil.refreshToken(mobile, UserEnums.MEMBER);
     }
 
 }

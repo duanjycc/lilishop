@@ -48,4 +48,26 @@ public class StoreTokenGenerate extends AbstractTokenGenerate<Member> {
         return tokenUtil.refreshToken(refreshToken, UserEnums.STORE);
     }
 
+    /**
+     * 刷新 appToken
+     *
+     * @param user 用户名
+     * @return TOKEN对象
+     */
+    @Override
+    public Token refreshAppToken(Member user) {
+        return null;
+    }
+
+    /**
+     * 生成appToken
+     *
+     * @param user     用户名
+     * @param longTerm 是否长时间有效
+     * @return TOKEN对象
+     */
+    @Override
+    public Token createAppToken(Member user, Boolean longTerm) {
+        return null;
+    }
 }

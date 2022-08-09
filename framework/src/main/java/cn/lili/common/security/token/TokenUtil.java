@@ -46,7 +46,7 @@ public class TokenUtil {
         String accessToken = createToken(username, claim, tokenProperties.getTokenExpireTime());
 
         cache.put(CachePrefix.ACCESS_TOKEN.getPrefix(userEnums) + accessToken, 1,
-                tokenProperties.getTokenExpireTime(), TimeUnit.MINUTES);
+                tokenProperties.getTokenExpireTime() * 15 * 24 * 60L, TimeUnit.MINUTES);
         //刷新token生成策略：如果是长时间有效的token（用于app），则默认15天有效期刷新token。如果是普通用户登录，则刷新token为普通token2倍数
         Long expireTime = longTerm ? 15 * 24 * 60L : tokenProperties.getTokenExpireTime() * 2;
         String refreshToken = createToken(username, claim, expireTime);

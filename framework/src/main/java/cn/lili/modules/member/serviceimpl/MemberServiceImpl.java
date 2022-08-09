@@ -138,6 +138,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     @Override
     public AuthUser getUserInfoByCache() {
         AuthUser tokenUser = UserContext.getCurrentUser();
+
         if (tokenUser != null) {
             return tokenUser;
         }

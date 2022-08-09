@@ -41,6 +41,6 @@ public class MakeAccountController {
     @ApiOperation(value = "查询做单列表")
     @GetMapping("/queryMakeAccount")
     public ResultMessage<IPage<MakeAccount>> queryMakeAccount(PageVO page) {
-        return ResultUtil.data(makeAccountService.page(PageUtil.initPage(page),new QueryWrapper<MakeAccount>().lambda().eq(MakeAccount::getMerId, UserContext.getCurrentUser().getId())));
+        return ResultUtil.data(makeAccountService.page(PageUtil.initPage(page),new QueryWrapper<MakeAccount>().lambda().eq(MakeAccount::getUserId, UserContext.getCurrentUser().getId())));
     }
 }

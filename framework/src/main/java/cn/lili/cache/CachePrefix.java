@@ -523,4 +523,5 @@ public enum CachePrefix {
     public String getPrefix(UserEnums user) {
         return "{" + this.name() + "_" + user.name() + "}_";
     }
+
 }

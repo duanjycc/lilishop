@@ -21,7 +21,21 @@ public abstract class AbstractTokenGenerate<T> {
      * @return TOKEN对象
      */
     public abstract Token createToken(T user, Boolean longTerm);
+    /**
+     * 生成appToken
+     *
+     * @param user 用户名
+     * @return TOKEN对象
+     */
+    public abstract Token createAppToken(T user, Boolean longTerm);
 
+    /**
+     * 刷新 appToken
+     *
+     * @param user 用户名
+     * @return TOKEN对象
+     */
+    public abstract Token refreshAppToken(T user);
     /**
      * 刷新token
      *

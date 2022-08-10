@@ -8,6 +8,7 @@ import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.enums.SecurityEnum;
 import cn.lili.common.security.enums.UserEnums;
 import cn.lili.common.properties.JWTTokenProperties;
+import cn.lili.modules.member.entity.dos.Member;
 import com.google.gson.Gson;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
@@ -46,7 +47,7 @@ public class TokenUtil {
         String accessToken = createToken(username, claim, tokenProperties.getTokenExpireTime());
 
         cache.put(CachePrefix.ACCESS_TOKEN.getPrefix(userEnums) + accessToken, 1,
-                tokenProperties.getTokenExpireTime(), TimeUnit.MINUTES);
+                tokenProperties.getTokenExpireTime() * 15 * 24 * 60L, TimeUnit.MINUTES);
         //刷新token生成策略：如果是长时间有效的token（用于app），则默认15天有效期刷新token。如果是普通用户登录，则刷新token为普通token2倍数
         Long expireTime = longTerm ? 15 * 24 * 60L : tokenProperties.getTokenExpireTime() * 2;
         String refreshToken = createToken(username, claim, expireTime);
@@ -57,6 +58,51 @@ public class TokenUtil {
         token.setRefreshToken(refreshToken);
         return token;
     }
+
+    public Token appCreateToken(String mobile,Object claim,UserEnums userEnums){
+        Token token = new Token();
+        String accessToken = createToken(mobile, claim, tokenProperties.getAppTokenExpireTime());
+
+        String key = CachePrefix.ACCESS_TOKEN.getPrefix(userEnums)+":"+ mobile;
+        cache.put(key,accessToken,tokenProperties.getAppTokenExpireTime(),TimeUnit.MINUTES);
+        token.setAccessToken(accessToken);
+        token.setRefreshToken(accessToken);
+        return token;
+    }
+    /**
+     * 刷新appToken
+     *
+     * @param member 刷新token
+     * @param userEnums 用户枚举
+     * @return token
+     */
+    public Token refreshAppToken(Member member, UserEnums userEnums) {
+        Token token = new Token();
+        String mo = member.getMobile();
+        String key = CachePrefix.ACCESS_TOKEN.getPrefix(userEnums)+":"+ mo;
+        String oldToken = (String) cache.get(key);
+        Claims claims;
+        try {
+            claims = Jwts.parser()
+                    .setSigningKey(SecretKeyUtil.generalKeyByDecoders())
+                    .parseClaimsJws(oldToken).getBody();
+        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
+            //token 过期 认证失败等
+            throw new ServiceException(ResultCode.USER_AUTH_EXPIRED);
+        }
+
+        String json = claims.get(SecurityEnum.USER_CONTEXT.getValue()).toString();
+        AuthUser authUser = new Gson().fromJson(json, AuthUser.class);
+        authUser.setMember(member);
+
+        String accessToken = createToken(mo, authUser, tokenProperties.getAppTokenExpireTime());
+
+        cache.put(key,accessToken,tokenProperties.getAppTokenExpireTime(),TimeUnit.MINUTES);
+        token.setAccessToken(accessToken);
+        token.setRefreshToken(accessToken);
+        return token;
+    }
+
 
     /**
      * 刷新token

@@ -55,16 +55,17 @@ public class TransferOutRecordServiceImpl extends ServiceImpl<TransferOutRecordM
     /**
      * 转出明细
      *
-     * @param dto
+     * @param beginDate
+     * @param endDate
      */
     @Override
-    public IPage<TransferOutRecord> transferOutDetails(PageVO pageVo, QueryTransferDTO dto) {
+    public IPage<TransferOutRecord> transferOutDetails(PageVO pageVo,String beginDate,String endDate) {
         AuthUser currentUser = UserContext.getCurrentUser();
         Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
 
         QueryWrapper<QueryTransferDTO> queryWrapper = new QueryWrapper();
-        queryWrapper.ge("t.recharge_time",dto.getBeginDate());
-        queryWrapper.le("t.recharge_time",dto.getEndDate());
+        queryWrapper.ge("t.recharge_time",beginDate);
+        queryWrapper.le("t.recharge_time",endDate);
         queryWrapper.eq("t.user_id",currentUser.getId());
 //        queryWrapper.eq("t.receipt_status", DelStatusEnum.USE.getType());
         queryWrapper.orderByDesc("t.recharge_time");
@@ -76,16 +77,17 @@ public class TransferOutRecordServiceImpl extends ServiceImpl<TransferOutRecordM
      * 转入明细
      *
      * @param pageVo
-     * @param dto
+     * @param beginDate
+     * @param endDate
      */
     @Override
-    public IPage<RechargeRecord> transferInDetails(PageVO pageVo, QueryTransferDTO dto) {
+    public IPage<RechargeRecord> transferInDetails(PageVO pageVo, String beginDate,String endDate) {
         AuthUser currentUser = UserContext.getCurrentUser();
         Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
 
         QueryWrapper<QueryTransferDTO> queryWrapper = new QueryWrapper();
-        queryWrapper.ge("t.recharge_time",dto.getBeginDate());
-        queryWrapper.le("t.recharge_time",dto.getEndDate());
+        queryWrapper.ge("t.recharge_time",beginDate);
+        queryWrapper.le("t.recharge_time",endDate);
         queryWrapper.eq("t.user_id",currentUser.getId());
 //        queryWrapper.eq("t.recharge_status", DelStatusEnum.USE.getType());
         queryWrapper.orderByDesc("t.recharge_time");

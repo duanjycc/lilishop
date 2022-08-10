@@ -104,10 +104,10 @@ public class MemberBuyerController {
 
     @ApiOperation(value = "获取当前登录用户接口")
     @GetMapping
-    public ResultMessage<Member> getUserInfo() {
-
-        return ResultUtil.data(memberService.getUserInfo());
+    public ResultMessage<AuthUser> getUserInfo() {
+        return ResultUtil.data(memberService.getUserInfoByCache());
     }
+
 
     @ApiOperation(value = "通过短信重置密码")
     @ApiImplicitParams({
@@ -206,5 +206,6 @@ public class MemberBuyerController {
         memberService.setUpPaymentPassword(paymentPassword);
         return ResultUtil.success();
     }
+
 
 }

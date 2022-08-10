@@ -14,6 +14,7 @@ import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.context.UserContext;
 import cn.lili.common.security.enums.UserEnums;
 import cn.lili.common.security.token.Token;
+import cn.lili.common.security.token.TokenUtil;
 import cn.lili.common.sensitive.SensitiveWordsFilter;
 import cn.lili.common.utils.*;
 import cn.lili.common.vo.PageVO;
@@ -21,6 +22,7 @@ import cn.lili.modules.connect.config.ConnectAuthEnum;
 import cn.lili.modules.connect.entity.Connect;
 import cn.lili.modules.connect.entity.dto.ConnectAuthUser;
 import cn.lili.modules.connect.service.ConnectService;
+import cn.lili.modules.liande.entity.enums.DelStatusEnum;
 import cn.lili.modules.member.aop.annotation.PointLogPoint;
 import cn.lili.modules.member.entity.dos.Member;
 import cn.lili.modules.member.entity.dto.*;
@@ -125,6 +127,59 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         AuthUser tokenUser = UserContext.getCurrentUser();
         if (tokenUser != null) {
             return this.findByUsername(tokenUser.getUsername());
+        }
+        throw new ServiceException(ResultCode.USER_NOT_LOGIN);
+    }
+
+//    QueryWrapper<Member> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.eq("mobile", mobilePhone);
+//    Member member = this.baseMapper.selectOne(queryWrapper);
+//    AdminUser adminUser = adminUserService.findByMobile(mobilePhone);
+//        if (ObjectUtils.isNotEmpty(adminUser)) {
+//        Department dept = departmentService.getById(adminUser.getDepartmentId());
+//        Department parentDept = departmentService.getById(dept.getParentId());
+//        List<Role> roles = roleService.list(new QueryWrapper<Role>().lambda().eq(Role::getDeleteFlag,false).in(Role::getId,Arrays.asList(adminUser.getRoleIds().split(","))));
+//        member.setMyRegionId(dept.getId());
+//        member.setMyRegion(dept.getTitle());
+//        member.setMyParentRegion(ObjectUtils.isEmpty(parentDept) ? null : parentDept.getTitle());
+//        member.setInviteeMobile(ObjectUtils.isEmpty(member.getInviteeId()) ? null : baseMapper.selectById(member.getInviteeId()).getMobile());
+//        member.setRoles(roles);
+//    }
+//
+//    //如果手机号不存在则自动注册用户
+//        if (member == null) {
+//        member = new Member(mobilePhone, UuidUtils.getUUID(), mobilePhone);
+//        registerHandler(member);
+//    }
+//    loginBindUser(member);
+//        return memberTokenGenerate.createAppToken(member, true);
+//
+
+
+    /**
+     * 获取当前登录的用户信息 - 缓存
+     *
+     * @return 会员信息
+     */
+    @Override
+    public AuthUser getUserInfoByCache() {
+        AuthUser tokenUser = UserContext.getCurrentUser();
+        if (tokenUser != null) {
+            String mobilePhone = tokenUser.getMember().getMobile();
+            Member member = this.baseMapper.selectOne(new QueryWrapper<Member>().lambda().eq(Member::getMobile,mobilePhone));
+            AdminUser adminUser = adminUserService.findByMobile(mobilePhone);
+            if (ObjectUtils.isNotEmpty(adminUser)) {
+                Department dept = departmentService.getById(adminUser.getDepartmentId());
+                Department parentDept = departmentService.getById(dept.getParentId());
+                List<Role> roles = roleService.list(new QueryWrapper<Role>().lambda().eq(Role::getDeleteFlag,false).in(Role::getId,Arrays.asList(adminUser.getRoleIds().split(","))));
+                member.setMyRegionId(dept.getId());
+                member.setMyRegion(dept.getTitle());
+                member.setMyParentRegion(ObjectUtils.isEmpty(parentDept) ? null : parentDept.getTitle());
+                member.setInviteeMobile(ObjectUtils.isEmpty(member.getInviteeId()) ? null : baseMapper.selectById(member.getInviteeId()).getMobile());
+                member.setRoles(roles);
+            }
+            tokenUser.setMember(member);
+            return tokenUser;
         }
         throw new ServiceException(ResultCode.USER_NOT_LOGIN);
     }
@@ -260,7 +315,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             registerHandler(member);
         }
         loginBindUser(member);
-        return memberTokenGenerate.createToken(member, true);
+        return memberTokenGenerate.createAppToken(member, true);
     }
 
     /**
@@ -307,6 +362,32 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         lambdaUpdateWrapper.set(Member::getPassword, new BCryptPasswordEncoder().encode(newPassword));
         this.update(lambdaUpdateWrapper);
         return member;
+    }
+
+
+    /**
+     * 绑定邀请人
+     *
+     * @param mobile
+     * @return
+     */
+    @Override
+    public Token bindInvitee(String mobile) {
+        Member member = baseMapper.selectOne(new QueryWrapper<Member>().lambda().eq(Member::getMobile, mobile)
+                .eq(Member::getDeleteFlag, DelStatusEnum.USE.getType()));
+        Optional.ofNullable(member).orElseThrow(() -> new ServiceException(ResultCode.INVITATION_MEMBER_NOT_EXIST_ERROR));
+
+        int update = baseMapper.update(null, new UpdateWrapper<Member>().lambda()
+                .set(Member::getInviteeId, member.getId())
+                .eq(Member::getId, UserContext.getCurrentUser().getId()));
+        if (update == 1){
+            Member currentMember = UserContext.getCurrentUser().getMember();
+            currentMember.setInviteeId(Long.parseLong(member.getId()));
+            currentMember.setInviteeMobile(mobile);
+            return  memberTokenGenerate.refreshAppToken(currentMember);
+        }else {
+            throw new ServiceException(ResultCode.INVITATION_BIND_ERROR);
+        }
     }
 
     @Override
@@ -686,9 +767,10 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
      */
     @Override
     public void logout(UserEnums userEnums) {
-        String currentUserToken = UserContext.getCurrentUserToken();
-        if (CharSequenceUtil.isNotEmpty(currentUserToken)) {
-            cache.remove(CachePrefix.ACCESS_TOKEN.getPrefix(userEnums) + currentUserToken);
+        String mobile = UserContext.getCurrentUser().getMember().getMobile();
+        String key = CachePrefix.ACCESS_TOKEN.getPrefix(userEnums)+":"+ mobile;
+        if (CharSequenceUtil.isNotEmpty(mobile)) {
+            cache.remove(key);
         }
     }
 
@@ -718,6 +800,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
     @Override
     public MemberVO getMember(String id) {
+        Member member = this.getById(id);
         return new MemberVO(this.getById(id));
     }
 

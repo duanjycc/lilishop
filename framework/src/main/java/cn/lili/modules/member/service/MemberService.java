@@ -1,6 +1,7 @@
 package cn.lili.modules.member.service;
 
 
+import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.enums.UserEnums;
 import cn.lili.common.security.token.Token;
 import cn.lili.common.vo.PageVO;
@@ -37,6 +38,13 @@ public interface MemberService extends IService<Member> {
      */
     Member getUserInfo();
 
+
+    /**
+     * 获取当前登录的用户信息 - 缓存
+     *
+     * @return 会员信息
+     */
+    AuthUser getUserInfoByCache();
     /**
      * 注册
      *
@@ -103,6 +111,14 @@ public interface MemberService extends IService<Member> {
      * @return 操作结果
      */
     Member modifyPass(String oldPassword, String newPassword);
+
+
+    /**
+     * 绑定邀请人
+     * @param mobile
+     * @return
+     */
+    Token bindInvitee(String mobile);
 
     /**
      * 是否可以初始化密码

@@ -6,10 +6,12 @@ import cn.lili.common.enums.ResultUtil;
 import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.context.UserContext;
 import cn.lili.common.vo.ResultMessage;
-import cn.lili.modules.liande.entity.dos.Configure;
-import cn.lili.modules.liande.entity.dos.MakeAccount;
+import cn.lili.modules.liande.entity.dos.*;
 import cn.lili.modules.liande.entity.dto.MakeAccountDTO;
+import cn.lili.modules.liande.mapper.DestroyDetailMapper;
 import cn.lili.modules.liande.mapper.MakeAccountMapper;
+import cn.lili.modules.liande.mapper.MemberIncomeMapper;
+import cn.lili.modules.liande.mapper.ServiceProviderIncomeMapper;
 import cn.lili.modules.liande.service.IConfigureService;
 import cn.lili.modules.liande.service.IMakeAccountService;
 import cn.lili.modules.member.entity.dos.Member;
@@ -32,6 +34,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.UUID;
 
 /**
@@ -66,6 +71,18 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
 
     @Autowired
     RoleMapper roleMapper;
+
+    @Autowired
+    MakeAccountMapper makeAccountMapper;
+
+    @Autowired
+    DestroyDetailMapper destroyDetailMapper;
+
+    @Autowired
+    MemberIncomeMapper memberIncomeMapper;
+
+    @Autowired
+    ServiceProviderIncomeMapper serviceProviderIncomeMapper;
     @Override
     public ResultMessage<Boolean> makeAccount(MakeAccountDTO makeAccountDTO) {
 
@@ -127,13 +144,19 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         long jfh=(long)(jf.getNumericalAlue()*makeAccountDTO.getSurrenderPrice());
         userMember.setPoint(userMember.getPoint()+jfh);
         memberMapper.update(userMember,userWrapper);
-        //商户获得积分
+
+        //商户获得积分/减去相对应的SSD
         QueryWrapper<Member> shangWrapper = new QueryWrapper();
         shangWrapper.eq("username",member.getUsername());
         Member shnghMember=memberMapper.selectOne(shangWrapper);
         long jfs=(long)(sh.getNumericalAlue()*makeAccountDTO.getSurrenderPrice());
         shnghMember.setPoint(shnghMember.getPoint()+jfs);
+        shnghMember.setSSD(shnghMember.getSSD()-wantsum);
         memberMapper.update(shnghMember,shangWrapper);
+
+
+
+
 
         //邀请人获得SSD卷
         QueryWrapper<Member> yqrWrapper = new QueryWrapper();
@@ -148,6 +171,10 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
             memberMapper.update(yqrMember,yqrssdWrapper);
         }
 
+        //生成做当ID
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));//设置北京时间
+        long mkid=Long.parseLong(simpleDateFormat.format(new Date()));
 
         //区域服务商获得SSD卷
         //查出店铺所属服务商
@@ -158,6 +185,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         String[]  strs=addressId.split(",");
         addressId=strs[strs.length-2];
         addressId= addressId.replace("\"/","");
+
 
         //根据区域ID查找部门
         QueryWrapper<Department> departmentQueryWrapper = new QueryWrapper();
@@ -182,6 +210,17 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
                     memberfws.setSSD(memberfws.getSSD()+wantsum*Double.parseDouble(role.getDescription()));
                     memberMapper.update(memberfws,memberWrapper);
 
+                    //本服务商收益日志
+                    ServiceProviderIncome si=new ServiceProviderIncome();
+                    si.setConsumerUserid(Long.parseLong(userMember.getId()));
+                    si.setUserId(Long.parseLong(memberfws.getId()));
+                    si.setCreationTime(new Date());
+                    si.setQuantity(wantsum*Double.parseDouble(role.getDescription()));
+                    si.setIncomeType(0l);
+                    si.setIncomeProportion(role.getDescription());
+                    si.setOrderId(mkid+"");
+                    serviceProviderIncomeMapper.insert(si);
+
                     if(department.getParentId() !=null){
                         //根据父部门ID查找上级服务商
                         QueryWrapper<AdminUser> sjadminUserQueryWrapper = new QueryWrapper();
@@ -195,6 +234,17 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
                             Member sjmemberfws=memberMapper.selectOne(sjmemberWrapper);
                             sjmemberfws.setSSD(sjmemberfws.getSSD()+wantsum*Double.parseDouble(role.getDescriptionParent()));
                             memberMapper.update(sjmemberfws,sjmemberWrapper);
+
+                            //父区域服务商收益日志
+                            ServiceProviderIncome ssj=new ServiceProviderIncome();
+                            si.setConsumerUserid(Long.parseLong(userMember.getId()));
+                            si.setUserId(Long.parseLong(sjmemberfws.getId()));
+                            si.setCreationTime(new Date());
+                            si.setQuantity(wantsum*Double.parseDouble(role.getDescriptionParent()));
+                            si.setIncomeType(1l);
+                            si.setIncomeProportion(role.getDescriptionParent());
+                            si.setOrderId(mkid+"");
+                            serviceProviderIncomeMapper.insert(ssj);
                         }
 
 
@@ -204,8 +254,45 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
 
             }
 
-
         }
+        //插入做单记录
+        MakeAccount ma=new MakeAccount();
+        ma.setId(mkid);
+        ma.setCreateTime(new Date());
+        ma.setUserId(Long.parseLong(st.getMemberId()));
+        ma.setMerId(st.getId());
+        ma.setMerName(st.getStoreName());
+        ma.setMonetary(makeAccountDTO.getMonetary());
+        ma.setUsername(st.getMemberName());
+        ma.setSurrenderPrice(makeAccountDTO.getSurrenderPrice());
+        ma.setSurrenderRatio(makeAccountDTO.getSurrenderRatio());
+        ma.setVipPhone(makeAccountDTO.getVipPhone());
+        ma.setIsUse("0");
+        ma.setWantPrice(makeAccountDTO.getWantPrice());
+        makeAccountMapper.insert(ma);
+
+        //插入销毁明细
+        DestroyDetail de=new DestroyDetail();
+        de.setUserId(Long.parseLong(st.getMemberId()));
+        de.setCreateTime(new Date());
+        de.setMerName(st.getMemberName());
+        de.setPrice(makeAccountDTO.getSurrenderPrice());
+        de.setWantCount(wantsum);
+        de.setStatus("0");
+        de.setDestroyTime(new Date());
+        de.setWantPrice(makeAccountDTO.getWantPrice());
+        destroyDetailMapper.insert(de) ;
+
+        //邀请人获取SSD日志
+        MemberIncome mi=new MemberIncome();
+        mi.setConsumerUserid(Long.parseLong(hy.getId()));
+        mi.setUserId(Long.parseLong(yqrMember.getId()));
+        mi.setCreationTime(new Date());
+        mi.setQuantity(wantsum*(yq.getNumericalAlue().doubleValue()));
+        mi.setIncomeProportion(yq.getNumericalAlue()+"");
+        mi.setOrderId(mkid+"");
+        memberIncomeMapper.insert(mi);
+
 
 
 

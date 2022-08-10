@@ -131,6 +131,31 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         throw new ServiceException(ResultCode.USER_NOT_LOGIN);
     }
 
+//    QueryWrapper<Member> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.eq("mobile", mobilePhone);
+//    Member member = this.baseMapper.selectOne(queryWrapper);
+//    AdminUser adminUser = adminUserService.findByMobile(mobilePhone);
+//        if (ObjectUtils.isNotEmpty(adminUser)) {
+//        Department dept = departmentService.getById(adminUser.getDepartmentId());
+//        Department parentDept = departmentService.getById(dept.getParentId());
+//        List<Role> roles = roleService.list(new QueryWrapper<Role>().lambda().eq(Role::getDeleteFlag,false).in(Role::getId,Arrays.asList(adminUser.getRoleIds().split(","))));
+//        member.setMyRegionId(dept.getId());
+//        member.setMyRegion(dept.getTitle());
+//        member.setMyParentRegion(ObjectUtils.isEmpty(parentDept) ? null : parentDept.getTitle());
+//        member.setInviteeMobile(ObjectUtils.isEmpty(member.getInviteeId()) ? null : baseMapper.selectById(member.getInviteeId()).getMobile());
+//        member.setRoles(roles);
+//    }
+//
+//    //如果手机号不存在则自动注册用户
+//        if (member == null) {
+//        member = new Member(mobilePhone, UuidUtils.getUUID(), mobilePhone);
+//        registerHandler(member);
+//    }
+//    loginBindUser(member);
+//        return memberTokenGenerate.createAppToken(member, true);
+//
+
+
     /**
      * 获取当前登录的用户信息 - 缓存
      *
@@ -139,8 +164,21 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     @Override
     public AuthUser getUserInfoByCache() {
         AuthUser tokenUser = UserContext.getCurrentUser();
-
         if (tokenUser != null) {
+            String mobilePhone = tokenUser.getMember().getMobile();
+            Member member = this.baseMapper.selectOne(new QueryWrapper<Member>().lambda().eq(Member::getMobile,mobilePhone));
+            AdminUser adminUser = adminUserService.findByMobile(mobilePhone);
+            if (ObjectUtils.isNotEmpty(adminUser)) {
+                Department dept = departmentService.getById(adminUser.getDepartmentId());
+                Department parentDept = departmentService.getById(dept.getParentId());
+                List<Role> roles = roleService.list(new QueryWrapper<Role>().lambda().eq(Role::getDeleteFlag,false).in(Role::getId,Arrays.asList(adminUser.getRoleIds().split(","))));
+                member.setMyRegionId(dept.getId());
+                member.setMyRegion(dept.getTitle());
+                member.setMyParentRegion(ObjectUtils.isEmpty(parentDept) ? null : parentDept.getTitle());
+                member.setInviteeMobile(ObjectUtils.isEmpty(member.getInviteeId()) ? null : baseMapper.selectById(member.getInviteeId()).getMobile());
+                member.setRoles(roles);
+            }
+            tokenUser.setMember(member);
             return tokenUser;
         }
         throw new ServiceException(ResultCode.USER_NOT_LOGIN);

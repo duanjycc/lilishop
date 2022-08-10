@@ -102,4 +102,8 @@ public class MakeAccountDTO {
     @NotBlank(message = "做单时want单价")
     private String wantPrice;
 
+    @ApiModelProperty(value = "二级密码")
+    @NotBlank(message = "请输入二级密码")
+    private String secondPassword;
+
 }

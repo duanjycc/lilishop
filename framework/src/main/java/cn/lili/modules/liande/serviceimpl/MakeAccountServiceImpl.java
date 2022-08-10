@@ -275,7 +275,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         DestroyDetail de=new DestroyDetail();
         de.setUserId(Long.parseLong(st.getMemberId()));
         de.setCreateTime(new Date());
-        de.setMerName(st.getMemberName());
+        de.setMerName(st.getStoreName());
         de.setPrice(makeAccountDTO.getSurrenderPrice());
         de.setWantCount(wantsum);
         de.setStatus("0");

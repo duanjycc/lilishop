@@ -114,7 +114,7 @@ public class Member extends BaseEntity {
 
     @ApiModelProperty(value = "SSD卷数量")
     @TableField(value = "SSD")
-    private Double SSD;
+    private Double ssd;
     @ApiModelProperty(value = "区块地址")
     private String blockAddress;
 

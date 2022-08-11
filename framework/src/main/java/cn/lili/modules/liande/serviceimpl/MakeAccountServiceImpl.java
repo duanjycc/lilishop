@@ -105,7 +105,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         //计算需要卷的数量
         Double wantPrice=Double.valueOf(makeAccountDTO.getWantPrice());
         Double wantsum=makeAccountDTO.getSurrenderPrice()/wantPrice;
-        if(wantsum>member.getSSD()){
+        if(wantsum>member.getSsd()){
             return ResultUtil.error(ResultCode.INSUFFICIENT_QUANTITY_ERROR);
         }
 
@@ -126,7 +126,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
             me.setDisabled(true);
             me.setHaveStore(false);
             m.setFrozenSSD(0.0);
-            m.setSSD(0.0);
+            m.setSsd(0.0);
             m.setBlockAddress(UUID.randomUUID().toString());
             m.setPrivateKey(UUID.randomUUID().toString());
             m.setInviteeId(Long.valueOf(member.getId()));
@@ -151,7 +151,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         Member shnghMember=memberMapper.selectOne(shangWrapper);
         long jfs=(long)(sh.getNumericalAlue()*makeAccountDTO.getSurrenderPrice());
         shnghMember.setPoint(shnghMember.getPoint()+jfs);
-        shnghMember.setSSD(shnghMember.getSSD()-wantsum);
+        shnghMember.setSsd(shnghMember.getSsd()-wantsum);
         memberMapper.update(shnghMember,shangWrapper);
 
 
@@ -167,7 +167,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         yqrssdWrapper.eq("id",hy.getInviteeId());
         Member yqrMember=memberMapper.selectOne(yqrssdWrapper);
         if(yqrMember !=null){
-            yqrMember.setSSD(yqrMember.getSSD()+wantsum*(yq.getNumericalAlue().doubleValue()));
+            yqrMember.setSsd(yqrMember.getSsd()+wantsum*(yq.getNumericalAlue().doubleValue()));
             memberMapper.update(yqrMember,yqrssdWrapper);
         }
 
@@ -207,7 +207,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
                     QueryWrapper<Member> memberWrapper = new QueryWrapper();
                     memberWrapper.eq("mobile",adminUser.getUsername());
                     Member memberfws=memberMapper.selectOne(memberWrapper);
-                    memberfws.setSSD(memberfws.getSSD()+wantsum*Double.parseDouble(role.getDescription()));
+                    memberfws.setSsd(memberfws.getSsd()+wantsum*Double.parseDouble(role.getDescription()));
                     memberMapper.update(memberfws,memberWrapper);
 
                     //本服务商收益日志
@@ -232,7 +232,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
                             QueryWrapper<Member> sjmemberWrapper = new QueryWrapper();
                             sjmemberWrapper.eq("mobile",sjadminUser.getUsername());
                             Member sjmemberfws=memberMapper.selectOne(sjmemberWrapper);
-                            sjmemberfws.setSSD(sjmemberfws.getSSD()+wantsum*Double.parseDouble(role.getDescriptionParent()));
+                            sjmemberfws.setSsd(sjmemberfws.getSsd()+wantsum*Double.parseDouble(role.getDescriptionParent()));
                             memberMapper.update(sjmemberfws,sjmemberWrapper);
 
                             //父区域服务商收益日志

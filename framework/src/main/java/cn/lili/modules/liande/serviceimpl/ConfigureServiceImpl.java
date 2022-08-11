@@ -39,9 +39,13 @@ public class ConfigureServiceImpl extends ServiceImpl<ConfigureMapper, Configure
      */
     @Override
     public Object queryConfigureByType(String type,String blockAddress) {
-        Member member = queryMember(blockAddress);
-        Configure unitPrice = baseMapper.selectOne(new QueryWrapper<Configure>().lambda().eq(Configure::getType, type));
-        return ObjectUtils.isEmpty(member) ? 0 : unitPrice.getNumericalAlue();
+        Configure configure = baseMapper.selectOne(new QueryWrapper<Configure>().lambda().eq(Configure::getType, type));
+        if (ObjectUtils.isNotEmpty(blockAddress)){
+            Member member = queryMember(blockAddress);
+            return ObjectUtils.isEmpty(member) ? 0 : configure.getNumericalAlue();
+        }else {
+            return configure.getNumericalAlue();
+        }
     }
 
     private Member queryMember(String address) {

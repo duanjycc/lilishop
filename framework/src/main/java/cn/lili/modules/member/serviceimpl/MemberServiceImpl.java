@@ -131,31 +131,6 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         throw new ServiceException(ResultCode.USER_NOT_LOGIN);
     }
 
-//    QueryWrapper<Member> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.eq("mobile", mobilePhone);
-//    Member member = this.baseMapper.selectOne(queryWrapper);
-//    AdminUser adminUser = adminUserService.findByMobile(mobilePhone);
-//        if (ObjectUtils.isNotEmpty(adminUser)) {
-//        Department dept = departmentService.getById(adminUser.getDepartmentId());
-//        Department parentDept = departmentService.getById(dept.getParentId());
-//        List<Role> roles = roleService.list(new QueryWrapper<Role>().lambda().eq(Role::getDeleteFlag,false).in(Role::getId,Arrays.asList(adminUser.getRoleIds().split(","))));
-//        member.setMyRegionId(dept.getId());
-//        member.setMyRegion(dept.getTitle());
-//        member.setMyParentRegion(ObjectUtils.isEmpty(parentDept) ? null : parentDept.getTitle());
-//        member.setInviteeMobile(ObjectUtils.isEmpty(member.getInviteeId()) ? null : baseMapper.selectById(member.getInviteeId()).getMobile());
-//        member.setRoles(roles);
-//    }
-//
-//    //如果手机号不存在则自动注册用户
-//        if (member == null) {
-//        member = new Member(mobilePhone, UuidUtils.getUUID(), mobilePhone);
-//        registerHandler(member);
-//    }
-//    loginBindUser(member);
-//        return memberTokenGenerate.createAppToken(member, true);
-//
-
-
     /**
      * 获取当前登录的用户信息 - 缓存
      *
@@ -167,6 +142,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         if (tokenUser != null) {
             String mobilePhone = tokenUser.getMember().getMobile();
             Member member = this.baseMapper.selectOne(new QueryWrapper<Member>().lambda().eq(Member::getMobile,mobilePhone));
+            if (ObjectUtils.isNotEmpty(member.getInviteeId())){
+                member.setInviteeMobile(ObjectUtils.isEmpty(member.getInviteeId()) ? null : baseMapper.selectById(member.getInviteeId()).getMobile());
+            }
             AdminUser adminUser = adminUserService.findByMobile(mobilePhone);
             if (ObjectUtils.isNotEmpty(adminUser)) {
                 Department dept = departmentService.getById(adminUser.getDepartmentId());
@@ -175,7 +153,6 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
                 member.setMyRegionId(dept.getId());
                 member.setMyRegion(dept.getTitle());
                 member.setMyParentRegion(ObjectUtils.isEmpty(parentDept) ? null : parentDept.getTitle());
-                member.setInviteeMobile(ObjectUtils.isEmpty(member.getInviteeId()) ? null : baseMapper.selectById(member.getInviteeId()).getMobile());
                 member.setRoles(roles);
             }
             tokenUser.setMember(member);
@@ -372,7 +349,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
      * @return
      */
     @Override
-    public Token bindInvitee(String mobile) {
+    public boolean bindInvitee(String mobile) {
         Member member = baseMapper.selectOne(new QueryWrapper<Member>().lambda().eq(Member::getMobile, mobile)
                 .eq(Member::getDeleteFlag, DelStatusEnum.USE.getType()));
         Optional.ofNullable(member).orElseThrow(() -> new ServiceException(ResultCode.INVITATION_MEMBER_NOT_EXIST_ERROR));
@@ -380,14 +357,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         int update = baseMapper.update(null, new UpdateWrapper<Member>().lambda()
                 .set(Member::getInviteeId, member.getId())
                 .eq(Member::getId, UserContext.getCurrentUser().getId()));
-        if (update == 1){
-            Member currentMember = UserContext.getCurrentUser().getMember();
-            currentMember.setInviteeId(Long.parseLong(member.getId()));
-            currentMember.setInviteeMobile(mobile);
-            return  memberTokenGenerate.refreshAppToken(currentMember);
-        }else {
-            throw new ServiceException(ResultCode.INVITATION_BIND_ERROR);
-        }
+
+        return update == 0 ? false: true;
     }
 
     @Override

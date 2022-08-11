@@ -109,15 +109,15 @@ public class TransferOutRecordServiceImpl extends ServiceImpl<TransferOutRecordM
         if (!new BCryptPasswordEncoder().matches(transfer.getSecondPassword(), transferorMember.getPaymentPassword()))
             throw new ServiceException(ResultCode.TRANSFER_SECOND_PASSWORD_ERROR);
 
-        if (transfer.getTransferCount() > transferorMember.getSSD())
+        if (transfer.getTransferCount() > transferorMember.getSsd())
             throw new ServiceException(ResultCode.TRANSFER_COUNT_ERROR);
 
         // 内部转账
         if (ObjectUtils.isNotEmpty(acceptMember)) {
-            transferorMember.setSSD(transferorMember.getSSD() - transfer.getTransferCount());
+            transferorMember.setSsd(transferorMember.getSsd() - transfer.getTransferCount());
             memberMapper.updateById(transferorMember);
 
-            acceptMember.setSSD(acceptMember.getSSD() + transfer.getTransferCount());
+            acceptMember.setSsd(acceptMember.getSsd() + transfer.getTransferCount());
             memberMapper.updateById(acceptMember);
             // 转出
             RechargeRecord recharge = new RechargeRecord(acceptMember.getId(), acceptMember.getBlockAddress(), contractAddress, transfer.getTransferCount());

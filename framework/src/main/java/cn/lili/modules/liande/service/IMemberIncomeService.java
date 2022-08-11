@@ -1,7 +1,10 @@
 
 package cn.lili.modules.liande.service;
 
+import cn.lili.common.vo.PageVO;
 import cn.lili.modules.liande.entity.dos.MemberIncome;
+import cn.lili.modules.liande.entity.dos.TransferOutRecord;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -14,4 +17,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IMemberIncomeService extends IService<MemberIncome> {
 
+    /**
+     * 会员收益
+     * @param pageVo
+     * @param beginDate
+     * @param endDate
+     */
+    IPage<MemberIncome> memberDetails(PageVO pageVo, String beginDate, String endDate);
 }

@@ -3,7 +3,6 @@ package cn.lili.modules.liande.mapper;
 
 import cn.lili.modules.liande.entity.dos.MemberIncome;
 import cn.lili.modules.liande.entity.dos.TransferOutRecord;
-import cn.lili.modules.liande.entity.dto.QueryTransferDTO;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 

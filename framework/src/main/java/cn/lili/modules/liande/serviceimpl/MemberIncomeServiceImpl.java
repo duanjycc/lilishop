@@ -16,6 +16,7 @@ import cn.lili.mybatis.util.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,8 +47,8 @@ public class MemberIncomeServiceImpl extends ServiceImpl<MemberIncomeMapper, Mem
         Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
 
         QueryWrapper<MemberIncome> queryWrapper = new QueryWrapper();
-        queryWrapper.ge("t.creation_time",beginDate);
-        queryWrapper.le("t.creation_time",endDate);
+        queryWrapper.ge(ObjectUtils.isNotEmpty(beginDate),"t.creation_time",beginDate);
+        queryWrapper.le(ObjectUtils.isNotEmpty(endDate),"t.creation_time",endDate);
         queryWrapper.eq("t.user_id",currentUser.getId());
 //        queryWrapper.eq("t.receipt_status", DelStatusEnum.USE.getType());
         queryWrapper.orderByDesc("t.recharge_time");

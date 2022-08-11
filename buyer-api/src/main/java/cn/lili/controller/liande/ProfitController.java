@@ -4,11 +4,13 @@ import cn.lili.common.enums.ResultUtil;
 import cn.lili.common.vo.PageVO;
 import cn.lili.common.vo.ResultMessage;
 import cn.lili.modules.liande.entity.dos.MemberIncome;
-import cn.lili.modules.liande.entity.dos.RechargeRecord;
+import cn.lili.modules.liande.entity.dos.ServiceProviderIncome;
 import cn.lili.modules.liande.service.IMemberIncomeService;
-import cn.lili.modules.liande.serviceimpl.MemberIncomeServiceImpl;
+import cn.lili.modules.liande.service.IServiceProviderIncomeService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +29,8 @@ public class ProfitController {
 
     @Autowired
     private IMemberIncomeService memberIncomeService;
+    @Autowired
+    private IServiceProviderIncomeService serviceProviderIncomeService;
 
     @ApiOperation(value = "会员收益")
     @PostMapping("/member")
@@ -34,9 +38,17 @@ public class ProfitController {
         return ResultUtil.data(memberIncomeService.memberDetails(pageVo, beginDate,endDate));
     }
 
-//    @ApiOperation(value = "子区域收益")
-//    @PostMapping("/child/area")
-//    public ResultMessage<IPage<RechargeRecord>> transferInDetails(PageVO pageVo, @RequestParam String beginDate, @RequestParam String endDate){
-//        return ResultUtil.data(transferService.transferInDetails(pageVo, beginDate,endDate));
-//    }
+    @ApiOperation(value = "子区域收益")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "incomeType", value = "类型（0：区域收益，1子区域收益）", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "beginDate", value = "开始时间", dataType = "String"),
+            @ApiImplicitParam(name = "endDate", value = "结束时间", dataType = "String")
+    })
+    @PostMapping("/area")
+    public ResultMessage<IPage<ServiceProviderIncome>> areaDetails(PageVO pageVo,
+                                                                   @RequestParam int incomeType,
+                                                                   @RequestParam String beginDate,
+                                                                   @RequestParam String endDate){
+        return ResultUtil.data(serviceProviderIncomeService.areaDetails(pageVo,incomeType, beginDate,endDate));
+    }
 }

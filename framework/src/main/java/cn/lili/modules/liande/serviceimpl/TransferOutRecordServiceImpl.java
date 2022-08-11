@@ -64,8 +64,8 @@ public class TransferOutRecordServiceImpl extends ServiceImpl<TransferOutRecordM
         Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
 
         QueryWrapper<QueryTransferDTO> queryWrapper = new QueryWrapper();
-        queryWrapper.ge("t.recharge_time",beginDate);
-        queryWrapper.le("t.recharge_time",endDate);
+        queryWrapper.ge(ObjectUtils.isNotEmpty(beginDate),"t.recharge_time",beginDate);
+        queryWrapper.le(ObjectUtils.isNotEmpty(endDate),"t.recharge_time",endDate);
         queryWrapper.eq("t.user_id",currentUser.getId());
 //        queryWrapper.eq("t.receipt_status", DelStatusEnum.USE.getType());
         queryWrapper.orderByDesc("t.recharge_time");
@@ -86,8 +86,8 @@ public class TransferOutRecordServiceImpl extends ServiceImpl<TransferOutRecordM
         Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
 
         QueryWrapper<QueryTransferDTO> queryWrapper = new QueryWrapper();
-        queryWrapper.ge("t.recharge_time",beginDate);
-        queryWrapper.le("t.recharge_time",endDate);
+        queryWrapper.ge(ObjectUtils.isNotEmpty(beginDate),"t.recharge_time",beginDate);
+        queryWrapper.le(ObjectUtils.isNotEmpty(endDate),"t.recharge_time",endDate);
         queryWrapper.eq("t.user_id",currentUser.getId());
 //        queryWrapper.eq("t.recharge_status", DelStatusEnum.USE.getType());
         queryWrapper.orderByDesc("t.recharge_time");

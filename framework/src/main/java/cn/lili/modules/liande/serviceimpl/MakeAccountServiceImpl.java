@@ -269,6 +269,8 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         ma.setVipPhone(makeAccountDTO.getVipPhone());
         ma.setIsUse("0");
         ma.setWantPrice(makeAccountDTO.getWantPrice());
+        ma.setShReturnPower(sh.getNumericalAlue()*makeAccountDTO.getSurrenderPrice());
+        ma.setUserReturnPower(jf.getNumericalAlue()*makeAccountDTO.getSurrenderPrice());
         makeAccountMapper.insert(ma);
 
         //插入销毁明细

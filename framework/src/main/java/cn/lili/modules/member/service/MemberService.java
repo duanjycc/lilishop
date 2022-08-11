@@ -118,7 +118,7 @@ public interface MemberService extends IService<Member> {
      * @param mobile
      * @return
      */
-    Token bindInvitee(String mobile);
+    boolean bindInvitee(String mobile);
 
     /**
      * 是否可以初始化密码

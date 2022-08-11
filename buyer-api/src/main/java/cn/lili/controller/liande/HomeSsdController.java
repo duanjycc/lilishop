@@ -28,4 +28,5 @@ public class HomeSsdController {
     public ResultMessage<HomeSsdCountVO> count() {
         return ResultUtil.data(IHomeSsdCountService.count());
     }
+
 }

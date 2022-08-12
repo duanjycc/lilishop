@@ -283,7 +283,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         de.setStatus("0");
         de.setDestroyTime(new Date());
         de.setWantPrice(makeAccountDTO.getWantPrice());
-        destroyDetailMapper.insert(de) ;
+        destroyDetailMapper.insert(de);
 
         //邀请人获取SSD日志
         MemberIncome mi=new MemberIncome();
@@ -293,11 +293,8 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         mi.setQuantity(wantsum*(yq.getNumericalAlue().doubleValue()));
         mi.setIncomeProportion(yq.getNumericalAlue()+"");
         mi.setOrderId(mkid+"");
+        mi.setIncomeType("0");
         memberIncomeMapper.insert(mi);
-
-
-
-
         return ResultUtil.success();
     }
 }

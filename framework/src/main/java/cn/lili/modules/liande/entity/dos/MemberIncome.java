@@ -83,4 +83,10 @@ public class MemberIncome extends Model<MemberIncome> {
     @ApiModelProperty(value = "做单ID")
     private String orderId;
 
+    /**
+     * 收益类型
+     */
+    @ApiModelProperty(value = "收益类型")
+    private String incomeType;
+
 }

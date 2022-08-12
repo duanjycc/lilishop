@@ -3,6 +3,7 @@ package cn.lili.modules.liande.serviceimpl;
 
 import cn.lili.common.enums.ResultCode;
 import cn.lili.common.enums.ResultUtil;
+import cn.lili.common.exception.ServiceException;
 import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.context.UserContext;
 import cn.lili.common.vo.ResultMessage;
@@ -85,6 +86,14 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
     ServiceProviderIncomeMapper serviceProviderIncomeMapper;
     @Override
     public ResultMessage<Boolean> makeAccount(MakeAccountDTO makeAccountDTO) {
+        //当前登陆会员
+        Member member = UserContext.getCurrentUser().getMember();
+        //验证支付密码
+        QueryWrapper<Member> memberpassWrapper = new QueryWrapper();
+        memberpassWrapper.eq("username",member.getUsername());
+        Member memberpass=memberMapper.selectOne(memberpassWrapper);
+        if (!new BCryptPasswordEncoder().matches(makeAccountDTO.getSecondPassword(), memberpass.getPaymentPassword()))
+            throw new ServiceException(ResultCode.TRANSFER_SECOND_PASSWORD_ERROR);
 
         //用户积分倍数
         QueryWrapper<Configure> jfWrapper = new QueryWrapper();
@@ -98,8 +107,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
 
 
 
-        //当前登陆会员
-        Member member = UserContext.getCurrentUser().getMember();
+
 
 
         //计算需要卷的数量

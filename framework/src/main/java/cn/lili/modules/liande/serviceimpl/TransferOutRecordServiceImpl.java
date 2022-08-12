@@ -5,6 +5,7 @@ import cn.lili.common.enums.ResultCode;
 import cn.lili.common.exception.ServiceException;
 import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.context.UserContext;
+import cn.lili.common.utils.DateUtil;
 import cn.lili.common.vo.PageVO;
 import cn.lili.modules.liande.entity.dos.RechargeRecord;
 import cn.lili.modules.liande.entity.dos.TransferOutRecord;
@@ -52,6 +53,8 @@ public class TransferOutRecordServiceImpl extends ServiceImpl<TransferOutRecordM
     private RechargeRecordMapper rechargeRecordMapper;
 
 
+
+
     /**
      * 转出明细
      *
@@ -64,8 +67,8 @@ public class TransferOutRecordServiceImpl extends ServiceImpl<TransferOutRecordM
         Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
 
         QueryWrapper<QueryTransferDTO> queryWrapper = new QueryWrapper();
-        queryWrapper.ge(ObjectUtils.isNotEmpty(beginDate),"t.recharge_time",beginDate);
-        queryWrapper.le(ObjectUtils.isNotEmpty(endDate),"t.recharge_time",endDate);
+        queryWrapper.ge(ObjectUtils.isNotEmpty(beginDate),"t.recharge_time",beginDate + DateUtil.DATA_PREFIX);
+        queryWrapper.le(ObjectUtils.isNotEmpty(endDate),"t.recharge_time",endDate + DateUtil.DATA_SUFFIX);
         queryWrapper.eq("t.user_id",currentUser.getId());
 //        queryWrapper.eq("t.receipt_status", DelStatusEnum.USE.getType());
         queryWrapper.orderByDesc("t.recharge_time");
@@ -86,8 +89,8 @@ public class TransferOutRecordServiceImpl extends ServiceImpl<TransferOutRecordM
         Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
 
         QueryWrapper<QueryTransferDTO> queryWrapper = new QueryWrapper();
-        queryWrapper.ge(ObjectUtils.isNotEmpty(beginDate),"t.recharge_time",beginDate);
-        queryWrapper.le(ObjectUtils.isNotEmpty(endDate),"t.recharge_time",endDate);
+        queryWrapper.ge(ObjectUtils.isNotEmpty(beginDate),"t.recharge_time",beginDate + DateUtil.DATA_PREFIX);
+        queryWrapper.le(ObjectUtils.isNotEmpty(endDate),"t.recharge_time",endDate + DateUtil.DATA_SUFFIX);
         queryWrapper.eq("t.user_id",currentUser.getId());
 //        queryWrapper.eq("t.recharge_status", DelStatusEnum.USE.getType());
         queryWrapper.orderByDesc("t.recharge_time");

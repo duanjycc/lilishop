@@ -5,6 +5,7 @@ import cn.lili.common.enums.ResultCode;
 import cn.lili.common.exception.ServiceException;
 import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.context.UserContext;
+import cn.lili.common.utils.DateUtil;
 import cn.lili.common.vo.PageVO;
 import cn.lili.modules.liande.entity.dos.MemberIncome;
 import cn.lili.modules.liande.entity.dos.ServiceProviderIncome;
@@ -43,13 +44,13 @@ public class ServiceProviderIncomeServiceImpl extends ServiceImpl<ServiceProvide
      * @return
      */
     @Override
-    public IPage<ServiceProviderIncome> areaDetails(PageVO pageVo, int incomeType, String beginDate, String endDate) {
+    public IPage<ServiceProviderIncome> areaDetails(PageVO pageVo, String incomeType, String beginDate, String endDate) {
         AuthUser currentUser = UserContext.getCurrentUser();
         Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
 
         QueryWrapper<ServiceProviderIncome> queryWrapper = new QueryWrapper();
-        queryWrapper.ge(ObjectUtils.isNotEmpty(beginDate),"t.creation_time",beginDate);
-        queryWrapper.le(ObjectUtils.isNotEmpty(endDate),"t.creation_time",endDate);
+        queryWrapper.ge(ObjectUtils.isNotEmpty(beginDate),"t.creation_time",beginDate + DateUtil.DATA_PREFIX);
+        queryWrapper.le(ObjectUtils.isNotEmpty(endDate),"t.creation_time",endDate + DateUtil.DATA_SUFFIX);
         queryWrapper.eq("t.Income_type",incomeType);
         queryWrapper.eq("t.user_id",currentUser.getId());
 //        queryWrapper.eq("t.receipt_status", DelStatusEnum.USE.getType());

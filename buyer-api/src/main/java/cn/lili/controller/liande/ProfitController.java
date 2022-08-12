@@ -38,7 +38,7 @@ public class ProfitController {
         return ResultUtil.data(memberIncomeService.memberDetails(pageVo, beginDate,endDate));
     }
 
-    @ApiOperation(value = "子区域收益")
+    @ApiOperation(value = "区域/子区域收益")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "incomeType", value = "类型（0：区域收益，1子区域收益）", required = true, dataType = "String"),
             @ApiImplicitParam(name = "beginDate", value = "开始时间", dataType = "String"),
@@ -46,7 +46,7 @@ public class ProfitController {
     })
     @PostMapping("/area")
     public ResultMessage<IPage<ServiceProviderIncome>> areaDetails(PageVO pageVo,
-                                                                   @RequestParam int incomeType,
+                                                                   @RequestParam String incomeType,
                                                                    @RequestParam String beginDate,
                                                                    @RequestParam String endDate){
         return ResultUtil.data(serviceProviderIncomeService.areaDetails(pageVo,incomeType, beginDate,endDate));

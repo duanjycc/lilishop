@@ -26,5 +26,5 @@ public interface IServiceProviderIncomeService extends IService<ServiceProviderI
      * @param endDate
      * @return
      */
-    IPage<ServiceProviderIncome> areaDetails(PageVO pageVo, int incomeType, String beginDate, String endDate);
+    IPage<ServiceProviderIncome> areaDetails(PageVO pageVo, String incomeType, String beginDate, String endDate);
 }

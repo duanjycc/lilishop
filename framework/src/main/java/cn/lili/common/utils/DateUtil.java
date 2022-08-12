@@ -19,6 +19,8 @@ public class DateUtil {
 
     public static final String FULL_DATE = "yyyyMMddHHmmss";
 
+    public static final String  DATA_PREFIX = " 00:00:00";
+    public static final String  DATA_SUFFIX = " 23:59:59";
 
     /**
      * 当天的开始时间

@@ -115,22 +115,22 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         Member m= memberMapper.selectOne(queryWrapper);
         if(m==null){
             //注册用户后继续做单
-            Member me=new Member();
-            me.setUsername(makeAccountDTO.getVipPhone());
+            m=new Member();
+            m.setUsername(makeAccountDTO.getVipPhone());
             String password=new BCryptPasswordEncoder().encode(makeAccountDTO.getVipPhone().substring(makeAccountDTO.getVipPhone().length() - 6));
-            me.setPassword(password);
-            me.setNickName(makeAccountDTO.getVipPhone());
-            me.setSex(1);
-            me.setMobile(makeAccountDTO.getVipPhone());
-            me.setPoint(0l);
-            me.setDisabled(true);
-            me.setHaveStore(false);
+            m.setPassword(password);
+            m.setNickName(makeAccountDTO.getVipPhone());
+            m.setSex(1);
+            m.setMobile(makeAccountDTO.getVipPhone());
+            m.setPoint(0l);
+            m.setDisabled(true);
+            m.setHaveStore(false);
             m.setFrozenSSD(0.0);
             m.setSsd(0.0);
             m.setBlockAddress(UUID.randomUUID().toString());
             m.setPrivateKey(UUID.randomUUID().toString());
             m.setInviteeId(Long.valueOf(member.getId()));
-            memberService.registerHandler(me);
+            memberService.registerHandler(m);
         }
         //邀请人获得SSD卷数
         QueryWrapper<Configure> yqWrapper = new QueryWrapper();

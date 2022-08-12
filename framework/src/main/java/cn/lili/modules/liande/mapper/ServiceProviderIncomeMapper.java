@@ -23,6 +23,6 @@ import org.apache.ibatis.annotations.Select;
 public interface ServiceProviderIncomeMapper extends BaseMapper<ServiceProviderIncome> {
 
 
-    @Select("SELECT t.* FROM w_service_provider_income t ${ew.customSqlSegment} ")
+    @Select("SELECT t.*,w.mer_name  FROM w_service_provider_income t LEFT JOIN w_make_account w on t.order_id = w.id ${ew.customSqlSegment} ")
     IPage<ServiceProviderIncome> areaDetails(IPage<ServiceProviderIncome> page, @Param(Constants.WRAPPER) Wrapper<ServiceProviderIncome> queryWrapper);
 }

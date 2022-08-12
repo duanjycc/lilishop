@@ -54,7 +54,7 @@ public class ServiceProviderIncomeServiceImpl extends ServiceImpl<ServiceProvide
         queryWrapper.eq("t.Income_type",incomeType);
         queryWrapper.eq("t.user_id",currentUser.getId());
 //        queryWrapper.eq("t.receipt_status", DelStatusEnum.USE.getType());
-        queryWrapper.orderByDesc("t.recharge_time");
+        queryWrapper.orderByDesc("t.creation_time");
 
         return baseMapper.areaDetails(PageUtil.initPage(pageVo),queryWrapper);
     }

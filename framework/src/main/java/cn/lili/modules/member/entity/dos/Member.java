@@ -142,6 +142,10 @@ public class Member extends BaseEntity {
     @TableField(exist = false)
     private List<Role> roles;
 
+    @ApiModelProperty(value = "是否服务商")
+    @TableField(exist = false)
+    private String serviceProvider;
+
 
 
     public Member(String username, String password, String mobile) {

@@ -13,6 +13,7 @@ public enum UserEnums {
      */
     MEMBER("会员"),
     STORE("商家"),
+    SERVICE_PROVIDER("服务商"),
     MANAGER("管理员"),
     SYSTEM("系统");
     private final String role;

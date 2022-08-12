@@ -154,6 +154,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
                 member.setMyRegion(dept.getTitle());
                 member.setMyParentRegion(ObjectUtils.isEmpty(parentDept) ? null : parentDept.getTitle());
                 member.setRoles(roles);
+                member.setServiceProvider(UserEnums.SERVICE_PROVIDER.name());
             }
             tokenUser.setMember(member);
             return tokenUser;

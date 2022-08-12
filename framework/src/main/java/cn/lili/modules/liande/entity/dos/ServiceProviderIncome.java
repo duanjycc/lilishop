@@ -104,5 +104,6 @@ public class ServiceProviderIncome extends Model<ServiceProviderIncome> {
      */
     @ApiModelProperty(value = "下下级区域名称")
     private String lowerLevelArea;
-
+    @ApiModelProperty(value = "商铺名称")
+    private String merName;
 }

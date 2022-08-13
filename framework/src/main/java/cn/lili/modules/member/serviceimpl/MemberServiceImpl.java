@@ -354,7 +354,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         Member member = baseMapper.selectOne(new QueryWrapper<Member>().lambda().eq(Member::getMobile, mobile)
                 .eq(Member::getDeleteFlag, DelStatusEnum.USE.getType()));
         Optional.ofNullable(member).orElseThrow(() -> new ServiceException(ResultCode.INVITATION_MEMBER_NOT_EXIST_ERROR));
+        if (member.equals(UserContext.getCurrentUser().getMember().getMobile())){
 
+        }
         int update = baseMapper.update(null, new UpdateWrapper<Member>().lambda()
                 .set(Member::getInviteeId, member.getId())
                 .eq(Member::getId, UserContext.getCurrentUser().getId()));

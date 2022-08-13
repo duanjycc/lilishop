@@ -68,14 +68,14 @@ public class StoreManagerController {
 
     @ApiOperation(value = "添加店铺")
     @PostMapping(value = "/add")
-    public ResultMessage<Store> add(@Valid AdminStoreApplyDTO adminStoreApplyDTO) {
+    public ResultMessage<Store> add(AdminStoreApplyDTO adminStoreApplyDTO) {
         return ResultUtil.data(storeService.add(adminStoreApplyDTO));
     }
 
     @ApiOperation(value = "编辑店铺")
     @ApiImplicitParam(name = "storeId", value = "店铺ID", required = true, paramType = "path", dataType = "String")
     @PutMapping(value = "/edit/{id}")
-    public ResultMessage<Store> edit(@PathVariable String id, @Valid StoreEditDTO storeEditDTO) {
+    public ResultMessage<Store> edit(@PathVariable String id, StoreEditDTO storeEditDTO) {
         storeEditDTO.setStoreId(id);
         return ResultUtil.data(storeService.edit(storeEditDTO));
     }

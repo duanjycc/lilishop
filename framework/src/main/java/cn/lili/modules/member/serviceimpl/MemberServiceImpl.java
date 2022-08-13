@@ -793,4 +793,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         }
     }
 
+    public static void main(String[] args) {
+        String st = "566661";
+        String encode = new BCryptPasswordEncoder().encode(StringUtils.md5(st));
+        System.out.println( encode );
+    }
 }

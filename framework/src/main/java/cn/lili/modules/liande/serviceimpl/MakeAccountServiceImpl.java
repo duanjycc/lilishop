@@ -163,7 +163,10 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         memberMapper.update(shnghMember,shangWrapper);
 
 
-
+        //生成做当ID
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));//设置北京时间
+        long mkid=Long.parseLong(simpleDateFormat.format(new Date()));
 
 
         //邀请人获得SSD卷
@@ -177,12 +180,20 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         if(yqrMember !=null){
             yqrMember.setSsd(yqrMember.getSsd()+wantsum*(yq.getNumericalAlue().doubleValue()));
             memberMapper.update(yqrMember,yqrssdWrapper);
+
+            //邀请人获取SSD日志
+            MemberIncome mi=new MemberIncome();
+            mi.setConsumerUserid(Long.parseLong(hy.getId()));
+            mi.setUserId(Long.parseLong(yqrMember.getId()));
+            mi.setCreationTime(new Date());
+            mi.setQuantity(wantsum*(yq.getNumericalAlue().doubleValue()));
+            mi.setIncomeProportion(yq.getNumericalAlue()+"");
+            mi.setOrderId(mkid+"");
+            mi.setIncomeType("0");
+            memberIncomeMapper.insert(mi);
         }
 
-        //生成做当ID
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));//设置北京时间
-        long mkid=Long.parseLong(simpleDateFormat.format(new Date()));
+
 
         //区域服务商获得SSD卷
         //查出店铺所属服务商
@@ -293,16 +304,8 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         de.setWantPrice(makeAccountDTO.getWantPrice());
         destroyDetailMapper.insert(de);
 
-        //邀请人获取SSD日志
-        MemberIncome mi=new MemberIncome();
-        mi.setConsumerUserid(Long.parseLong(hy.getId()));
-        mi.setUserId(Long.parseLong(yqrMember.getId()));
-        mi.setCreationTime(new Date());
-        mi.setQuantity(wantsum*(yq.getNumericalAlue().doubleValue()));
-        mi.setIncomeProportion(yq.getNumericalAlue()+"");
-        mi.setOrderId(mkid+"");
-        mi.setIncomeType("0");
-        memberIncomeMapper.insert(mi);
+
+
         return ResultUtil.success();
     }
 }

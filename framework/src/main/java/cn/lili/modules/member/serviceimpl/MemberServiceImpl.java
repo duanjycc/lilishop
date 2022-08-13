@@ -141,15 +141,15 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         AuthUser tokenUser = UserContext.getCurrentUser();
         if (tokenUser != null) {
             String mobilePhone = tokenUser.getMember().getMobile();
-            Member member = this.baseMapper.selectOne(new QueryWrapper<Member>().lambda().eq(Member::getMobile,mobilePhone));
-            if (ObjectUtils.isNotEmpty(member.getInviteeId())){
+            Member member = this.baseMapper.selectOne(new QueryWrapper<Member>().lambda().eq(Member::getMobile, mobilePhone));
+            if (ObjectUtils.isNotEmpty(member.getInviteeId())) {
                 member.setInviteeMobile(ObjectUtils.isEmpty(member.getInviteeId()) ? null : baseMapper.selectById(member.getInviteeId()).getMobile());
             }
             AdminUser adminUser = adminUserService.findByMobile(mobilePhone);
             if (ObjectUtils.isNotEmpty(adminUser)) {
                 Department dept = departmentService.getById(adminUser.getDepartmentId());
                 Department parentDept = departmentService.getById(dept.getParentId());
-                List<Role> roles = roleService.list(new QueryWrapper<Role>().lambda().eq(Role::getDeleteFlag,false).in(Role::getId,Arrays.asList(adminUser.getRoleIds().split(","))));
+                List<Role> roles = roleService.list(new QueryWrapper<Role>().lambda().eq(Role::getDeleteFlag, false).in(Role::getId, Arrays.asList(adminUser.getRoleIds().split(","))));
                 member.setMyRegionId(dept.getId());
                 member.setMyRegion(dept.getTitle());
                 member.setMyParentRegion(ObjectUtils.isEmpty(parentDept) ? null : parentDept.getTitle());
@@ -279,7 +279,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         if (ObjectUtils.isNotEmpty(adminUser)) {
             Department dept = departmentService.getById(adminUser.getDepartmentId());
             Department parentDept = departmentService.getById(dept.getParentId());
-            List<Role> roles = roleService.list(new QueryWrapper<Role>().lambda().eq(Role::getDeleteFlag,false).in(Role::getId,Arrays.asList(adminUser.getRoleIds().split(","))));
+            List<Role> roles = roleService.list(new QueryWrapper<Role>().lambda().eq(Role::getDeleteFlag, false).in(Role::getId, Arrays.asList(adminUser.getRoleIds().split(","))));
             member.setMyRegionId(dept.getId());
             member.setMyRegion(dept.getTitle());
             member.setMyParentRegion(ObjectUtils.isEmpty(parentDept) ? null : parentDept.getTitle());
@@ -289,7 +289,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
         //如果手机号不存在则自动注册用户
         if (member == null) {
-            member = new Member(mobilePhone, UuidUtils.getUUID(), mobilePhone);
+            //String password = new BCryptPasswordEncoder().encode(mobilePhone.substring(mobilePhone.length() - 6));
+            String password = new BCryptPasswordEncoder().encode(StringUtils.md5(mobilePhone.substring(mobilePhone.length() - 6)));
+            member = new Member(mobilePhone, password, mobilePhone);
             registerHandler(member);
         }
         loginBindUser(member);
@@ -354,14 +356,14 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         Member member = baseMapper.selectOne(new QueryWrapper<Member>().lambda().eq(Member::getMobile, mobile)
                 .eq(Member::getDeleteFlag, DelStatusEnum.USE.getType()));
         Optional.ofNullable(member).orElseThrow(() -> new ServiceException(ResultCode.INVITATION_MEMBER_NOT_EXIST_ERROR));
-        if (member.equals(UserContext.getCurrentUser().getMember().getMobile())){
+        if (member.equals(UserContext.getCurrentUser().getMember().getMobile())) {
 
         }
         int update = baseMapper.update(null, new UpdateWrapper<Member>().lambda()
                 .set(Member::getInviteeId, member.getId())
                 .eq(Member::getId, UserContext.getCurrentUser().getId()));
 
-        return update == 0 ? false: true;
+        return update == 0 ? false : true;
     }
 
     @Override
@@ -742,7 +744,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     @Override
     public void logout(UserEnums userEnums) {
         String mobile = UserContext.getCurrentUser().getMember().getMobile();
-        String key = CachePrefix.ACCESS_TOKEN.getPrefix(userEnums)+":"+ mobile;
+        String key = CachePrefix.ACCESS_TOKEN.getPrefix(userEnums) + ":" + mobile;
         if (CharSequenceUtil.isNotEmpty(mobile)) {
             cache.remove(key);
         }
@@ -790,4 +792,5 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             throw new ServiceException(ResultCode.USER_EXIST);
         }
     }
+
 }

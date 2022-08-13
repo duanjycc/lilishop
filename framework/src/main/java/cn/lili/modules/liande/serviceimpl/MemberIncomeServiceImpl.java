@@ -7,6 +7,7 @@ import cn.lili.common.enums.ResultCode;
 import cn.lili.common.exception.ServiceException;
 import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.context.UserContext;
+import cn.lili.common.utils.DateUtil;
 import cn.lili.common.vo.PageVO;
 import cn.lili.modules.liande.entity.dos.MemberIncome;
 import cn.lili.modules.liande.entity.dto.QueryTransferDTO;
@@ -47,11 +48,11 @@ public class MemberIncomeServiceImpl extends ServiceImpl<MemberIncomeMapper, Mem
         Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
 
         QueryWrapper<MemberIncome> queryWrapper = new QueryWrapper();
-        queryWrapper.ge(ObjectUtils.isNotEmpty(beginDate),"t.creation_time",beginDate);
-        queryWrapper.le(ObjectUtils.isNotEmpty(endDate),"t.creation_time",endDate);
+        queryWrapper.ge(ObjectUtils.isNotEmpty(beginDate),"t.creation_time",beginDate+ DateUtil.DATA_PREFIX);
+        queryWrapper.le(ObjectUtils.isNotEmpty(endDate),"t.creation_time",endDate+ DateUtil.DATA_SUFFIX);
         queryWrapper.eq("t.user_id",currentUser.getId());
 //        queryWrapper.eq("t.receipt_status", DelStatusEnum.USE.getType());
-        queryWrapper.orderByDesc("t.recharge_time");
+        queryWrapper.orderByDesc("t.creation_time");
 
         return baseMapper.memberDetails(PageUtil.initPage(pageVo),queryWrapper);
     }

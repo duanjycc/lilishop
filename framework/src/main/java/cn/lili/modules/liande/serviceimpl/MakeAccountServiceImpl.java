@@ -244,21 +244,29 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
                         AdminUser sjadminUser = adminUserMapper.selectOne(sjadminUserQueryWrapper);
 
                         if (sjadminUser != null) {
+
+                            //查找父服务商角色
+                            QueryWrapper<Role> fjRoleWrapper = new QueryWrapper();
+                            fjRoleWrapper.eq("id", sjadminUser.getRoleIds());
+                            Role fjrole = roleMapper.selectOne(fjRoleWrapper);
+
                             //根据角色分配比列给当前服务商上级分ssd
                             QueryWrapper<Member> sjmemberWrapper = new QueryWrapper();
                             sjmemberWrapper.eq("mobile", sjadminUser.getUsername());
                             Member sjmemberfws = memberMapper.selectOne(sjmemberWrapper);
-                            sjmemberfws.setSsd(sjmemberfws.getSsd() + wantsum * Double.parseDouble(role.getDescriptionParent()));
+                            sjmemberfws.setSsd(sjmemberfws.getSsd() + wantsum * Double.parseDouble(fjrole.getDescriptionParent()));
                             memberMapper.update(sjmemberfws, sjmemberWrapper);
+
+
 
                             //父区域服务商收益日志
                             ServiceProviderIncome ssj = new ServiceProviderIncome();
                             si.setConsumerUserid(Long.parseLong(userMember.getId()));
                             si.setUserId(Long.parseLong(sjmemberfws.getId()));
                             si.setCreationTime(new Date());
-                            si.setQuantity(wantsum * Double.parseDouble(role.getDescriptionParent()));
+                            si.setQuantity(wantsum * Double.parseDouble(fjrole.getDescriptionParent()));
                             si.setIncomeType(1l);
-                            si.setIncomeProportion(role.getDescriptionParent());
+                            si.setIncomeProportion(fjrole.getDescriptionParent());
                             si.setOrderId(mkid + "");
                             serviceProviderIncomeMapper.insert(ssj);
                         }
@@ -303,5 +311,10 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
 
 
         return ResultUtil.success();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(new BCryptPasswordEncoder().encode(StringUtils.md5("18268154183".substring("18268154183".length() - 6))));
+        System.out.println(StringUtils.md5("18268154183".substring("18268154183".length() - 6)));
     }
 }

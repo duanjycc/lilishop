@@ -58,8 +58,7 @@ public class UploadController {
                                         String base64,
                                         @RequestHeader String accessToken) {
 
-
-        AuthUser authUser = UserContext.getAuthUser(cache, accessToken);
+        AuthUser authUser =  UserContext.getCurrentUser();
         //如果用户未登录，则无法上传图片
         if (authUser == null) {
             throw new ServiceException(ResultCode.USER_AUTHORITY_ERROR);

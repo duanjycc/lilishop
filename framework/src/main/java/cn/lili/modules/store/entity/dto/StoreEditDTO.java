@@ -123,6 +123,9 @@ public class StoreEditDTO {
     @ApiModelProperty(value = "店铺经营类目")
     private String goodsManagementCategory;
 
+    @ApiModelProperty(value = "店铺经营类目中文")
+    private String goodsManagementCategoryName;
+
     @ApiModelProperty(value = "结算周期")
     private String settlementCycle;
 

@@ -34,6 +34,13 @@ public interface StoreService extends IService<Store> {
     StoreVO getStoreDetail();
 
     /**
+     * app商铺入住
+     * @param dto
+     * @return
+     */
+    Boolean settleIn(AdminStoreApplyDTO dto);
+
+    /**
      * 增加店铺
      * 用于后台添加店铺
      *

@@ -62,6 +62,12 @@ public class StoreBuyerController {
         return ResultUtil.success();
     }
 
+    @ApiOperation(value = "获取店铺列表分页")
+    @GetMapping("/getMakeByPage")
+    public ResultMessage<IPage<StoreVO>> getMakeByPage(StoreSearchParams entity, PageVO page) {
+        entity.setMemberId(UserContext.getCurrentUser().getId());
+        return ResultUtil.data(storeService.findMakeByConditionPage(entity, page));
+    }
 
     @ApiOperation(value = "获取店铺列表分页")
     @GetMapping

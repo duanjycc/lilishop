@@ -79,6 +79,20 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
     private Cache cache;
 
     @Override
+    public IPage<StoreVO> findMakeByConditionPage(StoreSearchParams storeSearchParams, PageVO page) {
+        QueryWrapper<StoreVO> wrapper = storeSearchParams.queryWrapper();
+        if (StringUtils.isNotEmpty(storeSearchParams.getMemberId())){
+            wrapper.eq("member_id",Long.parseLong(storeSearchParams.getMemberId()));
+        }
+        if (StringUtils.isNotEmpty(storeSearchParams.getStoreDisable())) {
+            wrapper.eq("store_disable", storeSearchParams.getStoreDisable());
+        } else {
+             wrapper.eq("store_disable", StoreStatusEnum.OPEN.name()).or().eq("store_disable", StoreStatusEnum.CLOSED.name());
+        }
+        return this.baseMapper.getStoreList(PageUtil.initPage(page),wrapper);
+    }
+
+    @Override
     public IPage<StoreVO> findByConditionPage(StoreSearchParams storeSearchParams, PageVO page) {
         AuthUser currentUser = UserContext.getCurrentUser();
         Optional.ofNullable(currentUser).orElseThrow(()-> new ServiceException(ResultCode.USER_NOT_LOGIN));
@@ -150,7 +164,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
 
         //添加店铺
         Store store = new Store(member, adminStoreApplyDTO);
-        AdminUser adminUser = adminUserService.getById(adminStoreApplyDTO.getMemberId());
+        AdminUser adminUser = adminUserService.findByMobile(member.getMobile());
         if (ObjectUtils.isNotEmpty(adminUser)){
             store.setStoreDisable(StoreStatusEnum.OPEN.value());
         }

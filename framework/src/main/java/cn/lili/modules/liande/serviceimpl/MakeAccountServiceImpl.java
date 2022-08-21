@@ -192,16 +192,21 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         }
 
 
+
         //区域服务商获得SSD卷
         //查出店铺所属服务商
         QueryWrapper<Store> storeWrapper = new QueryWrapper();
         storeWrapper.eq("id", makeAccountDTO.getMerId());
         Store st = storeMapper.selectOne(storeWrapper);
-        String addressId = st.getStoreAddressIdPath();
+        String addressId =null;
+        try {
+        addressId = st.getStoreAddressIdPath();
         String[] strs = addressId.split(",");
         addressId = strs[strs.length - 2];
         addressId = addressId.replace("\"/", "");
-
+        }catch (Exception e){
+            addressId="null";
+        }
 
         //根据区域ID查找部门
         QueryWrapper<Department> departmentQueryWrapper = new QueryWrapper();

@@ -310,8 +310,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         member.setPrivateKey(UuidUtils.getUUID());
         //保存会员
         this.save(member);
-        String destination = rocketmqCustomProperties.getMemberTopic() + ":" + MemberTagsEnum.MEMBER_REGISTER.name();
-        rocketMQTemplate.asyncSend(destination, member, RocketmqSendCallbackBuilder.commonCallback());
+        //String destination = rocketmqCustomProperties.getMemberTopic() + ":" + MemberTagsEnum.MEMBER_REGISTER.name();
+        //rocketMQTemplate.asyncSend(destination, member, RocketmqSendCallbackBuilder.commonCallback());
     }
 
     @Override

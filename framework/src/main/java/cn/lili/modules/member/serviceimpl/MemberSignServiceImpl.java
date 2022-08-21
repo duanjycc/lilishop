@@ -60,8 +60,9 @@ public class MemberSignServiceImpl extends ServiceImpl<MemberSignMapper, MemberS
 
     @Override
     public Boolean memberSign() {
+        return true;
         //获取当前会员信息
-        AuthUser authUser = UserContext.getCurrentUser();
+       /* AuthUser authUser = UserContext.getCurrentUser();
         if (authUser != null) {
             //当前签到天数的前一天日期
             List<MemberSign> signs = this.baseMapper.getBeforeMemberSign(authUser.getId());
@@ -89,7 +90,7 @@ public class MemberSignServiceImpl extends ServiceImpl<MemberSignMapper, MemberS
                 throw new ServiceException(ResultCode.MEMBER_SIGN_REPEAT);
             }
         }
-        throw new ServiceException(ResultCode.USER_NOT_LOGIN);
+        throw new ServiceException(ResultCode.USER_NOT_LOGIN);*/
     }
 
     @Override

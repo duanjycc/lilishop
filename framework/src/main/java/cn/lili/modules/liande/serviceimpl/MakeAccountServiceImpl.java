@@ -313,8 +313,8 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         return ResultUtil.success();
     }
 
-    public static void main(String[] args) {
-        System.out.println(new BCryptPasswordEncoder().encode(StringUtils.md5("18268154183".substring("18268154183".length() - 6))));
-        System.out.println(StringUtils.md5("18268154183".substring("18268154183".length() - 6)));
-    }
+//    public static void main(String[] args) {
+//        System.out.println(new BCryptPasswordEncoder().encode(StringUtils.md5("18268154183".substring("18268154183".length() - 6))));
+//        System.out.println(StringUtils.md5("18268154183".substring("18268154183".length() - 6)));
+//    }
 }

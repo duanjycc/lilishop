@@ -266,13 +266,13 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
 
                             //父区域服务商收益日志
                             ServiceProviderIncome ssj = new ServiceProviderIncome();
-                            si.setConsumerUserid(Long.parseLong(userMember.getId()));
-                            si.setUserId(Long.parseLong(sjmemberfws.getId()));
-                            si.setCreationTime(new Date());
-                            si.setQuantity(wantsum * Double.parseDouble(fjrole.getDescriptionParent()));
-                            si.setIncomeType(1l);
-                            si.setIncomeProportion(fjrole.getDescriptionParent());
-                            si.setOrderId(mkid + "");
+                            ssj.setConsumerUserid(Long.parseLong(userMember.getId()));
+                            ssj.setUserId(Long.parseLong(sjmemberfws.getId()));
+                            ssj.setCreationTime(new Date());
+                            ssj.setQuantity(wantsum * Double.parseDouble(fjrole.getDescriptionParent()));
+                            ssj.setIncomeType(1l);
+                            ssj.setIncomeProportion(fjrole.getDescriptionParent());
+                            ssj.setOrderId(mkid + "");
                             serviceProviderIncomeMapper.insert(ssj);
                         }
 

@@ -3,7 +3,12 @@
  */
 package cn.lili.modules.liande.service;
 
+import cn.lili.common.vo.PageVO;
+import cn.lili.modules.liande.entity.dos.MemberIncome;
 import cn.lili.modules.liande.entity.dos.PendingOrderForm;
+import cn.lili.modules.liande.entity.dto.PendingOrderFormDTO;
+import cn.lili.modules.liande.entity.vo.PendingOrderFormVO;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -16,4 +21,15 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IPendingOrderFormService extends IService<PendingOrderForm> {
 
+    IPage<PendingOrderForm>  listOfPendingOrders(PageVO page,String sort,String business);
+
+    PendingOrderForm pendingOrderInformation();
+
+    Boolean insertPendingOrder(PendingOrderFormDTO pendingOrderFormDTO);
+
+    Boolean updatePendingOrder(PendingOrderFormDTO pendingOrderFormDTO);
+
+    Boolean deletePendingOrder();
+
+    PendingOrderForm contactInformation(PendingOrderFormDTO pendingOrderFormDTO);
 }

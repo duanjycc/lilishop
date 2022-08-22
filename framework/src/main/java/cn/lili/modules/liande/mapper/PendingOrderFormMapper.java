@@ -4,9 +4,15 @@
 package cn.lili.modules.liande.mapper;
 
 import cn.lili.modules.liande.entity.dos.PendingOrderForm;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * <p>
@@ -18,5 +24,6 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface PendingOrderFormMapper extends BaseMapper<PendingOrderForm> {
-
+    @Select("SELECT * FROM pending_order_form")
+    IPage<PendingOrderForm> listOfPendingOrders(Page<Object> initPage, @Param(Constants.WRAPPER)QueryWrapper<PendingOrderForm> queryWrapper);
 }

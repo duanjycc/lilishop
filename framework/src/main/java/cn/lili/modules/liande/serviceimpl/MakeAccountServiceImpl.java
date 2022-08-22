@@ -308,7 +308,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         de.setCreateTime(new Date());
         de.setMerName(st.getStoreName());
         de.setPrice(makeAccountDTO.getSurrenderPrice());
-        de.setWantCount(wantsum);
+        de.setWantCount(wantsum*0.72);
         de.setStatus("0");
         de.setDestroyTime(new Date());
         de.setWantPrice(makeAccountDTO.getWantPrice());

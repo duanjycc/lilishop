@@ -10,10 +10,7 @@ import cn.lili.common.utils.StringUtils;
 import cn.lili.common.vo.ResultMessage;
 import cn.lili.modules.liande.entity.dos.*;
 import cn.lili.modules.liande.entity.dto.MakeAccountDTO;
-import cn.lili.modules.liande.mapper.DestroyDetailMapper;
-import cn.lili.modules.liande.mapper.MakeAccountMapper;
-import cn.lili.modules.liande.mapper.MemberIncomeMapper;
-import cn.lili.modules.liande.mapper.ServiceProviderIncomeMapper;
+import cn.lili.modules.liande.mapper.*;
 import cn.lili.modules.liande.service.IConfigureService;
 import cn.lili.modules.liande.service.IMakeAccountService;
 import cn.lili.modules.member.entity.dos.Member;
@@ -86,6 +83,8 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
     @Autowired
     ServiceProviderIncomeMapper serviceProviderIncomeMapper;
 
+    @Autowired
+    ScoreAcquisitionMapper  scoreAcquisitionMapper;
     @Override
     public ResultMessage<Boolean> makeAccount(MakeAccountDTO makeAccountDTO) {
         //当前登陆会员
@@ -150,6 +149,8 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         long jfh = (long) (jf.getNumericalAlue() * makeAccountDTO.getSurrenderPrice());
         userMember.setPoint(userMember.getPoint() + jfh);
         memberMapper.update(userMember, userWrapper);
+
+
 
         //商户获得积分/减去相对应的SSD
         QueryWrapper<Member> shangWrapper = new QueryWrapper();
@@ -314,6 +315,26 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         de.setWantPrice(makeAccountDTO.getWantPrice());
         destroyDetailMapper.insert(de);
 
+        //插入会员获取积分明细
+        ScoreAcquisition scoreAcquisition=new ScoreAcquisition();
+        scoreAcquisition.setCreateTime(new Date());
+        scoreAcquisition.setIntegralType(0l);
+        scoreAcquisition.setUserId(userMember.getId());
+        scoreAcquisition.setMerId(st.getId());
+        scoreAcquisition.setMerName(st.getStoreName());
+        scoreAcquisition.setOrderId(mkid);
+        scoreAcquisitionMapper.insert(scoreAcquisition);
+
+
+        //插入商户获取积分明细
+        ScoreAcquisition scoreAcquisitionsh=new ScoreAcquisition();
+        scoreAcquisitionsh.setCreateTime(new Date());
+        scoreAcquisitionsh.setIntegralType(1l);
+        scoreAcquisitionsh.setUserId(st.getMemberId());
+        scoreAcquisitionsh.setMerId(st.getId());
+        scoreAcquisitionsh.setMerName(st.getStoreName());
+        scoreAcquisitionsh.setOrderId(mkid);
+        scoreAcquisitionMapper.insert(scoreAcquisitionsh);
 
         return ResultUtil.success();
     }

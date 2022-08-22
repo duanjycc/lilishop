@@ -310,8 +310,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         member.setPrivateKey(UuidUtils.getUUID());
         //保存会员
         this.save(member);
-        String destination = rocketmqCustomProperties.getMemberTopic() + ":" + MemberTagsEnum.MEMBER_REGISTER.name();
-        rocketMQTemplate.asyncSend(destination, member, RocketmqSendCallbackBuilder.commonCallback());
+        //String destination = rocketmqCustomProperties.getMemberTopic() + ":" + MemberTagsEnum.MEMBER_REGISTER.name();
+        //rocketMQTemplate.asyncSend(destination, member, RocketmqSendCallbackBuilder.commonCallback());
     }
 
     @Override
@@ -743,10 +743,14 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
      */
     @Override
     public void logout(UserEnums userEnums) {
-        String mobile = UserContext.getCurrentUser().getMember().getMobile();
-        String key = CachePrefix.ACCESS_TOKEN.getPrefix(userEnums) + ":" + mobile;
-        if (CharSequenceUtil.isNotEmpty(mobile)) {
-            cache.remove(key);
+        AuthUser currentUser = UserContext.getCurrentUser();
+        if (ObjectUtils.isNotEmpty(currentUser)) {
+            String mobile = UserContext.getCurrentUser().getMember().getMobile();
+            String key = CachePrefix.ACCESS_TOKEN.getPrefix(userEnums) + ":" + mobile;
+            String jwt = (String) cache.get(key);
+            if (CharSequenceUtil.isNotEmpty(mobile) && StringUtils.isNotEmpty(jwt)) {
+                cache.remove(key);
+            }
         }
     }
 
@@ -793,4 +797,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         }
     }
 
+    public static void main(String[] args) {
+        String st = "154183";
+        String encode = new BCryptPasswordEncoder().encode(StringUtils.md5(st));
+        System.out.println(  encode );
+    }
 }

@@ -9,6 +9,7 @@ import cn.lili.common.properties.RocketmqCustomProperties;
 import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.context.UserContext;
 import cn.lili.common.utils.BeanUtil;
+import cn.lili.common.utils.StringUtils;
 import cn.lili.modules.goods.entity.dos.Category;
 import cn.lili.modules.goods.service.CategoryService;
 import cn.lili.modules.goods.service.GoodsService;
@@ -28,6 +29,7 @@ import cn.lili.modules.store.service.StoreService;
 import cn.lili.rocketmq.RocketmqSendCallbackBuilder;
 import cn.lili.rocketmq.tags.GoodsTagsEnum;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -36,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 店铺详细业务层实现
@@ -71,10 +74,11 @@ public class StoreDetailServiceImpl extends ServiceImpl<StoreDetailMapper, Store
 
     @Override
     public StoreDetailVO getStoreDetailVO(String storeId) {
-        StoreDetailVO storeDetailVO = (StoreDetailVO) cache.get(CachePrefix.STORE.getPrefix() + storeId);
-        if (storeDetailVO == null) {
-            storeDetailVO = this.baseMapper.getStoreDetail(storeId);
-            cache.put(CachePrefix.STORE.getPrefix() + storeId, storeDetailVO, 7200L);
+        StoreDetailVO storeDetailVO = this.baseMapper.getStoreDetail(storeId);
+        if (StringUtils.isNotEmpty(storeDetailVO.getGoodsManagementCategory())){
+            List<String> list = categoryService.list(new QueryWrapper<Category>().lambda().in(Category::getId, storeDetailVO.getGoodsManagementCategory().split(","))).stream().map(Category::getName).collect(Collectors.toList());
+            String join = String.join(",", list);
+            storeDetailVO.setGoodsManagementCategoryName(join);
         }
         return storeDetailVO;
     }

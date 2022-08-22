@@ -6,9 +6,7 @@ import cn.lili.common.vo.PageVO;
 import cn.lili.common.vo.ResultMessage;
 import cn.lili.modules.goods.entity.vos.StoreGoodsLabelVO;
 import cn.lili.modules.goods.service.StoreGoodsLabelService;
-import cn.lili.modules.store.entity.dto.StoreBankDTO;
-import cn.lili.modules.store.entity.dto.StoreCompanyDTO;
-import cn.lili.modules.store.entity.dto.StoreOtherInfoDTO;
+import cn.lili.modules.store.entity.dto.*;
 import cn.lili.modules.store.entity.vos.*;
 import cn.lili.modules.store.service.StoreDetailService;
 import cn.lili.modules.store.service.StoreService;
@@ -51,6 +49,26 @@ public class StoreBuyerController {
     @Autowired
     private StoreDetailService storeDetailService;
 
+    @ApiOperation(value = "申请商铺-入驻店铺")
+    @PostMapping(value = "/settleIn")
+    public ResultMessage<Object> settleIn(AdminStoreApplyDTO dto) {
+        return ResultUtil.data(storeService.settleIn(dto));
+    }
+
+    @ApiOperation(value = "app审核")
+    @GetMapping("/audit/{id}/{pass}")
+    public ResultMessage<Object> audit(@NotNull @PathVariable String id,@NotNull @PathVariable Integer pass) {
+        storeService.audit(id, pass);
+        return ResultUtil.success();
+    }
+
+    @ApiOperation(value = "获取店铺列表分页")
+    @GetMapping("/getMakeByPage")
+    public ResultMessage<IPage<StoreVO>> getMakeByPage(StoreSearchParams entity, PageVO page) {
+        entity.setMemberId(UserContext.getCurrentUser().getId());
+        return ResultUtil.data(storeService.findMakeByConditionPage(entity, page));
+    }
+
     @ApiOperation(value = "获取店铺列表分页")
     @GetMapping
     public ResultMessage<IPage<StoreVO>> getByPage(StoreSearchParams entity, PageVO page) {
@@ -61,8 +79,8 @@ public class StoreBuyerController {
     @ApiOperation(value = "通过id获取店铺信息")
     @ApiImplicitParam(name = "id", value = "店铺ID", required = true, paramType = "path")
     @GetMapping(value = "/get/detail/{id}")
-    public ResultMessage<StoreBasicInfoVO> detail(@NotNull @PathVariable String id) {
-        return ResultUtil.data(storeDetailService.getStoreBasicInfoDTO(id));
+    public ResultMessage<StoreDetailVO> detail(@NotNull @PathVariable String id) {
+        return ResultUtil.data(storeDetailService.getStoreDetailVO(id));
     }
 
     @ApiOperation(value = "通过id获取店铺详细信息-营业执照")

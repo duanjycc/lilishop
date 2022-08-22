@@ -1,5 +1,6 @@
 package cn.lili.common.security.token;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.lili.cache.Cache;
 import cn.lili.cache.CachePrefix;
 import cn.lili.common.enums.ResultCode;
@@ -8,6 +9,7 @@ import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.enums.SecurityEnum;
 import cn.lili.common.security.enums.UserEnums;
 import cn.lili.common.properties.JWTTokenProperties;
+import cn.lili.common.utils.StringUtils;
 import cn.lili.modules.member.entity.dos.Member;
 import com.google.gson.Gson;
 import io.jsonwebtoken.*;
@@ -64,6 +66,11 @@ public class TokenUtil {
         String accessToken = createToken(mobile, claim, tokenProperties.getAppTokenExpireTime());
 
         String key = CachePrefix.ACCESS_TOKEN.getPrefix(userEnums)+":"+ mobile;
+        String jwt = (String) cache.get(key);
+        if (CharSequenceUtil.isNotEmpty(mobile) && StringUtils.isNotEmpty(jwt)) {
+            cache.remove(key);
+        }
+
         cache.put(key,accessToken,tokenProperties.getAppTokenExpireTime(),TimeUnit.MINUTES);
         token.setAccessToken(accessToken);
         token.setRefreshToken(accessToken);

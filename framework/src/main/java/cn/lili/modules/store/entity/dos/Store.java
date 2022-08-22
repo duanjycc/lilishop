@@ -1,5 +1,7 @@
 package cn.lili.modules.store.entity.dos;
 
+import cn.lili.common.security.context.UserContext;
+import cn.lili.modules.store.entity.dto.StoreSettleInDTO;
 import cn.lili.mybatis.BaseEntity;
 import cn.lili.common.utils.BeanUtil;
 import cn.lili.modules.member.entity.dos.Member;
@@ -45,6 +47,9 @@ public class Store extends BaseEntity {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @ApiModelProperty(value = "店铺关闭时间")
     private Date storeEndTime;
+
+    @ApiModelProperty(value = "经营范围")
+    private String scopeIds;
 
     /**
      * @see StoreStatusEnum
@@ -102,6 +107,20 @@ public class Store extends BaseEntity {
     private String merchantEuid;
 
 
+    public Store(StoreSettleInDTO dto) {
+        BeanUtil.copyProperties(dto, this);
+        this.memberId = UserContext.getCurrentUser().getId();
+        this.memberName = UserContext.getCurrentUser().getUsername();
+        this.storeDisable = StoreStatusEnum.APPLY.value();
+        this.selfOperated = false;
+        this.deliveryScore = 0.0;
+        this.serviceScore = 0.0;
+        this.descriptionScore = 0.0;
+        this.goodsNum = 0;
+        this.collectionNum = 0;
+    }
+
+
     public Store(Member member) {
         this.memberId = member.getId();
         this.memberName = member.getUsername();
@@ -116,7 +135,6 @@ public class Store extends BaseEntity {
 
     public Store(Member member, AdminStoreApplyDTO adminStoreApplyDTO) {
         BeanUtil.copyProperties(adminStoreApplyDTO, this);
-
         this.memberId = member.getId();
         this.memberName = member.getUsername();
         storeDisable = StoreStatusEnum.APPLYING.value();

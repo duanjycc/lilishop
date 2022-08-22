@@ -8,12 +8,20 @@ import cn.lili.common.enums.ResultCode;
 import cn.lili.common.exception.ServiceException;
 import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.context.UserContext;
+import cn.lili.common.security.enums.UserEnums;
 import cn.lili.common.utils.BeanUtil;
+import cn.lili.common.utils.StringUtils;
 import cn.lili.common.vo.PageVO;
+import cn.lili.modules.file.entity.File;
+import cn.lili.modules.file.mapper.FileMapper;
 import cn.lili.modules.goods.service.GoodsService;
 import cn.lili.modules.member.entity.dos.Member;
 import cn.lili.modules.member.entity.dto.CollectionDTO;
 import cn.lili.modules.member.service.MemberService;
+import cn.lili.modules.permission.entity.dos.AdminUser;
+import cn.lili.modules.permission.entity.dos.Department;
+import cn.lili.modules.permission.service.AdminUserService;
+import cn.lili.modules.permission.service.DepartmentService;
 import cn.lili.modules.store.entity.dos.Store;
 import cn.lili.modules.store.entity.dos.StoreDetail;
 import cn.lili.modules.store.entity.dto.*;
@@ -27,13 +35,16 @@ import cn.lili.mybatis.util.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -46,29 +57,58 @@ import java.util.Optional;
 @Service
 public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements StoreService {
 
-    /**
-     * 会员
-     */
     @Autowired
     private MemberService memberService;
-    /**
-     * 商品
-     */
+
     @Autowired
     private GoodsService goodsService;
-    /**
-     * 店铺详情
-     */
+
     @Autowired
     private StoreDetailService storeDetailService;
+
+    @Autowired
+    private AdminUserService adminUserService;
+
+    @Autowired
+    private DepartmentService departmentService;
+    @Autowired
+    private FileMapper fileMapper;
 
 
     @Autowired
     private Cache cache;
 
     @Override
+    public IPage<StoreVO> findMakeByConditionPage(StoreSearchParams storeSearchParams, PageVO page) {
+        QueryWrapper<StoreVO> wrapper = storeSearchParams.queryWrapper();
+        if (StringUtils.isNotEmpty(storeSearchParams.getMemberId())){
+            wrapper.eq("member_id",Long.parseLong(storeSearchParams.getMemberId()));
+        }
+        if (StringUtils.isNotEmpty(storeSearchParams.getStoreDisable())) {
+            wrapper.eq("store_disable", storeSearchParams.getStoreDisable());
+        } else {
+             wrapper.eq("store_disable", StoreStatusEnum.OPEN.name()).or().eq("store_disable", StoreStatusEnum.CLOSED.name());
+        }
+        return this.baseMapper.getStoreList(PageUtil.initPage(page),wrapper);
+    }
+
+    @Override
     public IPage<StoreVO> findByConditionPage(StoreSearchParams storeSearchParams, PageVO page) {
-        return this.baseMapper.getStoreList(PageUtil.initPage(page), storeSearchParams.queryWrapper());
+        AuthUser currentUser = UserContext.getCurrentUser();
+        Optional.ofNullable(currentUser).orElseThrow(()-> new ServiceException(ResultCode.USER_NOT_LOGIN));
+        // 查询服务商
+        QueryWrapper<StoreVO> wrapper = storeSearchParams.queryWrapper();
+        AdminUser admin = adminUserService.findByMobile(currentUser.getMember().getMobile());
+        if(ObjectUtils.isNotEmpty(admin)){
+            Department dept = departmentService.getById(admin.getDepartmentId());
+            wrapper.apply("FIND_IN_SET("+dept.getAreaCode()+",store_address_id_path)");
+        }
+//        if (StringUtils.isNotEmpty(storeSearchParams.getMemberId())){
+        else {
+            wrapper.eq("member_id",Long.parseLong(storeSearchParams.getMemberId()));
+        }
+
+        return this.baseMapper.getStoreList(PageUtil.initPage(page),wrapper);
     }
 
     @Override
@@ -77,6 +117,28 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         StoreVO storeVO = this.baseMapper.getStoreDetail(currentUser.getStoreId());
         storeVO.setNickName(currentUser.getNickName());
         return storeVO;
+    }
+
+    /**
+     * app商铺入住
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean settleIn(AdminStoreApplyDTO dto) {
+        AuthUser currentUser = UserContext.getCurrentUser();
+        Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
+        dto.setMemberId(currentUser.getId());
+        dto.setLegalPhoto(dto.getStoreLogo());
+        Store store = add(dto);
+        fileMapper.update(null, new UpdateWrapper<File>().lambda()
+                .set(File::getOwnerId,store.getId())
+                .set(File::getUserEnums, UserEnums.STORE)
+                .eq(File::getUrl, dto.getStoreLogo())
+                .eq(File::getOwnerId,currentUser.getId()));
+        return true;
     }
 
     @Override
@@ -102,6 +164,10 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
 
         //添加店铺
         Store store = new Store(member, adminStoreApplyDTO);
+        AdminUser adminUser = adminUserService.findByMobile(member.getMobile());
+        if (ObjectUtils.isNotEmpty(adminUser)){
+            store.setStoreDisable(StoreStatusEnum.OPEN.value());
+        }
         this.save(store);
 
         //判断是否存在店铺详情，如果没有则进行新建，如果存在则进行修改

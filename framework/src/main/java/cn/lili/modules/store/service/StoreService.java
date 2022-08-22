@@ -24,6 +24,14 @@ public interface StoreService extends IService<Store> {
      * @param entity
      * @return
      */
+    IPage<StoreVO> findMakeByConditionPage(StoreSearchParams entity, PageVO page);
+    /**
+     * 分页条件查询
+     * 用于展示店铺列表
+     *
+     * @param entity
+     * @return
+     */
     IPage<StoreVO> findByConditionPage(StoreSearchParams entity, PageVO page);
 
     /**
@@ -32,6 +40,13 @@ public interface StoreService extends IService<Store> {
      * @return 店铺信息DO
      */
     StoreVO getStoreDetail();
+
+    /**
+     * app商铺入住
+     * @param dto
+     * @return
+     */
+    Boolean settleIn(AdminStoreApplyDTO dto);
 
     /**
      * 增加店铺

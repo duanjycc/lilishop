@@ -77,4 +77,7 @@ public class ScoreAcquisition extends Model<ScoreAcquisition> {
     @ApiModelProperty(value = "积分获取类型 0是会员积分1是商铺做单积分")
     private Long integralType;
 
+    @ApiModelProperty(value = "积分")
+    private Double integral;
+
 }

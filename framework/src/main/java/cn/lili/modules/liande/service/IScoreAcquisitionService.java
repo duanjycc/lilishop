@@ -3,8 +3,11 @@
  */
 package cn.lili.modules.liande.service;
 
+import cn.lili.common.vo.PageVO;
 import cn.lili.modules.liande.entity.dos.ScoreAcquisition;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * <p>
@@ -16,4 +19,13 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IScoreAcquisitionService extends IService<ScoreAcquisition> {
 
+
+    /**
+     * 积分
+     * @param pageVo
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    IPage<ScoreAcquisition> scoreDetails(PageVO pageVo,  String beginDate, String endDate);
 }

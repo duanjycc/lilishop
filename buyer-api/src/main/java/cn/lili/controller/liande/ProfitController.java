@@ -32,6 +32,9 @@ public class ProfitController {
     @Autowired
     private IServiceProviderIncomeService serviceProviderIncomeService;
 
+
+
+
     @ApiOperation(value = "会员收益")
     @PostMapping("/member")
     public ResultMessage<IPage<MemberIncome>> memberDetails(PageVO pageVo, @RequestParam String beginDate, @RequestParam String endDate){

@@ -1,15 +1,12 @@
 /*
  * Copyright © 2022- ~ hc R&D 电信支撑部/产品研发中心 All rights reserved.
  */
-package cn.lili.modules.liande.entity.dos;
+package cn.lili.modules.liande.entity.dto;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
-
-import java.io.Serializable;
-
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -24,10 +21,8 @@ import lombok.EqualsAndHashCode;
  * @since 2022-08-22
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
-@TableName("regional_promotion")
-@ApiModel(value = "RegionalPromotion对象", description = "区域推广员表")
-public class RegionalPromotion extends Model<RegionalPromotion> {
+@ApiModel( description = "区域推广员表")
+public class RegionalPromotionDTO extends Model<RegionalPromotionDTO> {
 
     private static final long serialVersionUID = 1L;
 
@@ -35,7 +30,6 @@ public class RegionalPromotion extends Model<RegionalPromotion> {
     /**
      * 主键ID
      */
-    @TableId(value = "id", type = IdType.AUTO)
     @ApiModelProperty(value = "主键ID")
     private Integer id;
 
@@ -44,7 +38,7 @@ public class RegionalPromotion extends Model<RegionalPromotion> {
      * 区域推广用户id
      */
     @ApiModelProperty(value = "区域推广用户id")
-    private String userId;
+    private Long userId;
 
 
     /**

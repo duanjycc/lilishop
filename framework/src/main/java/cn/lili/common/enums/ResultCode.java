@@ -489,6 +489,8 @@ public enum ResultCode {
     INSUFFICIENT_QUANTITY_ERROR(110001, "SSD数量不够"),
     DISTRIBUTION_ERROR(110001, "SSD数量不够"),
 
+    DISTRIBUTION_ERRORW(110002, "邀请人已经在你区域"),
+
     /**邀请相关*/
     INVITATION_NOT_EXIST_ERROR(120001, "会员未填写邀请人"),
     INVITATION_MEMBER_NOT_EXIST_ERROR(120002, "输入的邀请人不存在") ,

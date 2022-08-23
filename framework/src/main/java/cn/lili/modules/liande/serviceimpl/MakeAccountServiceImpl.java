@@ -274,6 +274,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
                             ssj.setIncomeType(1l);
                             ssj.setIncomeProportion(fjrole.getDescriptionParent());
                             ssj.setOrderId(mkid + "");
+                            ssj.setSubArea(department.getTitle());
                             serviceProviderIncomeMapper.insert(ssj);
                         }
 
@@ -323,6 +324,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         scoreAcquisition.setMerId(st.getId());
         scoreAcquisition.setMerName(st.getStoreName());
         scoreAcquisition.setOrderId(mkid);
+        scoreAcquisition.setIntegral(jf.getNumericalAlue() * makeAccountDTO.getSurrenderPrice());
         scoreAcquisitionMapper.insert(scoreAcquisition);
 
 
@@ -334,13 +336,10 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         scoreAcquisitionsh.setMerId(st.getId());
         scoreAcquisitionsh.setMerName(st.getStoreName());
         scoreAcquisitionsh.setOrderId(mkid);
+        scoreAcquisitionsh.setIntegral(sh.getNumericalAlue() * makeAccountDTO.getSurrenderPrice());
         scoreAcquisitionMapper.insert(scoreAcquisitionsh);
 
         return ResultUtil.success();
     }
 
-//    public static void main(String[] args) {
-//        System.out.println(new BCryptPasswordEncoder().encode(StringUtils.md5("18268154183".substring("18268154183".length() - 6))));
-//        System.out.println(StringUtils.md5("18268154183".substring("18268154183".length() - 6)));
-//    }
 }

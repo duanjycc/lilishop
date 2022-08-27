@@ -117,7 +117,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         //计算需要卷的数量
         Double wantPrice = jg.getNumericalAlue();
         Double wantsum = makeAccountDTO.getSurrenderPrice() / wantPrice;
-        if (wantsum > member.getSsd()) {
+        if (wantsum > memberpass.getSsd()) {
             throw new ServiceException(ResultCode.INSUFFICIENT_QUANTITY_ERROR);
 
         }

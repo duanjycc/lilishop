@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -86,6 +87,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
     @Autowired
     ScoreAcquisitionMapper  scoreAcquisitionMapper;
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ResultMessage<Boolean> makeAccount(MakeAccountDTO makeAccountDTO) {
         //当前登陆会员
         Member member = UserContext.getCurrentUser().getMember();
@@ -115,10 +117,10 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         //计算需要卷的数量
         Double wantPrice = jg.getNumericalAlue();
         Double wantsum = makeAccountDTO.getSurrenderPrice() / wantPrice;
-        if (wantsum <= member.getSsd()) {
-            return ResultUtil.error(ResultCode.INSUFFICIENT_QUANTITY_ERROR);
-        }
+        if (wantsum > member.getSsd()) {
+            throw new ServiceException(ResultCode.INSUFFICIENT_QUANTITY_ERROR);
 
+        }
         //查找做单会员用户存不存在，不存在就注册一个
         QueryWrapper<Member> queryWrapper = new QueryWrapper();
         queryWrapper.eq("mobile", makeAccountDTO.getVipPhone());

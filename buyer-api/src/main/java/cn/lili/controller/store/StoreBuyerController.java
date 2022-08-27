@@ -69,6 +69,13 @@ public class StoreBuyerController {
         return ResultUtil.data(storeService.findMakeByConditionPage(entity, page));
     }
 
+
+    @ApiOperation(value = "通过商品分类获取店铺")
+    @GetMapping(value = "/by/category")
+    public ResultMessage<IPage<StoreVO>> listStoreByCategory(AppStoreSearchParams params, PageVO page) {
+        return ResultUtil.data(storeService.listStoreByCategory(params,page));
+    }
+
     @ApiOperation(value = "获取店铺列表分页")
     @GetMapping
     public ResultMessage<IPage<StoreVO>> getByPage(StoreSearchParams entity, PageVO page) {
@@ -89,6 +96,7 @@ public class StoreBuyerController {
     public ResultMessage<StoreOtherVO> licencePhoto(@NotNull @PathVariable String id) {
         return ResultUtil.data(storeDetailService.getStoreOtherVO(id));
     }
+
 
     @ApiOperation(value = "通过id获取店铺商品分类")
     @ApiImplicitParams({

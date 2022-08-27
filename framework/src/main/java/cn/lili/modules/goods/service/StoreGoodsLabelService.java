@@ -2,6 +2,7 @@ package cn.lili.modules.goods.service;
 
 import cn.lili.modules.goods.entity.dos.StoreGoodsLabel;
 import cn.lili.modules.goods.entity.vos.StoreGoodsLabelVO;
+import cn.lili.modules.store.entity.vos.StoreVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public interface StoreGoodsLabelService extends IService<StoreGoodsLabel> {
      * @return 店铺分类列表
      */
     List<StoreGoodsLabelVO> listByStoreId(String storeId);
+
 
     /**
      * 根据分类id集合获取所有店铺分类根据层级排序

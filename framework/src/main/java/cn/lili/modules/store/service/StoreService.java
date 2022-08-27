@@ -9,6 +9,8 @@ import cn.lili.modules.store.entity.vos.StoreVO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * 店铺业务层
  *
@@ -33,6 +35,16 @@ public interface StoreService extends IService<Store> {
      * @return
      */
     IPage<StoreVO> findByConditionPage(StoreSearchParams entity, PageVO page);
+
+
+
+    /**
+     * 通过商品分类id获取店铺
+     *
+     * @param params 商铺分类查询参数
+     * @return 店铺分类列表
+     */
+    IPage<StoreVO> listStoreByCategory(AppStoreSearchParams params, PageVO page);
 
     /**
      * 获取当前登录店铺信息

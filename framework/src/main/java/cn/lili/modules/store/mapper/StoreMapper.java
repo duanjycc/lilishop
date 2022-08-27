@@ -18,6 +18,9 @@ import org.apache.ibatis.annotations.Update;
  */
 public interface StoreMapper extends BaseMapper<Store> {
 
+
+
+
     /**
      * 获取店铺详细
      *
@@ -36,6 +39,15 @@ public interface StoreMapper extends BaseMapper<Store> {
      */
     @Select("select s.* from li_store as s ${ew.customSqlSegment}")
     IPage<StoreVO> getStoreList(IPage<StoreVO> page, @Param(Constants.WRAPPER) Wrapper<StoreVO> queryWrapper);
+
+    /**
+     * 通过商品分类id获取店铺
+     *
+     * @param page         分页
+     * @param queryWrapper 查询条件
+     */
+    @Select("select s.* from li_store s left join li_store_detail d on s.id = d.store_id ${ew.customSqlSegment}")
+    IPage<StoreVO> listStoreByCategory(IPage<StoreVO> page, @Param(Constants.WRAPPER) Wrapper<StoreVO> queryWrapper);
 
 
     /**

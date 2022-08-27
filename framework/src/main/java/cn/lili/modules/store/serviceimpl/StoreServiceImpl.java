@@ -78,37 +78,55 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
     @Autowired
     private Cache cache;
 
+    /**
+     * 通过商品分类id获取店铺
+     *
+     * @param params 商铺分类查询参数
+     * @return 店铺分类列表
+     */
+    @Override
+    public IPage<StoreVO> listStoreByCategory(AppStoreSearchParams params, PageVO page) {
+        QueryWrapper<StoreVO> wrapper = new QueryWrapper<>();
+        if (StringUtils.isNotEmpty(params.getCategoryId())){
+            wrapper.apply("FIND_IN_SET(" + params.getCategoryId() + ",d.goods_management_category)");
+        }
+        if (StringUtils.isNotEmpty(params.getStoreName())){
+            wrapper.like("s.store_name",params.getStoreName());
+        }
+        return baseMapper.listStoreByCategory(PageUtil.initPage(page), wrapper);
+    }
+
     @Override
     public IPage<StoreVO> findMakeByConditionPage(StoreSearchParams storeSearchParams, PageVO page) {
         QueryWrapper<StoreVO> wrapper = storeSearchParams.queryWrapper();
-        if (StringUtils.isNotEmpty(storeSearchParams.getMemberId())){
-            wrapper.eq("member_id",Long.parseLong(storeSearchParams.getMemberId()));
+        if (StringUtils.isNotEmpty(storeSearchParams.getMemberId())) {
+            wrapper.eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
         }
         if (StringUtils.isNotEmpty(storeSearchParams.getStoreDisable())) {
             wrapper.eq("store_disable", storeSearchParams.getStoreDisable());
         } else {
-             wrapper.eq("store_disable", StoreStatusEnum.OPEN.name()).or().eq("store_disable", StoreStatusEnum.CLOSED.name());
+            wrapper.eq("store_disable", StoreStatusEnum.OPEN.name()).or().eq("store_disable", StoreStatusEnum.CLOSED.name());
         }
-        return this.baseMapper.getStoreList(PageUtil.initPage(page),wrapper);
+        return this.baseMapper.getStoreList(PageUtil.initPage(page), wrapper);
     }
 
     @Override
     public IPage<StoreVO> findByConditionPage(StoreSearchParams storeSearchParams, PageVO page) {
         AuthUser currentUser = UserContext.getCurrentUser();
-        Optional.ofNullable(currentUser).orElseThrow(()-> new ServiceException(ResultCode.USER_NOT_LOGIN));
+        Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
         // 查询服务商
         QueryWrapper<StoreVO> wrapper = storeSearchParams.queryWrapper();
         AdminUser admin = adminUserService.findByMobile(currentUser.getMember().getMobile());
-        if(ObjectUtils.isNotEmpty(admin)){
+        if (ObjectUtils.isNotEmpty(admin)) {
             Department dept = departmentService.getById(admin.getDepartmentId());
-            wrapper.apply("FIND_IN_SET("+dept.getAreaCode()+",store_address_id_path)");
+            wrapper.apply("FIND_IN_SET(" + dept.getAreaCode() + ",store_address_id_path)");
         }
 //        if (StringUtils.isNotEmpty(storeSearchParams.getMemberId())){
         else {
-            wrapper.eq("member_id",Long.parseLong(storeSearchParams.getMemberId()));
+            wrapper.eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
         }
 
-        return this.baseMapper.getStoreList(PageUtil.initPage(page),wrapper);
+        return this.baseMapper.getStoreList(PageUtil.initPage(page), wrapper);
     }
 
     @Override
@@ -134,10 +152,10 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         dto.setLegalPhoto(dto.getStoreLogo());
         Store store = add(dto);
         fileMapper.update(null, new UpdateWrapper<File>().lambda()
-                .set(File::getOwnerId,store.getId())
+                .set(File::getOwnerId, store.getId())
                 .set(File::getUserEnums, UserEnums.STORE)
                 .eq(File::getUrl, dto.getStoreLogo())
-                .eq(File::getOwnerId,currentUser.getId()));
+                .eq(File::getOwnerId, currentUser.getId()));
         return true;
     }
 
@@ -165,7 +183,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         //添加店铺
         Store store = new Store(member, adminStoreApplyDTO);
         AdminUser adminUser = adminUserService.findByMobile(member.getMobile());
-        if (ObjectUtils.isNotEmpty(adminUser)){
+        if (ObjectUtils.isNotEmpty(adminUser)) {
             store.setStoreDisable(StoreStatusEnum.OPEN.value());
         }
         this.save(store);

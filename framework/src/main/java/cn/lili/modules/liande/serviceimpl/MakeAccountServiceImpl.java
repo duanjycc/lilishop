@@ -106,11 +106,16 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         shWrapper.eq("type", "merchantPoints");
         Configure sh = iConfigureService.getOne(shWrapper);
 
+        //价格
+        QueryWrapper<Configure> jgWrapper = new QueryWrapper();
+        jgWrapper.eq("type", "unitPrice");
+        Configure jg = iConfigureService.getOne(jgWrapper);
+
 
         //计算需要卷的数量
-        Double wantPrice = Double.valueOf(makeAccountDTO.getWantPrice());
+        Double wantPrice = jg.getNumericalAlue();
         Double wantsum = makeAccountDTO.getSurrenderPrice() / wantPrice;
-        if (wantsum > member.getSsd()) {
+        if (wantsum <= member.getSsd()) {
             return ResultUtil.error(ResultCode.INSUFFICIENT_QUANTITY_ERROR);
         }
 
@@ -299,7 +304,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         ma.setSurrenderRatio(makeAccountDTO.getSurrenderRatio());
         ma.setVipPhone(makeAccountDTO.getVipPhone());
         ma.setIsUse("0");
-        ma.setWantPrice(makeAccountDTO.getWantPrice());
+        ma.setWantPrice(wantPrice+"");
         ma.setShReturnPower(sh.getNumericalAlue() * makeAccountDTO.getSurrenderPrice());
         ma.setUserReturnPower(jf.getNumericalAlue() * makeAccountDTO.getSurrenderPrice());
         makeAccountMapper.insert(ma);
@@ -313,7 +318,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         de.setWantCount(wantsum*0.72);
         de.setStatus("0");
         de.setDestroyTime(new Date());
-        de.setWantPrice(makeAccountDTO.getWantPrice());
+        de.setWantPrice(wantPrice+"");
         destroyDetailMapper.insert(de);
 
         //插入会员获取积分明细

@@ -66,6 +66,14 @@ public class PendingOrderFormServiceImpl extends ServiceImpl<PendingOrderFormMap
     @Override
     public Boolean insertPendingOrder(PendingOrderFormDTO pendingOrderFormDTO) {
         Member member = UserContext.getCurrentUser().getMember();
+
+        QueryWrapper<PendingOrderForm> queryWrapper = new QueryWrapper();
+        queryWrapper.eq("username",member.getUsername());
+        PendingOrderForm pis=pendingOrderFormMapper.selectOne(queryWrapper);
+        if(pis !=null){
+            pendingOrderFormMapper.delete(queryWrapper);
+        }
+
         PendingOrderForm p=new PendingOrderForm();
         p.setUsername(member.getUsername());
         p.setBusiness(pendingOrderFormDTO.getBusiness());
@@ -75,8 +83,7 @@ public class PendingOrderFormServiceImpl extends ServiceImpl<PendingOrderFormMap
         p.setContacts(pendingOrderFormDTO.getContacts());
         p.setSalesVolume(pendingOrderFormDTO.getSalesVolume());
         int i=pendingOrderFormMapper.insert(p);
-        QueryWrapper<PendingOrderForm> queryWrapper = new QueryWrapper();
-        queryWrapper.eq("username",member.getUsername());
+
         Boolean r=false;
         if(i>0){
            r= true;

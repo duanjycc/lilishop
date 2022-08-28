@@ -86,6 +86,9 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
 
     @Autowired
     ScoreAcquisitionMapper  scoreAcquisitionMapper;
+
+    @Autowired
+    RegionalPromotionMapper regionalPromotionMapper;
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ResultMessage<Boolean> makeAccount(MakeAccountDTO makeAccountDTO) {
@@ -231,12 +234,45 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
                 QueryWrapper<Role> RoleWrapper = new QueryWrapper();
                 RoleWrapper.eq("id", adminUser.getRoleIds());
                 Role role = roleMapper.selectOne(RoleWrapper);
+
+                //根据邀请人和区域code查找分配比例
+                Double fws =Double.parseDouble(role.getDescription());
+                Double yqr =0.0;
+                if(st.getInvitationPhone() !=null){
+                    QueryWrapper<RegionalPromotion> regionalWrapper = new QueryWrapper();
+                    regionalWrapper.eq("user_name", st.getInvitationPhone());
+                    regionalWrapper.eq("area_code",addressId);
+                    RegionalPromotion r=regionalPromotionMapper.selectOne(regionalWrapper);
+                    if(r!=null){
+                        //分配邀请人收益
+                        yqr=  ((double)r.getIncomeComparison()/100.00);
+                        QueryWrapper<Member> shqqrWrapper = new QueryWrapper();
+                        shqqrWrapper.eq("username", st.getInvitationPhone());
+                        Member spyqr = memberMapper.selectOne(shqqrWrapper);
+                        spyqr.setSsd(spyqr.getSsd()+wantsum*yqr);
+                        memberMapper.update(spyqr, shqqrWrapper);
+
+                        //本服务商合伙人收益日志
+                        ServiceProviderIncome hhr = new ServiceProviderIncome();
+                        hhr.setConsumerUserid(Long.parseLong(userMember.getId()));
+                        hhr.setUserId(Long.parseLong(spyqr.getId()));
+                        hhr.setCreationTime(new Date());
+                        hhr.setQuantity(wantsum * wantsum*yqr);
+                        hhr.setIncomeType(0l);
+                        hhr.setIncomeProportion(yqr+"");
+                        hhr.setOrderId(mkid + "");
+                        serviceProviderIncomeMapper.insert(hhr);
+                    }
+                }
+
+
+
                 if (role != null) {
                     //根据角色分配比列给当前服务商分ssd
                     QueryWrapper<Member> memberWrapper = new QueryWrapper();
                     memberWrapper.eq("mobile", adminUser.getUsername());
                     Member memberfws = memberMapper.selectOne(memberWrapper);
-                    memberfws.setSsd(memberfws.getSsd() + wantsum * Double.parseDouble(role.getDescription()));
+                    memberfws.setSsd(memberfws.getSsd() + wantsum * (fws-yqr));
                     memberMapper.update(memberfws, memberWrapper);
 
                     //本服务商收益日志
@@ -244,9 +280,9 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
                     si.setConsumerUserid(Long.parseLong(userMember.getId()));
                     si.setUserId(Long.parseLong(memberfws.getId()));
                     si.setCreationTime(new Date());
-                    si.setQuantity(wantsum * Double.parseDouble(role.getDescription()));
+                    si.setQuantity(wantsum * (fws-yqr));
                     si.setIncomeType(0l);
-                    si.setIncomeProportion(role.getDescription());
+                    si.setIncomeProportion((fws-yqr)+"");
                     si.setOrderId(mkid + "");
                     serviceProviderIncomeMapper.insert(si);
 
@@ -349,4 +385,10 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         return ResultUtil.success();
     }
 
+    public static void main(String[] args) {
+        int i=10;
+
+
+        System.out.println((double)i/100);
+    }
 }

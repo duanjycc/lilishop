@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @Api(tags = "挂单")
-@RequestMapping("/ui/pendingOrderForm")
+@RequestMapping("/buyer/pendingOrderForm")
 public class PendingOrderFormController {
 
     @Autowired

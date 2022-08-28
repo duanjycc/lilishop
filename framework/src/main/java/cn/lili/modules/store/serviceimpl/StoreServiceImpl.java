@@ -121,11 +121,12 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         if (ObjectUtils.isNotEmpty(admin)) {
             Department dept = departmentService.getById(admin.getDepartmentId());
             wrapper.apply("FIND_IN_SET(" + dept.getAreaCode() + ",store_address_id_path)");
+            wrapper.or().eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
         }
 //        if (StringUtils.isNotEmpty(storeSearchParams.getMemberId())){
-        else {
-            wrapper.eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
-        }
+//        else {
+//            wrapper.eq(
+//        }
 
         return this.baseMapper.getStoreList(PageUtil.initPage(page), wrapper);
     }
@@ -189,8 +190,11 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
 
         //添加店铺
         Store store = new Store(member, adminStoreApplyDTO);
+        String s = adminStoreApplyDTO.getStoreAddressIdPath().split(",")[2];
         AdminUser adminUser = adminUserService.findByMobile(member.getMobile());
-        if (ObjectUtils.isNotEmpty(adminUser)) {
+        Department department = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getId,adminUser.getDepartmentId()).eq(Department::getDeleteFlag, DelStatusEnum.USE.getType()));
+
+        if (ObjectUtils.isNotEmpty(adminUser) && s.equals(department.getId())) {
             store.setStoreDisable(StoreStatusEnum.OPEN.value());
         }
         this.save(store);

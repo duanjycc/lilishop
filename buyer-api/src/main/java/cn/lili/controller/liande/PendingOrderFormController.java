@@ -37,7 +37,7 @@ public class PendingOrderFormController {
     IPendingOrderFormService iPendingOrderFormService;
     @ApiOperation(value = "挂单列表")
     @GetMapping("/listOfPendingOrders")
-    public ResultMessage<IPage<PendingOrderForm>>  listOfPendingOrders(PageVO page,String sort,String collation,String business) {
+    public ResultMessage<IPage<PendingOrderForm>>  listOfPendingOrders(PageVO page,String sort,String business,String collation) {
 
         return ResultUtil.data(iPendingOrderFormService.listOfPendingOrders(page,sort,business,collation));
     }

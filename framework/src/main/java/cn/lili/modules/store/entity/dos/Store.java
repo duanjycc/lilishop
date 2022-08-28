@@ -106,6 +106,8 @@ public class Store extends BaseEntity {
     @ApiModelProperty(value = "udesk IM标识")
     private String merchantEuid;
 
+    @ApiModelProperty(value = "店铺邀请人")
+    private String invitationPhone;
 
     public Store(StoreSettleInDTO dto) {
         BeanUtil.copyProperties(dto, this);

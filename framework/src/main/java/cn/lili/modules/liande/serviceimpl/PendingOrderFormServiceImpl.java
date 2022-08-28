@@ -43,9 +43,14 @@ public class PendingOrderFormServiceImpl extends ServiceImpl<PendingOrderFormMap
 
 
     @Override
-    public IPage<PendingOrderForm> listOfPendingOrders(PageVO page,String sort,String collation,String business) {
+    public IPage<PendingOrderForm> listOfPendingOrders(PageVO page,String sort,String business,String collation) {
         QueryWrapper<PendingOrderForm> queryWrapper = new QueryWrapper();
-        queryWrapper.orderByDesc(sort);
+        if(collation.equals("DESC")){
+
+        }else{
+
+        }
+
         queryWrapper.eq("business",business);
         return pendingOrderFormMapper.listOfPendingOrders(PageUtil.initPage(page),queryWrapper);
     }

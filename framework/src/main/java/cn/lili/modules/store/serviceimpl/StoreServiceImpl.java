@@ -122,11 +122,9 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
             Department dept = departmentService.getById(admin.getDepartmentId());
             wrapper.apply("FIND_IN_SET(" + dept.getAreaCode() + ",store_address_id_path)");
             wrapper.or().eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
+        }else {
+            wrapper.eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
         }
-//        if (StringUtils.isNotEmpty(storeSearchParams.getMemberId())){
-//        else {
-//            wrapper.eq(
-//        }
 
         return this.baseMapper.getStoreList(PageUtil.initPage(page), wrapper);
     }
@@ -194,7 +192,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         AdminUser adminUser = adminUserService.findByMobile(member.getMobile());
         Department department = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getId,adminUser.getDepartmentId()).eq(Department::getDeleteFlag, DelStatusEnum.USE.getType()));
 
-        if (ObjectUtils.isNotEmpty(adminUser) && s.equals(department.getId())) {
+        if (ObjectUtils.isNotEmpty(adminUser) && s.equals(department.getAreaCode())) {
             store.setStoreDisable(StoreStatusEnum.OPEN.value());
         }
         this.save(store);

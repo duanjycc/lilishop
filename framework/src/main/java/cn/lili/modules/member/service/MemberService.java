@@ -38,6 +38,12 @@ public interface MemberService extends IService<Member> {
      */
     Member getUserInfo();
 
+    /**
+     * 查询当前用户是那个区服务商
+     * @return
+     */
+    String queryServiceProvider();
+
 
     /**
      * 获取当前登录的用户信息 - 缓存

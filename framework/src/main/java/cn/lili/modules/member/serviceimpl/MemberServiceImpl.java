@@ -108,6 +108,26 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     @Autowired
     private RoleService roleService;
 
+
+    /**
+     * 查询当前用户是那个区服务商
+     *
+     * @return
+     */
+    @Override
+    public String queryServiceProvider() {
+        AuthUser tokenUser = UserContext.getCurrentUser();
+        if (tokenUser == null) {
+            throw new ServiceException(ResultCode.USER_NOT_PHONE);
+        }
+        AdminUser admin = adminUserService.findByMobile(tokenUser.getMember().getMobile());
+        if (ObjectUtils.isNotEmpty(admin)){
+            return departmentService.getById(admin.getDepartmentId()).getAreaCode();
+        }
+
+        return null;
+    }
+
     /**
      * 缓存
      */

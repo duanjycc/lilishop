@@ -5,7 +5,6 @@ package cn.lili.modules.liande.mapper;
 
 import cn.lili.common.vo.ResultMessage;
 import cn.lili.modules.liande.entity.dos.RegionalPromotion;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -14,7 +13,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 /**
  * <p>
  * 区域推广员表 Mapper 接口
@@ -25,6 +24,6 @@ import org.apache.ibatis.annotations.Select;
  */
 @Mapper
 public interface RegionalPromotionMapper extends BaseMapper<RegionalPromotion> {
-    @Select("SELECT * from regional_promotion")
-   IPage<RegionalPromotion> listOfPromoters(Page<Object> initPage, @Param(Constants.WRAPPER)QueryWrapper<RegionalPromotion> queryWrapper);
+    @Select("SELECT * from regional_promotion ${ew.customSqlSegment}")
+   IPage<RegionalPromotion> listOfPromoters(Page<Object> initPage, @Param(Constants.WRAPPER)Wrapper<RegionalPromotion> queryWrapper);
 }

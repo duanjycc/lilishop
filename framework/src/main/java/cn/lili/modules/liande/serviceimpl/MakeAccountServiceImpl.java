@@ -95,8 +95,8 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         QueryWrapper<Member> memberpassWrapper = new QueryWrapper();
         memberpassWrapper.eq("username", member.getUsername());
         Member memberpass = memberMapper.selectOne(memberpassWrapper);
-        if (!new BCryptPasswordEncoder().matches(makeAccountDTO.getSecondPassword(), memberpass.getPaymentPassword()))
-            throw new ServiceException(ResultCode.TRANSFER_SECOND_PASSWORD_ERROR);
+//        if (!new BCryptPasswordEncoder().matches(makeAccountDTO.getSecondPassword(), memberpass.getPaymentPassword()))
+//            throw new ServiceException(ResultCode.TRANSFER_SECOND_PASSWORD_ERROR);
 
         //用户积分倍数
         QueryWrapper<Configure> jfWrapper = new QueryWrapper();

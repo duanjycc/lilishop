@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IPendingOrderFormService extends IService<PendingOrderForm> {
 
-    IPage<PendingOrderForm>  listOfPendingOrders(PageVO page,String sort,String business);
+    IPage<PendingOrderForm>  listOfPendingOrders(PageVO page,String sort,String business,String collation);
 
     PendingOrderForm pendingOrderInformation();
 

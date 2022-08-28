@@ -27,6 +27,8 @@ public class AdminStoreApplyDTO {
     @ApiModelProperty(value = "店铺logo")
     private String storeLogo;
 
+    @ApiModelProperty(value = "推广员")
+    private String invitationPhone;
 //    @Size(min = 6, max = 200, message = "店铺简介需在6-200字符之间")
     @NotBlank(message = "店铺简介不能为空")
     @ApiModelProperty(value = "店铺简介")

@@ -15,6 +15,7 @@ import cn.lili.common.vo.PageVO;
 import cn.lili.modules.file.entity.File;
 import cn.lili.modules.file.mapper.FileMapper;
 import cn.lili.modules.goods.service.GoodsService;
+import cn.lili.modules.liande.entity.enums.DelStatusEnum;
 import cn.lili.modules.member.entity.dos.Member;
 import cn.lili.modules.member.entity.dto.CollectionDTO;
 import cn.lili.modules.member.service.MemberService;
@@ -148,6 +149,12 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
     public Boolean settleIn(AdminStoreApplyDTO dto) {
         AuthUser currentUser = UserContext.getCurrentUser();
         Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
+        if (ObjectUtils.isEmpty(dto.getInvitationPhone()) || "null".equals(dto.getInvitationPhone())){
+            String s = dto.getStoreAddressIdPath().split(",")[2];
+            Department department = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getAreaCode, s).eq(Department::getDeleteFlag, DelStatusEnum.USE.getType()));
+            AdminUser adminUser = adminUserService.getOne(new QueryWrapper<AdminUser>().lambda().eq(AdminUser::getDepartmentId, department.getId()).eq(AdminUser::getDeleteFlag, DelStatusEnum.USE.getType()));
+            dto.setInvitationPhone(adminUser.getUsername());
+        }
         dto.setMemberId(currentUser.getId());
         dto.setLegalPhoto(dto.getStoreLogo());
         Store store = add(dto);

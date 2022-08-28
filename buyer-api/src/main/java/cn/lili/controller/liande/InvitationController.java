@@ -8,6 +8,8 @@ import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.context.UserContext;
 import cn.lili.common.vo.PageVO;
 import cn.lili.common.vo.ResultMessage;
+import cn.lili.modules.liande.entity.vo.InvitationUser;
+import cn.lili.modules.liande.service.IRegionalPromotionService;
 import cn.lili.modules.member.entity.dos.Member;
 import cn.lili.modules.member.entity.vo.MemberSearchVO;
 import cn.lili.modules.member.entity.vo.MemberVO;
@@ -24,6 +26,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -39,6 +42,9 @@ public class InvitationController {
     private MemberService memberService;
     @Autowired
     private DepartmentService departmentService;
+    @Autowired
+    private IRegionalPromotionService regionalPromotionService;
+
 
     @ApiOperation(value = "查询是否绑定邀请人")
     @GetMapping("/checkInvitee")
@@ -84,5 +90,17 @@ public class InvitationController {
     @GetMapping("/queryInvitationRegion/{regionId}")
     public ResultMessage<IPage<Department>> queryInvitationRegion(@PathVariable("regionId") String regionId, PageVO page) {
         return ResultUtil.data(departmentService.page(PageUtil.initPage(page),new QueryWrapper<Department>().lambda().eq(Department::getParentId,regionId)));
+    }
+
+
+
+    /**
+     * 根据所选区域查询邀请人
+     * @return
+     */
+    @ApiOperation(value = "根据所选区域查询邀请人")
+    @GetMapping("/queryInvitationUser/{regionCode}")
+    public ResultMessage<List<InvitationUser>> queryInvitationUser(@PathVariable("regionCode") String regionCode) {
+        return ResultUtil.data(regionalPromotionService.queryInvitationUser(regionCode));
     }
 }

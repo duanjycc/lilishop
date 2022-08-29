@@ -190,10 +190,12 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         Store store = new Store(member, adminStoreApplyDTO);
         String s = adminStoreApplyDTO.getStoreAddressIdPath().split(",")[2];
         AdminUser adminUser = adminUserService.findByMobile(member.getMobile());
-        Department department = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getId,adminUser.getDepartmentId()).eq(Department::getDeleteFlag, DelStatusEnum.USE.getType()));
 
-        if (ObjectUtils.isNotEmpty(adminUser) && s.equals(department.getAreaCode())) {
-            store.setStoreDisable(StoreStatusEnum.OPEN.value());
+        if (ObjectUtils.isNotEmpty(adminUser) ) {
+            Department department = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getId,adminUser.getDepartmentId()).eq(Department::getDeleteFlag, DelStatusEnum.USE.getType()));
+            if(s.equals(department.getAreaCode())){
+                store.setStoreDisable(StoreStatusEnum.OPEN.value());
+            }
         }
         this.save(store);
 

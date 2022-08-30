@@ -258,7 +258,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
                         hhr.setUserId(Long.parseLong(spyqr.getId()));
                         hhr.setCreationTime(new Date());
                         hhr.setQuantity(wantsum * wantsum*yqr);
-                        hhr.setIncomeType(0l);
+                        hhr.setIncomeType(2l);
                         hhr.setIncomeProportion(yqr+"");
                         hhr.setOrderId(mkid + "");
                         serviceProviderIncomeMapper.insert(hhr);

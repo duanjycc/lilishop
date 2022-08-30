@@ -21,6 +21,10 @@ public class StoreSearchParams extends PageVO implements Serializable {
 
     private static final long serialVersionUID = 6916054310764833369L;
 
+    private String longitude;
+    private String latitude;
+
+
     @ApiModelProperty(value = "会员店铺")
     private String memberId;
 

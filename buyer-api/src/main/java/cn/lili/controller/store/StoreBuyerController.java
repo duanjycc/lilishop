@@ -49,6 +49,13 @@ public class StoreBuyerController {
     @Autowired
     private StoreDetailService storeDetailService;
 
+    @ApiOperation(value = "app获取店铺列表分页")
+    @GetMapping("/getAppByPage")
+    public ResultMessage<IPage<StoreVO>> getAppByPage(StoreSearchParams entity, PageVO page) {
+        return ResultUtil.data(storeService.getAppByPage(entity, page));
+    }
+
+
     @ApiOperation(value = "APP申请商铺-入驻店铺")
     @PostMapping(value = "/settleIn")
     public ResultMessage<Object> settleIn(AdminStoreApplyDTO dto) {

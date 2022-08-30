@@ -97,6 +97,23 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         return baseMapper.listStoreByCategory(PageUtil.initPage(page), wrapper);
     }
 
+    /**
+     * APP分页条件查询
+     * 用于展示店铺列表
+     *
+     * @param entity
+     * @param page
+     * @return
+     */
+    @Override
+    public IPage<StoreVO> getAppByPage(StoreSearchParams entity, PageVO page) {
+        String local = entity.getLongitude() +","+ entity.getLatitude();
+        QueryWrapper<StoreVO> wrapper = entity.queryWrapper();
+        wrapper.eq("store_disable", StoreStatusEnum.OPEN.name());
+        wrapper.orderByAsc("distance");
+        return this.baseMapper.getAppByPage(PageUtil.initPage(page),local, wrapper);
+    }
+
     @Override
     public IPage<StoreVO> findMakeByConditionPage(StoreSearchParams storeSearchParams, PageVO page) {
         QueryWrapper<StoreVO> wrapper = storeSearchParams.queryWrapper();

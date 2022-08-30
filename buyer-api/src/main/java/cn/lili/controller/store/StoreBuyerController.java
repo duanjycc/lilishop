@@ -49,7 +49,7 @@ public class StoreBuyerController {
     @Autowired
     private StoreDetailService storeDetailService;
 
-    @ApiOperation(value = "申请商铺-入驻店铺")
+    @ApiOperation(value = "APP申请商铺-入驻店铺")
     @PostMapping(value = "/settleIn")
     public ResultMessage<Object> settleIn(AdminStoreApplyDTO dto) {
         return ResultUtil.data(storeService.settleIn(dto));

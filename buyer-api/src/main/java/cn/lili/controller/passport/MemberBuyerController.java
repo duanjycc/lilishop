@@ -44,6 +44,14 @@ public class MemberBuyerController {
     private VerificationService verificationService;
 
 
+
+    @ApiOperation(value = "查询当前用户是那个区服务商")
+    @GetMapping("/service/provider")
+    public ResultMessage<String> queryServiceProvider(){
+        return ResultUtil.data(memberService.queryServiceProvider());
+    }
+
+
     @ApiOperation(value = "登录接口")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "username", value = "用户名", required = true, paramType = "query"),

@@ -15,6 +15,7 @@ import cn.lili.common.vo.PageVO;
 import cn.lili.modules.file.entity.File;
 import cn.lili.modules.file.mapper.FileMapper;
 import cn.lili.modules.goods.service.GoodsService;
+import cn.lili.modules.liande.entity.enums.DelStatusEnum;
 import cn.lili.modules.member.entity.dos.Member;
 import cn.lili.modules.member.entity.dto.CollectionDTO;
 import cn.lili.modules.member.service.MemberService;
@@ -120,9 +121,8 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         if (ObjectUtils.isNotEmpty(admin)) {
             Department dept = departmentService.getById(admin.getDepartmentId());
             wrapper.apply("FIND_IN_SET(" + dept.getAreaCode() + ",store_address_id_path)");
-        }
-//        if (StringUtils.isNotEmpty(storeSearchParams.getMemberId())){
-        else {
+            wrapper.or().eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
+        }else {
             wrapper.eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
         }
 
@@ -148,6 +148,12 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
     public Boolean settleIn(AdminStoreApplyDTO dto) {
         AuthUser currentUser = UserContext.getCurrentUser();
         Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
+        if (ObjectUtils.isEmpty(dto.getInvitationPhone()) || "null".equals(dto.getInvitationPhone())){
+            String s = dto.getStoreAddressIdPath().split(",")[2];
+            Department department = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getAreaCode, s).eq(Department::getDeleteFlag, DelStatusEnum.USE.getType()));
+            AdminUser adminUser = adminUserService.getOne(new QueryWrapper<AdminUser>().lambda().eq(AdminUser::getDepartmentId, department.getId()).eq(AdminUser::getDeleteFlag, DelStatusEnum.USE.getType()));
+            dto.setInvitationPhone(adminUser.getUsername());
+        }
         dto.setMemberId(currentUser.getId());
         dto.setLegalPhoto(dto.getStoreLogo());
         Store store = add(dto);
@@ -182,9 +188,14 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
 
         //添加店铺
         Store store = new Store(member, adminStoreApplyDTO);
+        String s = adminStoreApplyDTO.getStoreAddressIdPath().split(",")[2];
         AdminUser adminUser = adminUserService.findByMobile(member.getMobile());
-        if (ObjectUtils.isNotEmpty(adminUser)) {
-            store.setStoreDisable(StoreStatusEnum.OPEN.value());
+
+        if (ObjectUtils.isNotEmpty(adminUser) ) {
+            Department department = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getId,adminUser.getDepartmentId()).eq(Department::getDeleteFlag, DelStatusEnum.USE.getType()));
+            if(s.equals(department.getAreaCode())){
+                store.setStoreDisable(StoreStatusEnum.OPEN.value());
+            }
         }
         this.save(store);
 

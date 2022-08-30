@@ -8,8 +8,11 @@ import cn.lili.common.vo.ResultMessage;
 import cn.lili.modules.liande.entity.dos.PendingOrderForm;
 import cn.lili.modules.liande.entity.dos.RegionalPromotion;
 import cn.lili.modules.liande.entity.dto.RegionalPromotionDTO;
+import cn.lili.modules.liande.entity.vo.InvitationUser;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -28,4 +31,12 @@ public interface IRegionalPromotionService extends IService<RegionalPromotion> {
     ResultMessage<Object> updateOfPromoters(RegionalPromotionDTO regionalPromotionDTO);
 
     ResultMessage<Object> deleteOfPromoters(RegionalPromotionDTO regionalPromotionDTO);
+
+
+    /**
+     * 根据所选区域查询邀请人
+     * @param regionCode
+     * @return
+     */
+    List<InvitationUser> queryInvitationUser(String regionCode);
 }

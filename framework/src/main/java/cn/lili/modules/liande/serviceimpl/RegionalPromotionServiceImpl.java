@@ -6,10 +6,12 @@ package cn.lili.modules.liande.serviceimpl;
 import cn.lili.common.enums.ResultCode;
 import cn.lili.common.enums.ResultUtil;
 import cn.lili.common.security.context.UserContext;
+import cn.lili.common.utils.StringUtils;
 import cn.lili.common.vo.PageVO;
 import cn.lili.common.vo.ResultMessage;
 import cn.lili.modules.liande.entity.dos.RegionalPromotion;
 import cn.lili.modules.liande.entity.dto.RegionalPromotionDTO;
+import cn.lili.modules.liande.entity.vo.InvitationUser;
 import cn.lili.modules.liande.mapper.RegionalPromotionMapper;
 import cn.lili.modules.liande.service.IRegionalPromotionService;
 import cn.lili.modules.member.entity.dos.Member;
@@ -25,6 +27,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * <p>
@@ -47,8 +53,29 @@ public class RegionalPromotionServiceImpl extends ServiceImpl<RegionalPromotionM
 
     @Autowired
     private MemberMapper memberMapper;
+
+
+    /**
+     * 根据所选区域查询邀请人
+     *
+     * @param regionCode
+     * @return
+     */
     @Override
-    public IPage<RegionalPromotion>listOfPromoters(PageVO page) {
+    public List<InvitationUser> queryInvitationUser(String regionCode) {
+        List<InvitationUser> invitationUsers = new ArrayList<>();
+        List<RegionalPromotion> list = baseMapper.selectList(new QueryWrapper<RegionalPromotion>().lambda()
+                .eq(StringUtils.isNotEmpty(regionCode), RegionalPromotion::getAreaCode, regionCode));
+
+        list.stream().forEach(s -> {
+            InvitationUser user = new InvitationUser(s.getName() + "     " + s.getUserName(), s.getUserName());
+            invitationUsers.add(user);
+        });
+        return invitationUsers;
+    }
+
+    @Override
+    public IPage<RegionalPromotion> listOfPromoters(PageVO page) {
         //查出当前登陆人属于哪个区域
         Member member = UserContext.getCurrentUser().getMember();
 
@@ -56,17 +83,17 @@ public class RegionalPromotionServiceImpl extends ServiceImpl<RegionalPromotionM
         QueryWrapper<AdminUser> adminUserQueryWrapper = new QueryWrapper();
         adminUserQueryWrapper.eq("username", member.getUsername());
         AdminUser adminUser = adminUserMapper.selectOne(adminUserQueryWrapper);
-        if(adminUser !=null){
-            if(adminUser.getDepartmentId()!=null){
+        if (adminUser != null) {
+            if (adminUser.getDepartmentId() != null) {
                 //查找当前登陆人的部门
                 QueryWrapper<Department> departmentQueryWrapper = new QueryWrapper();
                 departmentQueryWrapper.eq("id", adminUser.getDepartmentId());
                 Department department = separtmentMapper.selectOne(departmentQueryWrapper);
 
                 QueryWrapper<RegionalPromotion> queryWrapper = new QueryWrapper();
-                queryWrapper.eq("area_code",department.getAreaCode());
+                queryWrapper.eq("area_code", department.getAreaCode());
 
-                return regionalPromotionMapper.listOfPromoters(PageUtil.initPage(page),queryWrapper);
+                return regionalPromotionMapper.listOfPromoters(PageUtil.initPage(page), queryWrapper);
             }
 
         }
@@ -80,23 +107,21 @@ public class RegionalPromotionServiceImpl extends ServiceImpl<RegionalPromotionM
         //查出当前登陆人属于哪个区域
         Member member = UserContext.getCurrentUser().getMember();
         QueryWrapper<Member> userMemberWrapper = new QueryWrapper();
-        userMemberWrapper.eq("username",regionalPromotionDTO.getUserName());
-        Member userMember=memberMapper.selectOne(userMemberWrapper);
+        userMemberWrapper.eq("username", regionalPromotionDTO.getUserName());
+        Member userMember = memberMapper.selectOne(userMemberWrapper);
 
 
-
-
-        if(regionalPromotionDTO.getIncomeComparison()>=13){
-            return  ResultUtil.error(ResultCode.PARAMS_ERROR);
+        if (regionalPromotionDTO.getIncomeComparison() >= 13) {
+            return ResultUtil.error(ResultCode.PARAMS_ERROR);
         }
 
-        if(userMember!=null){
+        if (userMember != null) {
             //根据手机号码查询部门
             QueryWrapper<AdminUser> adminUserQueryWrapper = new QueryWrapper();
             adminUserQueryWrapper.eq("username", member.getUsername());
             AdminUser adminUser = adminUserMapper.selectOne(adminUserQueryWrapper);
-            if(adminUser !=null){
-                if(adminUser.getDepartmentId()!=null){
+            if (adminUser != null) {
+                if (adminUser.getDepartmentId() != null) {
 
                     //查找当前登陆人的部门
                     QueryWrapper<Department> departmentQueryWrapper = new QueryWrapper();
@@ -106,12 +131,12 @@ public class RegionalPromotionServiceImpl extends ServiceImpl<RegionalPromotionM
                     QueryWrapper<RegionalPromotion> rgQueryWrapper = new QueryWrapper();
                     rgQueryWrapper.eq("user_name", regionalPromotionDTO.getUserName());
                     rgQueryWrapper.eq("area_code", department.getAreaCode());
-                    RegionalPromotion rp=regionalPromotionMapper.selectOne(rgQueryWrapper);
-                    if(rp!=null){
+                    RegionalPromotion rp = regionalPromotionMapper.selectOne(rgQueryWrapper);
+                    if (rp != null) {
                         return ResultUtil.error(ResultCode.DISTRIBUTION_ERRORW);
                     }
 
-                    RegionalPromotion reg=new RegionalPromotion();
+                    RegionalPromotion reg = new RegionalPromotion();
                     reg.setUserId(userMember.getId());
                     reg.setAreaCode(department.getAreaCode());
                     reg.setAreaName(department.getTitle());
@@ -123,13 +148,12 @@ public class RegionalPromotionServiceImpl extends ServiceImpl<RegionalPromotionM
                 }
 
             }
-        }else {
+        } else {
             return ResultUtil.error(ResultCode.INVITATION_MEMBER_NOT_EXIST_ERROR);
         }
 
 
-
-        return  ResultUtil.success();
+        return ResultUtil.success();
     }
 
     @Override
@@ -199,9 +223,7 @@ public class RegionalPromotionServiceImpl extends ServiceImpl<RegionalPromotionM
 
                     QueryWrapper<RegionalPromotion> rgQueryWrapper = new QueryWrapper();
                     rgQueryWrapper.eq("user_name", regionalPromotionDTO.getUserName());
-                    rgQueryWrapper.eq("area_code",department.getAreaCode());
-
-
+                    rgQueryWrapper.eq("area_code", department.getAreaCode());
 
 
                     regionalPromotionMapper.delete(rgQueryWrapper);

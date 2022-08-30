@@ -30,22 +30,18 @@ public class RegionalPromotionController {
     @ApiOperation(value = "区域推广员添加")
     @GetMapping("/addOfPromoters")
     public ResultMessage<Object> addOfPromoters(RegionalPromotionDTO regionalPromotionDTO) {
-
         return regionalPromotionService.addOfPromoters(regionalPromotionDTO);
     }
 
     @ApiOperation(value = "区域推广员修改")
     @GetMapping("/updateOfPromoters")
     public ResultMessage<Object> updateOfPromoters(RegionalPromotionDTO regionalPromotionDTO) {
-
         return regionalPromotionService.updateOfPromoters(regionalPromotionDTO);
     }
-
 
     @ApiOperation(value = "区域推广员删除")
     @GetMapping("/deleteOfPromoters")
     public ResultMessage<Object> deleteOfPromoters(RegionalPromotionDTO regionalPromotionDTO) {
-
         return regionalPromotionService.deleteOfPromoters(regionalPromotionDTO);
     }
 }

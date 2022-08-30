@@ -6,6 +6,7 @@ package cn.lili.modules.liande.serviceimpl;
 import cn.lili.common.enums.ResultCode;
 import cn.lili.common.enums.ResultUtil;
 import cn.lili.common.security.context.UserContext;
+import cn.lili.common.utils.ObjectUtil;
 import cn.lili.common.utils.StringUtils;
 import cn.lili.common.vo.PageVO;
 import cn.lili.common.vo.ResultMessage;
@@ -24,6 +25,7 @@ import cn.lili.mybatis.util.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +56,19 @@ public class RegionalPromotionServiceImpl extends ServiceImpl<RegionalPromotionM
     @Autowired
     private MemberMapper memberMapper;
 
+
+    /**
+     * 检测是否区域推广员
+     *
+     * @param mobile
+     * @return
+     */
+    @Override
+    public boolean checkPromoters(String mobile) {
+        RegionalPromotion regionalPromotion = baseMapper.selectOne(new QueryWrapper<RegionalPromotion>().lambda()
+                .eq(RegionalPromotion::getUserName, mobile));
+        return ObjectUtils.isEmpty(regionalPromotion) ? false : true ;
+    }
 
     /**
      * 根据所选区域查询邀请人

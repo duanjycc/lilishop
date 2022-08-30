@@ -206,8 +206,45 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         if (!new BCryptPasswordEncoder().matches(password, member.getPassword())) {
             throw new ServiceException(ResultCode.USER_PASSWORD_ERROR);
         }
+        AdminUser adminUser = adminUserService.findByMobile(member.getMobile());
+        if (ObjectUtils.isNotEmpty(adminUser)) {
+            Department dept = departmentService.getById(adminUser.getDepartmentId());
+            Department parentDept = departmentService.getById(dept.getParentId());
+            List<Role> roles = roleService.list(new QueryWrapper<Role>().lambda().eq(Role::getDeleteFlag, false).in(Role::getId, Arrays.asList(adminUser.getRoleIds().split(","))));
+            member.setMyRegionId(dept.getId());
+            member.setMyRegion(dept.getTitle());
+            member.setMyParentRegion(ObjectUtils.isEmpty(parentDept) ? null : parentDept.getTitle());
+            member.setInviteeMobile(ObjectUtils.isEmpty(member.getInviteeId()) ? null : baseMapper.selectById(member.getInviteeId()).getMobile());
+            member.setRoles(roles);
+        }
         loginBindUser(member);
-        return memberTokenGenerate.createToken(member, false);
+        return memberTokenGenerate.createAppToken(member, false);
+    }
+
+    @Override
+    public Token mobilePhoneLogin(String mobilePhone) {
+        QueryWrapper<Member> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("mobile", mobilePhone);
+        Member member = this.baseMapper.selectOne(queryWrapper);
+        AdminUser adminUser = adminUserService.findByMobile(mobilePhone);
+        if (ObjectUtils.isNotEmpty(adminUser)) {
+            Department dept = departmentService.getById(adminUser.getDepartmentId());
+            Department parentDept = departmentService.getById(dept.getParentId());
+            List<Role> roles = roleService.list(new QueryWrapper<Role>().lambda().eq(Role::getDeleteFlag, false).in(Role::getId, Arrays.asList(adminUser.getRoleIds().split(","))));
+            member.setMyRegionId(dept.getId());
+            member.setMyRegion(dept.getTitle());
+            member.setMyParentRegion(ObjectUtils.isEmpty(parentDept) ? null : parentDept.getTitle());
+            member.setInviteeMobile(ObjectUtils.isEmpty(member.getInviteeId()) ? null : baseMapper.selectById(member.getInviteeId()).getMobile());
+            member.setRoles(roles);
+        }
+        if (member == null) {
+            //String password = new BCryptPasswordEncoder().encode(mobilePhone.substring(mobilePhone.length() - 6));
+            String password = new BCryptPasswordEncoder().encode(StringUtils.md5(mobilePhone.substring(mobilePhone.length() - 6)));
+            member = new Member(mobilePhone, password, mobilePhone);
+            registerHandler(member);
+        }
+        loginBindUser(member);
+        return memberTokenGenerate.createAppToken(member, true);
     }
 
     @Override
@@ -290,33 +327,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         return storeTokenGenerate.refreshToken(refreshToken);
     }
 
-    @Override
-    public Token mobilePhoneLogin(String mobilePhone) {
-        QueryWrapper<Member> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("mobile", mobilePhone);
-        Member member = this.baseMapper.selectOne(queryWrapper);
-        AdminUser adminUser = adminUserService.findByMobile(mobilePhone);
-        if (ObjectUtils.isNotEmpty(adminUser)) {
-            Department dept = departmentService.getById(adminUser.getDepartmentId());
-            Department parentDept = departmentService.getById(dept.getParentId());
-            List<Role> roles = roleService.list(new QueryWrapper<Role>().lambda().eq(Role::getDeleteFlag, false).in(Role::getId, Arrays.asList(adminUser.getRoleIds().split(","))));
-            member.setMyRegionId(dept.getId());
-            member.setMyRegion(dept.getTitle());
-            member.setMyParentRegion(ObjectUtils.isEmpty(parentDept) ? null : parentDept.getTitle());
-            member.setInviteeMobile(ObjectUtils.isEmpty(member.getInviteeId()) ? null : baseMapper.selectById(member.getInviteeId()).getMobile());
-            member.setRoles(roles);
-        }
 
-        //如果手机号不存在则自动注册用户
-        if (member == null) {
-            //String password = new BCryptPasswordEncoder().encode(mobilePhone.substring(mobilePhone.length() - 6));
-            String password = new BCryptPasswordEncoder().encode(StringUtils.md5(mobilePhone.substring(mobilePhone.length() - 6)));
-            member = new Member(mobilePhone, password, mobilePhone);
-            registerHandler(member);
-        }
-        loginBindUser(member);
-        return memberTokenGenerate.createAppToken(member, true);
-    }
 
     /**
      * 注册方法抽象
@@ -818,7 +829,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     }
 
     public static void main(String[] args) {
-        String st = "154183";
+        String st = "151608";
         String encode = new BCryptPasswordEncoder().encode(StringUtils.md5(st));
         System.out.println(  encode );
     }

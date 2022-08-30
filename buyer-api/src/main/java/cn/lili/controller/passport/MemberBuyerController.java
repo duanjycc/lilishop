@@ -7,9 +7,9 @@ import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.context.UserContext;
 import cn.lili.common.security.enums.UserEnums;
 import cn.lili.common.vo.ResultMessage;
+import cn.lili.modules.liande.service.IRegionalPromotionService;
 import cn.lili.modules.member.entity.dos.Member;
 import cn.lili.modules.member.entity.dto.MemberEditDTO;
-import cn.lili.modules.member.entity.vo.MemberVO;
 import cn.lili.modules.member.service.MemberService;
 import cn.lili.modules.sms.SmsUtil;
 import cn.lili.modules.verification.entity.enums.VerificationEnums;
@@ -42,6 +42,8 @@ public class MemberBuyerController {
     private SmsUtil smsUtil;
     @Autowired
     private VerificationService verificationService;
+    @Autowired
+    private IRegionalPromotionService regionalPromotionService;
 
 
 
@@ -61,7 +63,7 @@ public class MemberBuyerController {
     public ResultMessage<Object> userLogin(@NotNull(message = "用户名不能为空") @RequestParam String username,
                                            @NotNull(message = "密码不能为空") @RequestParam String password,
                                            @RequestHeader String uuid) {
-        verificationService.check(uuid, VerificationEnums.LOGIN);
+//        verificationService.check(uuid, VerificationEnums.LOGIN);
         return ResultUtil.data(this.memberService.usernameLogin(username, password));
     }
 
@@ -208,6 +210,7 @@ public class MemberBuyerController {
         return ResultUtil.data(ObjectUtils.isEmpty(member.getPaymentPassword())? false : true);
     }
 
+
     @ApiOperation(value = "补充支付密码")
     @GetMapping("/setUp/payment/password")
     public ResultMessage<Object> setUpPaymentPassword(@NotNull(message = "补充支付密码") @RequestParam String paymentPassword) {
@@ -215,5 +218,11 @@ public class MemberBuyerController {
         return ResultUtil.success();
     }
 
+    @ApiOperation(value = "检测是否区域推广员")
+    @GetMapping("/check/promoters")
+    public ResultMessage<Object> checkPromoters() {
+        AuthUser currentUser = UserContext.getCurrentUser();
+        return ResultUtil.data(regionalPromotionService.checkPromoters(currentUser.getMember().getMobile()));
+    }
 
 }

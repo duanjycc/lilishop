@@ -39,4 +39,12 @@ public interface IRegionalPromotionService extends IService<RegionalPromotion> {
      * @return
      */
     List<InvitationUser> queryInvitationUser(String regionCode);
+
+
+    /**
+     * 检测是否区域推广员
+     * @param mobile
+     * @return
+     */
+    boolean checkPromoters(String mobile);
 }

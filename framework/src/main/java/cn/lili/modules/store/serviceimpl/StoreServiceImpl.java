@@ -224,7 +224,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         //设置会员-店铺信息
         memberService.update(new LambdaUpdateWrapper<Member>()
                 .eq(Member::getId, member.getId())
-                .set(Member::getHaveStore, true)
+                .set(Member::getHaveStore, false)
                 .set(Member::getStoreId, store.getId()));
         return store;
 

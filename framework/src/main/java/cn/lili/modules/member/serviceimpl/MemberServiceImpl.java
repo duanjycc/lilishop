@@ -829,7 +829,14 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     }
 
     public static void main(String[] args) {
-        String st = "482999";
+        String mobilePhone = "18268154189" ;
+
+
+
+        String password = new BCryptPasswordEncoder().encode(StringUtils.md5(mobilePhone.substring(mobilePhone.length() - 6)));
+        System.out.println(  password );
+        System.out.println(  "===================" );
+        String st = "154189";
         String encode = new BCryptPasswordEncoder().encode(StringUtils.md5(st));
         System.out.println(  encode );
     }

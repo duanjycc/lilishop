@@ -142,6 +142,8 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         }else {
             wrapper.eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
         }
+        //wrapper.orderByAsc(" field(state,1,4,2,3)");
+        wrapper.orderByAsc("field(store_disable,'APPLYING','REFUSED','OPEN')");
 
         return this.baseMapper.getStoreList(PageUtil.initPage(page), wrapper);
     }

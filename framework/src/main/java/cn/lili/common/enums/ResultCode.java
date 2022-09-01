@@ -488,7 +488,7 @@ public enum ResultCode {
     /**做单相关*/
     INSUFFICIENT_QUANTITY_ERROR(110001, "SSD数量不够"),
     DISTRIBUTION_ERROR(110001, "SSD数量不够"),
-
+    DISTRIBUTIONVIP_ERROR(110003, "不能给自己做单"),
     DISTRIBUTION_ERRORW(110002, "邀请人已经在你区域"),
 
     /**邀请相关*/

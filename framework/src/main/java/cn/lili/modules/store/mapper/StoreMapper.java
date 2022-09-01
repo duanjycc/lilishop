@@ -41,6 +41,16 @@ public interface StoreMapper extends BaseMapper<Store> {
     IPage<StoreVO> getStoreList(IPage<StoreVO> page, @Param(Constants.WRAPPER) Wrapper<StoreVO> queryWrapper);
 
     /**
+     * APP分页查找附近条件查询
+     *
+     * @param page         分页
+     * @param queryWrapper 查询条件
+     * @return 店铺VO分页列表
+     */
+    @Select("select s.*, st_distance_sphere( point ( left(store_center, LOCATE(',',store_center)-1), right(store_center, LOCATE(',',store_center)-2) ),point ( ${local} ) ) / 1000 AS distance  from li_store as s ${ew.customSqlSegment}")
+    IPage<StoreVO> getAppByPage(IPage<StoreVO> page,@Param("local") String local, @Param(Constants.WRAPPER) Wrapper<StoreVO> queryWrapper);
+
+    /**
      * 通过商品分类id获取店铺
      *
      * @param page         分页

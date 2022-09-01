@@ -19,4 +19,7 @@ public class StoreVO extends Store {
     @ApiModelProperty(value = "登录用户的昵称")
     private String nickName;
 
+    @ApiModelProperty(value = "距离")
+    private Double distance;
+
 }

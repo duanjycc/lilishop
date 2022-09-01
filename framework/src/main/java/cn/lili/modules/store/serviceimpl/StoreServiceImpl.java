@@ -97,6 +97,23 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         return baseMapper.listStoreByCategory(PageUtil.initPage(page), wrapper);
     }
 
+    /**
+     * APP分页条件查询
+     * 用于展示店铺列表
+     *
+     * @param entity
+     * @param page
+     * @return
+     */
+    @Override
+    public IPage<StoreVO> getAppByPage(StoreSearchParams entity, PageVO page) {
+        String local = entity.getLongitude() +","+ entity.getLatitude();
+        QueryWrapper<StoreVO> wrapper = entity.queryWrapper();
+        wrapper.eq("store_disable", StoreStatusEnum.OPEN.name());
+        wrapper.orderByAsc("distance");
+        return this.baseMapper.getAppByPage(PageUtil.initPage(page),local, wrapper);
+    }
+
     @Override
     public IPage<StoreVO> findMakeByConditionPage(StoreSearchParams storeSearchParams, PageVO page) {
         QueryWrapper<StoreVO> wrapper = storeSearchParams.queryWrapper();
@@ -125,6 +142,8 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         }else {
             wrapper.eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
         }
+        //wrapper.orderByAsc(" field(state,1,4,2,3)");
+        wrapper.orderByAsc("field(store_disable,'APPLYING','REFUSED','OPEN')");
 
         return this.baseMapper.getStoreList(PageUtil.initPage(page), wrapper);
     }
@@ -207,7 +226,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         //设置会员-店铺信息
         memberService.update(new LambdaUpdateWrapper<Member>()
                 .eq(Member::getId, member.getId())
-                .set(Member::getHaveStore, true)
+                .set(Member::getHaveStore, false)
                 .set(Member::getStoreId, store.getId()));
         return store;
 

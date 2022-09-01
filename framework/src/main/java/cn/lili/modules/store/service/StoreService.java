@@ -28,6 +28,14 @@ public interface StoreService extends IService<Store> {
      */
     IPage<StoreVO> findMakeByConditionPage(StoreSearchParams entity, PageVO page);
     /**
+     * APP分页条件查询
+     * 用于展示店铺列表
+     *
+     * @param entity
+     * @return
+     */
+    IPage<StoreVO> getAppByPage(StoreSearchParams entity, PageVO page);
+    /**
      * 分页条件查询
      * 用于展示店铺列表
      *

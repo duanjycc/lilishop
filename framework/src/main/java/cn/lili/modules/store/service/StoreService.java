@@ -9,8 +9,6 @@ import cn.lili.modules.store.entity.vos.StoreVO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
-import java.util.List;
-
 /**
  * 店铺业务层
  *
@@ -66,7 +64,14 @@ public interface StoreService extends IService<Store> {
      * @param dto
      * @return
      */
-    Boolean settleIn(AdminStoreApplyDTO dto);
+    Boolean settleIn(AppStoreSettleDTO dto);
+
+    /**
+     * app 商铺入住修改
+     * @param dto
+     * @return
+     */
+    int settleInUpdate(AppStoreSettleDTO dto);
 
     /**
      * 增加店铺
@@ -93,6 +98,14 @@ public interface StoreService extends IService<Store> {
      * @return 操作结果
      */
     boolean audit(String id, Integer passed);
+
+    /**
+     * 驳回店铺
+     *
+     * @param id     店铺ID
+     * @return 操作结果
+     */
+    int reject(String id);
 
     /**
      * 关闭店铺

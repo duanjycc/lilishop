@@ -45,7 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -156,6 +156,39 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         return storeVO;
     }
 
+
+    /**
+     * app 商铺入住修改
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public int settleInUpdate(AppStoreSettleDTO dto) {
+        AuthUser currentUser = UserContext.getCurrentUser();
+        Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
+        if (ObjectUtils.isEmpty(dto.getInvitationPhone()) || "null".equals(dto.getInvitationPhone())){
+            String s = dto.getStoreAddressIdPath().split(",")[2];
+            Department department = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getAreaCode, s).eq(Department::getDeleteFlag, DelStatusEnum.USE.getType()));
+            AdminUser adminUser = adminUserService.getOne(new QueryWrapper<AdminUser>().lambda().eq(AdminUser::getDepartmentId, department.getId()).eq(AdminUser::getDeleteFlag, DelStatusEnum.USE.getType()));
+            Optional.ofNullable(adminUser).orElseThrow(() -> new ServiceException(ResultCode.AREA_SERVICE_PROVIDER_NOT_EXIST));
+
+            dto.setInvitationPhone(adminUser.getUsername());
+        }
+
+        Store store = baseMapper.selectById(dto.getStoreId());
+
+        BeanUtil.copyProperties(dto,store);
+        store.setStoreDisable(StoreStatusEnum.APPLYING.value());
+        fileMapper.update(null, new UpdateWrapper<File>().lambda()
+                .set(File::getOwnerId, store.getId())
+                .set(File::getUserEnums, UserEnums.STORE)
+                .eq(File::getUrl, dto.getStoreLogo())
+                .eq(File::getOwnerId, currentUser.getId()));
+
+        return baseMapper.updateById(store);
+    }
+
     /**
      * app商铺入住
      *
@@ -164,18 +197,30 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean settleIn(AdminStoreApplyDTO dto) {
+    public Boolean settleIn(AppStoreSettleDTO dto) {
         AuthUser currentUser = UserContext.getCurrentUser();
+
         Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
+        Store memberStore = baseMapper.selectOne(new QueryWrapper<Store>().lambda()
+                .eq(Store::getMemberId, currentUser.getId())
+                .eq(Store::getStoreDisable, StoreStatusEnum.APPLYING.value()));
+
+        Optional.ofNullable(memberStore).orElseThrow(() -> new ServiceException(ResultCode.MEMBER_HAVE_OPEN_STORE));
+
         if (ObjectUtils.isEmpty(dto.getInvitationPhone()) || "null".equals(dto.getInvitationPhone())){
             String s = dto.getStoreAddressIdPath().split(",")[2];
             Department department = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getAreaCode, s).eq(Department::getDeleteFlag, DelStatusEnum.USE.getType()));
             AdminUser adminUser = adminUserService.getOne(new QueryWrapper<AdminUser>().lambda().eq(AdminUser::getDepartmentId, department.getId()).eq(AdminUser::getDeleteFlag, DelStatusEnum.USE.getType()));
+            Optional.ofNullable(adminUser).orElseThrow(() -> new ServiceException(ResultCode.AREA_SERVICE_PROVIDER_NOT_EXIST));
+
             dto.setInvitationPhone(adminUser.getUsername());
         }
         dto.setMemberId(currentUser.getId());
-        dto.setLegalPhoto(dto.getStoreLogo());
-        Store store = add(dto);
+        AdminStoreApplyDTO adminStoreApplyDTO = new AdminStoreApplyDTO();
+
+        BeanUtil.copyProperties(dto,adminStoreApplyDTO);
+        adminStoreApplyDTO.setLegalPhoto(dto.getStoreLogo());
+        Store store   = add(adminStoreApplyDTO);
         fileMapper.update(null, new UpdateWrapper<File>().lambda()
                 .set(File::getOwnerId, store.getId())
                 .set(File::getUserEnums, UserEnums.STORE)
@@ -280,6 +325,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         storeDetailService.update(storeDetail, new QueryWrapper<StoreDetail>().eq("store_id", storeEditDTO.getStoreId()));
     }
 
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean audit(String id, Integer passed) {
@@ -304,6 +350,36 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
 
         return this.updateById(store);
     }
+
+
+    /**
+     * 驳回店铺
+     *
+     * @param id 店铺ID
+     * @return 操作结果
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public int reject(String id) {
+        Store store = this.getById(id);
+        if (store == null) {
+            throw new ServiceException(ResultCode.STORE_NOT_EXIST);
+        }
+
+        memberService.update(null,new UpdateWrapper<Member>().lambda()
+                .set(Member::getHaveStore,false)
+                .set(Member::getStoreId,null)
+                .eq(Member::getId,store.getMemberId()));
+
+        return baseMapper.update(null,new UpdateWrapper<Store>().lambda()
+                .set(Store::getStoreDisable,StoreStatusEnum.REFUSED.value())
+                .eq(Store::getId,id));
+    }
+
+
+
+
+
 
     @Override
     public boolean disable(String id) {

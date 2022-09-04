@@ -2,6 +2,7 @@ package cn.lili.controller.store;
 
 import cn.lili.common.enums.ResultUtil;
 import cn.lili.common.security.context.UserContext;
+import cn.lili.common.utils.StringUtils;
 import cn.lili.common.vo.PageVO;
 import cn.lili.common.vo.ResultMessage;
 import cn.lili.modules.goods.entity.vos.StoreGoodsLabelVO;
@@ -32,20 +33,10 @@ import java.util.List;
 @RequestMapping("/buyer/store/store")
 @Api(tags = "买家端,店铺接口")
 public class StoreBuyerController {
-
-    /**
-     * 店铺
-     */
     @Autowired
     private StoreService storeService;
-    /**
-     * 店铺商品分类
-     */
     @Autowired
     private StoreGoodsLabelService storeGoodsLabelService;
-    /**
-     * 店铺详情
-     */
     @Autowired
     private StoreDetailService storeDetailService;
 
@@ -58,8 +49,12 @@ public class StoreBuyerController {
 
     @ApiOperation(value = "APP申请商铺-入驻店铺")
     @PostMapping(value = "/settleIn")
-    public ResultMessage<Object> settleIn(AdminStoreApplyDTO dto) {
-        return ResultUtil.data(storeService.settleIn(dto));
+    public ResultMessage<Object> settleIn(AppStoreSettleDTO dto) {
+        if (StringUtils.isNotEmpty(dto.getStoreId())){
+            return ResultUtil.data(storeService.settleInUpdate(dto));
+        }else{
+            return ResultUtil.data(storeService.settleIn(dto));
+        }
     }
 
     @ApiOperation(value = "app审核")
@@ -68,6 +63,15 @@ public class StoreBuyerController {
         storeService.audit(id, pass);
         return ResultUtil.success();
     }
+
+
+    @ApiOperation(value = "app驳回")
+    @GetMapping("/reject/{id}")
+    public ResultMessage<Object> reject(@NotNull @PathVariable String id) {
+        storeService.reject(id);
+        return ResultUtil.success();
+    }
+
 
     @ApiOperation(value = "获取店铺列表分页")
     @GetMapping("/getMakeByPage")

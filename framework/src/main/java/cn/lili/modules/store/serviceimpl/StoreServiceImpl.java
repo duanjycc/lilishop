@@ -205,7 +205,10 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
                 .eq(Store::getMemberId, currentUser.getId())
                 .eq(Store::getStoreDisable, StoreStatusEnum.APPLYING.value()));
 
-        Optional.ofNullable(memberStore).orElseThrow(() -> new ServiceException(ResultCode.MEMBER_HAVE_OPEN_STORE));
+        if (ObjectUtils.isNotEmpty(memberStore)){
+            throw new ServiceException(ResultCode.MEMBER_HAVE_OPEN_STORE);
+        }
+
 
         if (ObjectUtils.isEmpty(dto.getInvitationPhone()) || "null".equals(dto.getInvitationPhone())){
             String s = dto.getStoreAddressIdPath().split(",")[2];

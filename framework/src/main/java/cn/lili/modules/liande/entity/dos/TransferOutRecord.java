@@ -4,14 +4,12 @@
 package cn.lili.modules.liande.entity.dos;
 
 import cn.lili.common.security.context.UserContext;
-import cn.lili.modules.liande.entity.enums.DelStatusEnum;
+import cn.lili.modules.liande.entity.enums.StatusEnum;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -90,7 +88,7 @@ public class TransferOutRecord extends Model<TransferOutRecord> {
         this.arrivalAmount = amount;
         this.serviceCharge = 0.00;
         this.rechargeTime = new Date();
-        this.receiptStatus = DelStatusEnum.USE.getType();
+        this.receiptStatus = StatusEnum.USE.getType();
         this.intoTime = new Date();
     }
 }

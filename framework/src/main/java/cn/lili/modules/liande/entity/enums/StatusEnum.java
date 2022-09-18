@@ -7,7 +7,7 @@ package cn.lili.modules.liande.entity.enums;
  * @since 2021/3/20 10:44
  */
 
-public enum DelStatusEnum {
+public enum StatusEnum {
     /**
      * 商品名称
      */
@@ -28,7 +28,7 @@ public enum DelStatusEnum {
         return description;
     }
 
-    DelStatusEnum(String type, String desc) {
+    StatusEnum(String type, String desc) {
         this.type = type;
         this.description = desc;
     }

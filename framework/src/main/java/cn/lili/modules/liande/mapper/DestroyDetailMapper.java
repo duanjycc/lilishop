@@ -23,7 +23,8 @@ public interface DestroyDetailMapper extends BaseMapper<DestroyDetail> {
     @Select("select IFNULL(SUM(want_count),0)  from w_destroy_detail where status = '0' ")
     Double sum();
 
-    @Select("select IFNULL(SUM(want_count),0)  from w_destroy_detail where status = '0' and  left(destroy_time,10) = left(DATE_SUB(now(),INTERVAL 1 DAY),10) ")
+   // @Select("select IFNULL(SUM(want_count),0)  from w_destroy_detail where status = '0' and  left(destroy_time,10) = left(DATE_SUB(now(),INTERVAL 1 DAY),10) ")
+    @Select("select IFNULL(SUM(want_count),0)  from w_destroy_detail where status = '0' and  left(destroy_time,10) = left(now(),10) ")
     Double yesterdaySum();
 
 }

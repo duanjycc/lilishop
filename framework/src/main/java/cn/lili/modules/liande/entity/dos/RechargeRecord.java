@@ -4,14 +4,12 @@
 package cn.lili.modules.liande.entity.dos;
 
 import cn.lili.common.security.context.UserContext;
-import cn.lili.modules.liande.entity.enums.DelStatusEnum;
-import cn.lili.trigger.enums.DelayTypeEnums;
+import cn.lili.modules.liande.entity.enums.StatusEnum;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
@@ -144,7 +142,7 @@ public class RechargeRecord extends Model<RechargeRecord> {
         this.rechargeAmount = amount;
         this.arrivalAmount = amount;
         this.serviceCharge = 0.00;
-        this.rechargeStatus = DelStatusEnum.USE.getType();
+        this.rechargeStatus = StatusEnum.USE.getType();
         this.rechargeTime =  new Date();
         this.intoTime = new Date();
         this.type = "0";

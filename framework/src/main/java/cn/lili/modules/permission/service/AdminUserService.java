@@ -2,6 +2,9 @@ package cn.lili.modules.permission.service;
 
 
 import cn.lili.common.security.token.Token;
+import cn.lili.common.vo.PageVO;
+import cn.lili.modules.liande.entity.dto.ServiceProviderParams;
+import cn.lili.modules.liande.entity.vo.ServiceProviderParamsVO;
 import cn.lili.modules.permission.entity.dos.AdminUser;
 import cn.lili.modules.permission.entity.dto.AdminUserDTO;
 import cn.lili.modules.permission.entity.vo.AdminUserVO;
@@ -22,6 +25,15 @@ import java.util.List;
 @CacheConfig(cacheNames = "{adminuser}")
 public interface AdminUserService extends IService<AdminUser> {
 
+
+    /**
+     * 获取服务商后端管理分页
+     *
+     * @param initPage
+     * @param params
+     * @return
+     */
+    IPage<ServiceProviderParamsVO> queryServiceProvider(Page initPage ,ServiceProviderParams params);
 
     /**
      * 获取管理员分页

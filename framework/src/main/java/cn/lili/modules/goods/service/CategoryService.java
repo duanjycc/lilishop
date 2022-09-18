@@ -57,6 +57,13 @@ public interface CategoryService extends IService<Category> {
     List<CategoryVO> listAllChildren(String parentId);
 
     /**
+     * App获取第一层分类列表
+     *
+     * @return 所有的分类，父子关系
+     */
+    List<Category> getFirstList();
+
+    /**
      * 查询所有的分类，父子关系
      * 数据库获取
      *

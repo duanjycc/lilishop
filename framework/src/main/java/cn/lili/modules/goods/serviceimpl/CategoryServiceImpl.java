@@ -12,6 +12,7 @@ import cn.lili.modules.goods.service.CategoryBrandService;
 import cn.lili.modules.goods.service.CategoryParameterGroupService;
 import cn.lili.modules.goods.service.CategoryService;
 import cn.lili.modules.goods.service.CategorySpecificationService;
+import cn.lili.modules.liande.entity.enums.StatusEnum;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -138,6 +139,19 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
             }
         }
         return new ArrayList<>();
+    }
+
+
+    /**
+     * App获取第一层分类列表
+     *
+     * @return 所有的分类，父子关系
+     */
+    @Override
+    public List<Category> getFirstList() {
+        List<Category> categories = baseMapper.selectList(new QueryWrapper<Category>().lambda()
+                .eq(Category::getLevel, StatusEnum.USE.getType()));
+        return categories;
     }
 
     @Override

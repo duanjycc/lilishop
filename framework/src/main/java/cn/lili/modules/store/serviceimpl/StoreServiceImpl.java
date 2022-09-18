@@ -15,7 +15,7 @@ import cn.lili.common.vo.PageVO;
 import cn.lili.modules.file.entity.File;
 import cn.lili.modules.file.mapper.FileMapper;
 import cn.lili.modules.goods.service.GoodsService;
-import cn.lili.modules.liande.entity.enums.DelStatusEnum;
+import cn.lili.modules.liande.entity.enums.StatusEnum;
 import cn.lili.modules.member.entity.dos.Member;
 import cn.lili.modules.member.entity.dto.CollectionDTO;
 import cn.lili.modules.member.service.MemberService;
@@ -45,7 +45,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -169,8 +168,8 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
         if (ObjectUtils.isEmpty(dto.getInvitationPhone()) || "null".equals(dto.getInvitationPhone())){
             String s = dto.getStoreAddressIdPath().split(",")[2];
-            Department department = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getAreaCode, s).eq(Department::getDeleteFlag, DelStatusEnum.USE.getType()));
-            AdminUser adminUser = adminUserService.getOne(new QueryWrapper<AdminUser>().lambda().eq(AdminUser::getDepartmentId, department.getId()).eq(AdminUser::getDeleteFlag, DelStatusEnum.USE.getType()));
+            Department department = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getAreaCode, s).eq(Department::getDeleteFlag, StatusEnum.USE.getType()));
+            AdminUser adminUser = adminUserService.getOne(new QueryWrapper<AdminUser>().lambda().eq(AdminUser::getDepartmentId, department.getId()).eq(AdminUser::getDeleteFlag, StatusEnum.USE.getType()));
             Optional.ofNullable(adminUser).orElseThrow(() -> new ServiceException(ResultCode.AREA_SERVICE_PROVIDER_NOT_EXIST));
 
             dto.setInvitationPhone(adminUser.getUsername());
@@ -212,8 +211,8 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
 
         if (ObjectUtils.isEmpty(dto.getInvitationPhone()) || "null".equals(dto.getInvitationPhone())){
             String s = dto.getStoreAddressIdPath().split(",")[2];
-            Department department = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getAreaCode, s).eq(Department::getDeleteFlag, DelStatusEnum.USE.getType()));
-            AdminUser adminUser = adminUserService.getOne(new QueryWrapper<AdminUser>().lambda().eq(AdminUser::getDepartmentId, department.getId()).eq(AdminUser::getDeleteFlag, DelStatusEnum.USE.getType()));
+            Department department = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getAreaCode, s).eq(Department::getDeleteFlag, StatusEnum.USE.getType()));
+            AdminUser adminUser = adminUserService.getOne(new QueryWrapper<AdminUser>().lambda().eq(AdminUser::getDepartmentId, department.getId()).eq(AdminUser::getDeleteFlag, StatusEnum.USE.getType()));
             Optional.ofNullable(adminUser).orElseThrow(() -> new ServiceException(ResultCode.AREA_SERVICE_PROVIDER_NOT_EXIST));
 
             dto.setInvitationPhone(adminUser.getUsername());
@@ -259,7 +258,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         AdminUser adminUser = adminUserService.findByMobile(member.getMobile());
 
         if (ObjectUtils.isNotEmpty(adminUser) ) {
-            Department department = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getId,adminUser.getDepartmentId()).eq(Department::getDeleteFlag, DelStatusEnum.USE.getType()));
+            Department department = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getId,adminUser.getDepartmentId()).eq(Department::getDeleteFlag, StatusEnum.USE.getType()));
             if(s.equals(department.getAreaCode())){
                 store.setStoreDisable(StoreStatusEnum.OPEN.value());
             }

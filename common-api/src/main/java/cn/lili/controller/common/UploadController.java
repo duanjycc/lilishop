@@ -12,7 +12,6 @@ import cn.lili.common.utils.Base64DecodeMultipartFile;
 import cn.lili.common.utils.CommonUtil;
 import cn.lili.common.vo.ResultMessage;
 import cn.lili.modules.file.entity.File;
-import cn.lili.modules.file.plugin.FilePlugin;
 import cn.lili.modules.file.plugin.FilePluginFactory;
 import cn.lili.modules.file.service.FileService;
 import cn.lili.modules.system.entity.dos.Setting;
@@ -52,6 +51,7 @@ public class UploadController {
     @Autowired
     private Cache cache;
 
+
     @ApiOperation(value = "文件上传")
     @PostMapping(value = "/file")
     public ResultMessage<Object> upload(MultipartFile file,
@@ -64,6 +64,8 @@ public class UploadController {
             throw new ServiceException(ResultCode.USER_AUTHORITY_ERROR);
         }
         Setting setting = settingService.get(SettingEnum.OSS_SETTING.name());
+        Setting prefixOss = settingService.get(SettingEnum.PREFIX_OSS_PATH.name());
+        Setting initOss = settingService.get(SettingEnum.INIT_OSS_PATH.name());
         if (setting == null || CharSequenceUtil.isBlank(setting.getSettingValue())) {
             throw new ServiceException(ResultCode.OSS_NOT_EXIST);
         }
@@ -92,7 +94,7 @@ public class UploadController {
             newFile.setFileSize(file.getSize());
             newFile.setFileType(file.getContentType());
             newFile.setFileKey(fileKey);
-            newFile.setUrl(result);
+            newFile.setUrl(result.replace(initOss.getSettingValue(),prefixOss.getSettingValue()));
             newFile.setCreateBy(authUser.getUsername());
             newFile.setUserEnums(authUser.getRole().name());
             //如果是店铺，则记录店铺id

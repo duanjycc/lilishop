@@ -14,7 +14,6 @@ import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.context.UserContext;
 import cn.lili.common.security.enums.UserEnums;
 import cn.lili.common.security.token.Token;
-import cn.lili.common.security.token.TokenUtil;
 import cn.lili.common.sensitive.SensitiveWordsFilter;
 import cn.lili.common.utils.*;
 import cn.lili.common.vo.PageVO;
@@ -22,7 +21,7 @@ import cn.lili.modules.connect.config.ConnectAuthEnum;
 import cn.lili.modules.connect.entity.Connect;
 import cn.lili.modules.connect.entity.dto.ConnectAuthUser;
 import cn.lili.modules.connect.service.ConnectService;
-import cn.lili.modules.liande.entity.enums.DelStatusEnum;
+import cn.lili.modules.liande.entity.enums.StatusEnum;
 import cn.lili.modules.member.aop.annotation.PointLogPoint;
 import cn.lili.modules.member.entity.dos.Member;
 import cn.lili.modules.member.entity.dto.*;
@@ -385,7 +384,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     @Override
     public boolean bindInvitee(String mobile) {
         Member member = baseMapper.selectOne(new QueryWrapper<Member>().lambda().eq(Member::getMobile, mobile)
-                .eq(Member::getDeleteFlag, DelStatusEnum.USE.getType()));
+                .eq(Member::getDeleteFlag, StatusEnum.USE.getType()));
         Optional.ofNullable(member).orElseThrow(() -> new ServiceException(ResultCode.INVITATION_MEMBER_NOT_EXIST_ERROR));
         if (member.equals(UserContext.getCurrentUser().getMember().getMobile())) {
 

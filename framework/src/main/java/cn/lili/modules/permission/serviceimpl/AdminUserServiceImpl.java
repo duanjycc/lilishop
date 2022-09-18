@@ -8,6 +8,9 @@ import cn.lili.common.security.context.UserContext;
 import cn.lili.common.security.token.Token;
 import cn.lili.common.utils.BeanUtil;
 import cn.lili.common.utils.StringUtils;
+import cn.lili.modules.liande.entity.dto.QueryTransferDTO;
+import cn.lili.modules.liande.entity.dto.ServiceProviderParams;
+import cn.lili.modules.liande.entity.vo.ServiceProviderParamsVO;
 import cn.lili.modules.permission.entity.dos.AdminUser;
 import cn.lili.modules.permission.entity.dos.Department;
 import cn.lili.modules.permission.entity.dos.Role;
@@ -57,6 +60,16 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
      * 角色长度
      */
     private final int rolesMaxSize = 10;
+
+
+    @Override
+    public IPage<ServiceProviderParamsVO> queryServiceProvider(Page initPage, ServiceProviderParams params) {
+        QueryWrapper<ServiceProviderParams> queryWrapper = new QueryWrapper();
+
+        baseMapper.queryServiceProvider(initPage,queryWrapper);
+
+        return null;
+    }
 
     @Override
     public IPage<AdminUserVO> adminUserPage(Page initPage, QueryWrapper<AdminUser> initWrapper) {

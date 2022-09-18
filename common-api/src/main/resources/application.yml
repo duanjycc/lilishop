@@ -147,6 +147,11 @@ swagger:
     name: lili
     url: https://pickmall.cn
     email: admin@pickmall.com
+minio:
+  endpoint: http://116.62.62.54:9000 #MinIO服务所在地址
+  bucketName: hlm #存储桶名称
+  accessKey: 87aefef0a6cd #访问的key
+  secretKey: 078f906e87084c8bba9f10feb0918bdb #访问的秘钥
 
 # Mybatis-plus
 mybatis-plus:

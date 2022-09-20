@@ -9,11 +9,13 @@ import cn.lili.common.security.token.Token;
 import cn.lili.common.utils.BeanUtil;
 import cn.lili.common.utils.DateUtil;
 import cn.lili.common.utils.StringUtils;
+import cn.lili.modules.liande.entity.dos.ServiceLog;
 import cn.lili.modules.liande.entity.dto.QueryTransferDTO;
 import cn.lili.modules.liande.entity.dto.ServiceProviderParams;
 import cn.lili.modules.liande.entity.dto.SignInDTO;
 import cn.lili.modules.liande.entity.enums.StatusEnum;
 import cn.lili.modules.liande.entity.vo.ServiceProviderParamsVO;
+import cn.lili.modules.liande.mapper.ServiceLogMapper;
 import cn.lili.modules.member.entity.dos.Member;
 import cn.lili.modules.member.serviceimpl.MemberServiceImpl;
 import cn.lili.modules.permission.entity.dos.AdminUser;
@@ -51,6 +53,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser> implements AdminUserService {
+
+    @Autowired
+    private ServiceLogMapper serviceLogMapper;
+
     @Autowired
     private UserRoleService userRoleService;
     @Autowired
@@ -153,8 +159,12 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
         if (ObjectUtils.isEmpty(user)){
             throw new ServiceException(ResultCode.AREA_IS_NOT_SIGN);
         }
+
         departmentService.removeById(dept.getId());
         baseMapper.deleteById(user.getId());
+
+        ServiceLog log = new ServiceLog(dept.getAreaCode(), dept.getTitle(),user.getId(),user.getNickName());
+        serviceLogMapper.insert(log);
     }
 
     @Override

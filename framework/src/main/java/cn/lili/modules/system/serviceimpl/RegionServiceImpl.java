@@ -129,11 +129,12 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
     public List<RegionVO> getAllCity() {
         LambdaQueryWrapper<Region> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         //查询所有省市
-        lambdaQueryWrapper.in(Region::getLevel, "city", "province");
+        lambdaQueryWrapper.in(Region::getLevel, "city", "province","district");
         return regionTree(this.list(lambdaQueryWrapper));
     }
 
     private List<RegionVO> regionTree(List<Region> regions) {
+
         List<RegionVO> regionVOS = new ArrayList<>();
         regions.stream().filter(region -> ("province").equals(region.getLevel())).forEach(item -> regionVOS.add(new RegionVO(item)));
         regions.stream().filter(region -> ("city").equals(region.getLevel())).forEach(item -> {
@@ -141,6 +142,16 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
                 if (region.getId().equals(item.getParentId())) {
                     region.getChildren().add(new RegionVO(item));
                 }
+            }
+        });
+        regions.stream().filter(region ->("district").equals(region.getLevel())).forEach(item ->{
+            for (RegionVO region : regionVOS) {
+                for ( RegionVO regionVO : region.getChildren()){
+                    if (regionVO.getId().equals(item.getParentId())) {
+                        regionVO.getChildren().add(new RegionVO(item));
+                    }
+                }
+
             }
         });
         return regionVOS;

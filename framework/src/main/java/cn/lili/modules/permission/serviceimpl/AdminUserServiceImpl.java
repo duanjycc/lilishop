@@ -7,10 +7,15 @@ import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.context.UserContext;
 import cn.lili.common.security.token.Token;
 import cn.lili.common.utils.BeanUtil;
+import cn.lili.common.utils.DateUtil;
 import cn.lili.common.utils.StringUtils;
 import cn.lili.modules.liande.entity.dto.QueryTransferDTO;
 import cn.lili.modules.liande.entity.dto.ServiceProviderParams;
+import cn.lili.modules.liande.entity.dto.SignInDTO;
+import cn.lili.modules.liande.entity.enums.StatusEnum;
 import cn.lili.modules.liande.entity.vo.ServiceProviderParamsVO;
+import cn.lili.modules.member.entity.dos.Member;
+import cn.lili.modules.member.serviceimpl.MemberServiceImpl;
 import cn.lili.modules.permission.entity.dos.AdminUser;
 import cn.lili.modules.permission.entity.dos.Department;
 import cn.lili.modules.permission.entity.dos.Role;
@@ -23,7 +28,9 @@ import cn.lili.modules.system.aspect.annotation.SystemLogPoint;
 import cn.lili.modules.system.token.ManagerTokenGenerate;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -32,9 +39,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -53,7 +58,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
     @Autowired
     private DepartmentService departmentService;
     @Autowired
-    private MenuService menuService;
+    private MemberServiceImpl memberService;
     @Autowired
     private ManagerTokenGenerate managerTokenGenerate;
     /**
@@ -66,9 +71,90 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
     public IPage<ServiceProviderParamsVO> queryServiceProvider(Page initPage, ServiceProviderParams params) {
         QueryWrapper<ServiceProviderParams> queryWrapper = new QueryWrapper();
 
-        baseMapper.queryServiceProvider(initPage,queryWrapper);
+        queryWrapper.apply("r.level in ('province','city','district')");
+        if (StatusEnum.USE.getType().equals(params.getIsSignIn())){
+            queryWrapper.apply(" t.id is not null");
+        }
+        if (StatusEnum.DEL.getType().equals(params.getIsSignIn())){
+            queryWrapper.apply(" t.id is null");
+        }
+        if (ObjectUtils.isNotEmpty(params.getAreaName())){
+            queryWrapper.like("r.name",params.getAreaName());
+        }
+        if (ObjectUtils.isNotEmpty(params.getAreaId())){
+            queryWrapper.apply(" FIND_IN_SET(" + params.getAreaId() + ", r.path)");
+        }
+        queryWrapper.orderByDesc("t.signCreateTime ");
+        return baseMapper.queryServiceProvider(initPage, queryWrapper);
+    }
 
-        return null;
+    /**
+     * 服务商管理-签约
+     *
+     * @param signInDTO
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void signIn(SignInDTO signInDTO) {
+        Member member = memberService.getOne(new QueryWrapper<Member>().lambda().eq(Member::getMobile, signInDTO.getMobile()));
+        if (ObjectUtils.isEmpty(member)){
+            throw new ServiceException(ResultCode.MEMBER_IS_NOT_EXIST);
+        }
+        AdminUser user = baseMapper.selectOne(new QueryWrapper<AdminUser>().lambda().eq(AdminUser::getMobile, signInDTO.getMobile()));
+        if (ObjectUtils.isNotEmpty(user)){
+            throw new ServiceException(ResultCode.USER_IS_HAVE_SIGN);
+        }
+        Department dept = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getAreaCode, signInDTO.getSignAreaId()));
+        if (ObjectUtils.isNotEmpty(dept)){
+            throw new ServiceException(ResultCode.AREA_IS_HAVE_SIGN);
+        }
+
+        // 插入部门表
+        Department department = new Department();
+        department.setAreaCode(signInDTO.getSignAreaId());
+        department.setParentId(signInDTO.getParentServiceProvider());
+        department.setCreateTime(new Date());
+        department.setTitle(signInDTO.getSignAreaName().replace("/",""));
+        department.setCreateBy(UserContext.getCurrentUser().getUsername());
+        departmentService.save(department);
+        // 插入 admin_user
+
+        AdminUser adminUser = new AdminUser();
+        adminUser.setDepartmentId(department.getId());
+        adminUser.setDescription(signInDTO.getUsername()+"在【"+DateUtil.getCurrentDateStr()+"】 签约成为服务商");
+        adminUser.setMobile(signInDTO.getMobile());
+        adminUser.setUsername(signInDTO.getMobile());
+        adminUser.setNickName(signInDTO.getUsername());
+        adminUser.setIsSuper(false);
+        adminUser.setStatus(true);
+        adminUser.setRoleIds(signInDTO.getServiceProviderLevel());
+        adminUser.setEmail(signInDTO.getMobile()+"qq.com");
+        String password = new BCryptPasswordEncoder().encode(StringUtils.md5(signInDTO.getMobile().substring(signInDTO.getMobile().length() - 6)));
+        adminUser.setPassword(password);
+        adminUser.setCreateTime(new Date());
+        department.setCreateBy(UserContext.getCurrentUser().getUsername());
+        baseMapper.insert(adminUser);
+    }
+
+
+    /**
+     * 服务商管理-删除签约
+     *
+     * @param id
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void deleteSignIn(String id) {
+        Department dept = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getAreaCode, id));
+        if (ObjectUtils.isEmpty(dept)){
+            throw new ServiceException(ResultCode.AREA_IS_NOT_SIGN);
+        }
+        AdminUser user = baseMapper.selectOne(new QueryWrapper<AdminUser>().lambda().eq(AdminUser::getDepartmentId, dept.getId()));
+        if (ObjectUtils.isEmpty(user)){
+            throw new ServiceException(ResultCode.AREA_IS_NOT_SIGN);
+        }
+        departmentService.removeById(dept.getId());
+        baseMapper.deleteById(user.getId());
     }
 
     @Override

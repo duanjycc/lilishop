@@ -4,6 +4,7 @@ package cn.lili.modules.permission.service;
 import cn.lili.common.security.token.Token;
 import cn.lili.common.vo.PageVO;
 import cn.lili.modules.liande.entity.dto.ServiceProviderParams;
+import cn.lili.modules.liande.entity.dto.SignInDTO;
 import cn.lili.modules.liande.entity.vo.ServiceProviderParamsVO;
 import cn.lili.modules.permission.entity.dos.AdminUser;
 import cn.lili.modules.permission.entity.dto.AdminUserDTO;
@@ -14,6 +15,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.cache.annotation.CacheConfig;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -34,6 +36,19 @@ public interface AdminUserService extends IService<AdminUser> {
      * @return
      */
     IPage<ServiceProviderParamsVO> queryServiceProvider(Page initPage ,ServiceProviderParams params);
+
+
+    /**
+     * 服务商管理-签约
+     * @param signInDTO
+     */
+
+    void signIn(SignInDTO signInDTO);
+    /**
+     * 服务商管理-删除签约
+     * @param id
+     */
+    void deleteSignIn(String id);
 
     /**
      * 获取管理员分页

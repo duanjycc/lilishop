@@ -1,8 +1,11 @@
 package cn.lili.modules.liande.entity.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  *
@@ -21,7 +24,9 @@ public class ServiceProviderParamsVO {
     private String areaServiceProviderMobile;
     @ApiModelProperty(value = "服务商联系人名称")
     private String areaServiceProviderName;
+    @ApiModelProperty(value = "签约时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:sss",timezone = "GMT+8")
+    private Date signCreateTime;
     @ApiModelProperty(value = "状态( 0: 签约 ,1: 未签约) ",allowableValues = "0,1")
     private String isSignIn;
-
 }

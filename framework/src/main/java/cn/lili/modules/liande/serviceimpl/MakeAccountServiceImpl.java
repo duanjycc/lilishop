@@ -361,6 +361,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         de.setStatus("0");
         de.setDestroyTime(new Date());
         de.setWantPrice(wantPrice+"");
+        de.setStoreId(st.getId());
         destroyDetailMapper.insert(de);
 
         //插入会员获取积分明细

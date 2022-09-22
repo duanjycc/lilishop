@@ -94,4 +94,10 @@ public class DestroyDetail extends Model<DestroyDetail> {
     @ApiModelProperty(value = "做单时want单价")
     private String wantPrice;
 
+    /**
+     * 店铺ID
+     */
+    @ApiModelProperty(value = "店铺ID")
+    private String storeId;
+
 }

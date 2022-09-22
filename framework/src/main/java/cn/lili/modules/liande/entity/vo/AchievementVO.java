@@ -30,6 +30,8 @@ public class AchievementVO {
     @ApiModelProperty(value = "服务商等级")
     private String serviceProviderLevel;
 
+    @ApiModelProperty(value = "签约区域ID")
+    private String signAreaId;
     @ApiModelProperty(value = "签约区域名称")
     private String signAreaName;
 

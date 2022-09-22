@@ -32,7 +32,7 @@ public interface StoreMapper extends BaseMapper<Store> {
      * @return
      */
     @Select("select \n" +
-            "\tsum(surrender_price)\n" +
+            "\tif(sum(surrender_price),sum(surrender_price),0)\n" +
             "\tfrom w_make_account w\n" +
             "\t\tleft join li_store s on w.mer_id =  cast(s.id as char)\n" +
             "\twhere \n" +
@@ -45,7 +45,7 @@ public interface StoreMapper extends BaseMapper<Store> {
      * @return
      */
     @Select("select \n" +
-            "\tsum(want_count)\n" +
+            "\tif(sum(want_count),sum(want_count),0)\n" +
             "\tfrom w_destroy_detail w\n" +
             "\t\tleft join li_store s on w.user_id =  cast(s.member_id as char)\n" +
             "\twhere \n" +

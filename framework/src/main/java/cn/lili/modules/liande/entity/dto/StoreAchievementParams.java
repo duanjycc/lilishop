@@ -18,14 +18,12 @@ public class StoreAchievementParams {
     @ApiModelProperty(value = "区域id")
     private String areaId;
 
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     @ApiModelProperty(value = "做单开始时间")
-    private Date startDate;
+    private String startDate;
 
-    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     @ApiModelProperty(value = "做单结束时间")
-    private Date endDate;
+    private String endDate;
 
 }

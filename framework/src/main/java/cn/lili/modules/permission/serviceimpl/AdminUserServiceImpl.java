@@ -110,6 +110,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
         achievementVO.setMobile(mobile);
         achievementVO.setServiceProviderLevel(role.getRoleName());
         achievementVO.setSignAreaName(region.getName());
+        achievementVO.setSignAreaId(region.getId());
         achievementVO.setParentName(parentDept.getTitle());
         achievementVO.setSignCreateTime(user.getCreateTime());
         achievementVO.setStoreCount(storeCount);

@@ -1,7 +1,9 @@
 package cn.lili.modules.permission.mapper;
 
 import cn.lili.modules.liande.entity.dto.ServiceProviderParams;
+import cn.lili.modules.liande.entity.dto.StoreAchievementParams;
 import cn.lili.modules.liande.entity.vo.ServiceProviderParamsVO;
+import cn.lili.modules.liande.entity.vo.StoreAchievementParamsVO;
 import cn.lili.modules.permission.entity.dos.AdminUser;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -44,6 +46,17 @@ public interface AdminUserMapper extends BaseMapper<AdminUser> {
             "\t\t\t\t\tleft join li_admin_user a on d.id = a.department_id\n" +
             "\t\t\t) t on Cast(r.id as char) = t.area_code  ${ew.customSqlSegment}")
     IPage<ServiceProviderParamsVO>  queryServiceProvider(IPage<ServiceProviderParamsVO> initPage, @Param(Constants.WRAPPER) QueryWrapper<ServiceProviderParams> queryWrapper);
+
+
+    @Select("select \n" +
+            "\t\t\ts.member_name as memberName,\n" +
+            "\t\t\ts.store_name as storeName,\n" +
+            "\t\t\tif(sum( w.surrender_price),sum( w.surrender_price),0) as surrenderPrice,\n" +
+            "\t\t\tif(count( w.id),count( w.id),0) as makeCount,\n" +
+            "\t\t\t(select if(sum(w.want_count),sum(w.want_count),0) from w_destroy_detail w where w.user_id in ( s.member_id  ) ) as destroyCount\n" +
+            "\t\t\tfrom li_store s \n" +
+            "\t\t\t\t left join w_make_account w  on cast(s.id as char) = w.mer_id ${ew.customSqlSegment} group by s.id  ")
+    IPage<StoreAchievementParamsVO>  queryStoreAchievement(IPage<StoreAchievementParamsVO> initPage, @Param(Constants.WRAPPER) QueryWrapper<StoreAchievementParams> queryWrapper);
 
 
     /**

@@ -7,7 +7,10 @@ import cn.lili.common.vo.PageVO;
 import cn.lili.common.vo.ResultMessage;
 import cn.lili.modules.liande.entity.dto.ServiceProviderParams;
 import cn.lili.modules.liande.entity.dto.SignInDTO;
+import cn.lili.modules.liande.entity.dto.StoreAchievementParams;
+import cn.lili.modules.liande.entity.vo.AchievementVO;
 import cn.lili.modules.liande.entity.vo.ServiceProviderParamsVO;
+import cn.lili.modules.liande.entity.vo.StoreAchievementParamsVO;
 import cn.lili.modules.permission.entity.dto.AdminUserDTO;
 import cn.lili.modules.permission.service.AdminUserService;
 import cn.lili.mybatis.util.PageUtil;
@@ -33,6 +36,23 @@ public class ServiceProviderController {
     @Autowired
     private AdminUserService userService;
 
+
+    @ApiOperation(value = "查询服务商业绩")
+    @GetMapping(value = "/achievement/{mobile}")
+    public ResultMessage<AchievementVO> queryAchievement(@PathVariable String mobile) {
+
+        return ResultUtil.data(userService.queryAchievement(mobile));
+    }
+
+
+    @ApiOperation(value = "查询服务商业绩")
+    @GetMapping(value = "/store/achievement")
+    public ResultMessage<IPage<StoreAchievementParamsVO>> queryStoreAchievement(StoreAchievementParams params,
+                                                                                PageVO pageVo) {
+
+        IPage<StoreAchievementParamsVO> page = userService.queryStoreAchievement(PageUtil.initPage(pageVo), params);
+        return ResultUtil.data(page);
+    }
 
     @ApiOperation(value = "查询服务商列表分页")
     @GetMapping

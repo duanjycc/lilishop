@@ -5,7 +5,10 @@ import cn.lili.common.security.token.Token;
 import cn.lili.common.vo.PageVO;
 import cn.lili.modules.liande.entity.dto.ServiceProviderParams;
 import cn.lili.modules.liande.entity.dto.SignInDTO;
+import cn.lili.modules.liande.entity.dto.StoreAchievementParams;
+import cn.lili.modules.liande.entity.vo.AchievementVO;
 import cn.lili.modules.liande.entity.vo.ServiceProviderParamsVO;
+import cn.lili.modules.liande.entity.vo.StoreAchievementParamsVO;
 import cn.lili.modules.permission.entity.dos.AdminUser;
 import cn.lili.modules.permission.entity.dto.AdminUserDTO;
 import cn.lili.modules.permission.entity.vo.AdminUserVO;
@@ -14,6 +17,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -29,6 +33,12 @@ public interface AdminUserService extends IService<AdminUser> {
 
 
     /**
+     * 服务商业绩
+     * @param mobile
+     * @return
+     */
+    AchievementVO queryAchievement(String mobile);
+    /**
      * 获取服务商后端管理分页
      *
      * @param initPage
@@ -36,6 +46,15 @@ public interface AdminUserService extends IService<AdminUser> {
      * @return
      */
     IPage<ServiceProviderParamsVO> queryServiceProvider(Page initPage ,ServiceProviderParams params);
+
+    /**
+     * 获取服务商所属店铺业绩后端管理分页
+     *
+     * @param initPage
+     * @param params
+     * @return
+     */
+    IPage<StoreAchievementParamsVO> queryStoreAchievement(Page initPage , StoreAchievementParams params);
 
 
     /**

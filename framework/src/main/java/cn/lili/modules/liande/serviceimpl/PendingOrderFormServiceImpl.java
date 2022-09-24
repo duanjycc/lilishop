@@ -3,28 +3,22 @@
  */
 package cn.lili.modules.liande.serviceimpl;
 
-import cn.hutool.db.Page;
-import cn.lili.common.enums.ResultCode;
-import cn.lili.common.exception.ServiceException;
-import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.context.UserContext;
 import cn.lili.common.vo.PageVO;
 import cn.lili.modules.liande.entity.dos.PendingOrderForm;
 import cn.lili.modules.liande.entity.dto.PendingOrderFormDTO;
-import cn.lili.modules.liande.entity.dto.QueryTransferDTO;
-import cn.lili.modules.liande.entity.vo.PendingOrderFormVO;
 import cn.lili.modules.liande.mapper.PendingOrderFormMapper;
 import cn.lili.modules.liande.service.IPendingOrderFormService;
 import cn.lili.modules.member.entity.dos.Member;
 import cn.lili.mybatis.util.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>
@@ -43,38 +37,39 @@ public class PendingOrderFormServiceImpl extends ServiceImpl<PendingOrderFormMap
 
 
     @Override
-    public IPage<PendingOrderForm> listOfPendingOrders(PageVO page,String sort,String business,String collation) {
+    public IPage<PendingOrderForm> listOfPendingOrders(PageVO page, String sort, String business, String collation) {
         QueryWrapper<PendingOrderForm> queryWrapper = new QueryWrapper();
-        if(collation.equals("DESC")){
+        if (collation.equals("DESC")) {
 
-        }else{
+        } else {
 
         }
 
-        queryWrapper.eq("business",business);
-        return pendingOrderFormMapper.listOfPendingOrders(PageUtil.initPage(page),queryWrapper);
+        queryWrapper.eq("business", business);
+        return pendingOrderFormMapper.listOfPendingOrders(PageUtil.initPage(page), queryWrapper);
     }
 
     @Override
     public PendingOrderForm pendingOrderInformation() {
         Member member = UserContext.getCurrentUser().getMember();
         QueryWrapper<PendingOrderForm> queryWrapper = new QueryWrapper();
-        queryWrapper.eq("username",member.getUsername());
+        queryWrapper.eq("username", member.getUsername());
         return pendingOrderFormMapper.selectOne(queryWrapper);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Boolean insertPendingOrder(PendingOrderFormDTO pendingOrderFormDTO) {
         Member member = UserContext.getCurrentUser().getMember();
 
         QueryWrapper<PendingOrderForm> queryWrapper = new QueryWrapper();
-        queryWrapper.eq("username",member.getUsername());
-        PendingOrderForm pis=pendingOrderFormMapper.selectOne(queryWrapper);
-        if(pis !=null){
+        queryWrapper.eq("username", member.getUsername());
+        PendingOrderForm pis = pendingOrderFormMapper.selectOne(queryWrapper);
+        if (pis != null) {
             pendingOrderFormMapper.delete(queryWrapper);
         }
 
-        PendingOrderForm p=new PendingOrderForm();
+        PendingOrderForm p = new PendingOrderForm();
         p.setUsername(member.getUsername());
         p.setBusiness(pendingOrderFormDTO.getBusiness());
         p.setPrice(pendingOrderFormDTO.getPrice());
@@ -82,19 +77,19 @@ public class PendingOrderFormServiceImpl extends ServiceImpl<PendingOrderFormMap
         p.setPhoneNumber(pendingOrderFormDTO.getPhoneNumber());
         p.setContacts(pendingOrderFormDTO.getContacts());
         p.setSalesVolume(pendingOrderFormDTO.getSalesVolume());
-        int i=pendingOrderFormMapper.insert(p);
+        p.setBankNo(pendingOrderFormDTO.getBankNo());
+        p.setAlipayCollectionCodeUrl(pendingOrderFormDTO.getAlipayCollectionCodeUrl());
+        p.setWxCollectionCodeUrl(pendingOrderFormDTO.getWxCollectionCodeUrl());
+        p.setAcceptAddress(ObjectUtils.isEmpty(pendingOrderFormDTO.getAcceptAddress()) ? null : pendingOrderFormDTO.getAcceptAddress());
 
-        Boolean r=false;
-        if(i>0){
-           r= true;
-        }
-        return r;
+        return pendingOrderFormMapper.insert(p) > 0 ? true : false;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Boolean updatePendingOrder(PendingOrderFormDTO pendingOrderFormDTO) {
         Member member = UserContext.getCurrentUser().getMember();
-        PendingOrderForm p=new PendingOrderForm();
+        PendingOrderForm p = new PendingOrderForm();
         p.setUsername(member.getUsername());
         p.setBusiness(pendingOrderFormDTO.getBusiness());
         p.setPrice(pendingOrderFormDTO.getPrice());
@@ -102,38 +97,30 @@ public class PendingOrderFormServiceImpl extends ServiceImpl<PendingOrderFormMap
         p.setPhoneNumber(pendingOrderFormDTO.getPhoneNumber());
         p.setContacts(pendingOrderFormDTO.getContacts());
         p.setSalesVolume(pendingOrderFormDTO.getSalesVolume());
+        p.setBankNo(pendingOrderFormDTO.getBankNo());
+        p.setAlipayCollectionCodeUrl(pendingOrderFormDTO.getAlipayCollectionCodeUrl());
+        p.setWxCollectionCodeUrl(pendingOrderFormDTO.getWxCollectionCodeUrl());
+        p.setAcceptAddress(ObjectUtils.isEmpty(pendingOrderFormDTO.getAcceptAddress()) ? null : pendingOrderFormDTO.getAcceptAddress());
 
         QueryWrapper<PendingOrderForm> queryWrapper = new QueryWrapper();
-        queryWrapper.eq("username",member.getUsername());
+        queryWrapper.eq("username", member.getUsername());
 
-        int i=pendingOrderFormMapper.update(p,queryWrapper);
+        return pendingOrderFormMapper.update(p, queryWrapper) > 0 ? true : false;
 
-        Boolean r=false;
-        if(i>0){
-            r= true;
-        }
-        return r;
     }
 
     @Override
     public Boolean deletePendingOrder() {
-
         Member member = UserContext.getCurrentUser().getMember();
         QueryWrapper<PendingOrderForm> queryWrapper = new QueryWrapper();
-        queryWrapper.eq("username",member.getUsername());
-        int i=pendingOrderFormMapper.delete(queryWrapper);
-
-        Boolean r=false;
-        if(i>0){
-            r= true;
-        }
-        return r;
+        queryWrapper.eq("username", member.getUsername());
+        return pendingOrderFormMapper.delete(queryWrapper) > 0 ? true : false;
     }
 
     @Override
     public PendingOrderForm contactInformation(PendingOrderFormDTO pendingOrderFormDTO) {
         QueryWrapper<PendingOrderForm> queryWrapper = new QueryWrapper();
-        queryWrapper.eq("username",pendingOrderFormDTO.getUsername());
+        queryWrapper.eq("username", pendingOrderFormDTO.getUsername());
         return pendingOrderFormMapper.selectOne(queryWrapper);
     }
 }

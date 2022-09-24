@@ -32,53 +32,36 @@ public class PendingOrderForm extends Model<PendingOrderForm> {
     @ApiModelProperty(value = "")
     private Long id;
 
-
-    /**
-     * 会员用户名
-     */
     @ApiModelProperty(value = "会员用户名")
     private String username;
 
-
-    /**
-     * 0表示买1表示卖
-     */
     @ApiModelProperty(value = "0表示买1表示卖")
     private String business;
 
-
-    /**
-     * 买卖数量
-     */
     @ApiModelProperty(value = "买卖数量")
     private Double salesVolume;
 
-
-    /**
-     * 价格
-     */
     @ApiModelProperty(value = "价格")
     private Double price;
 
-
-    /**
-     * 手机号码
-     */
     @ApiModelProperty(value = "手机号码")
     private String phoneNumber;
 
-
-    /**
-     * 微信号
-     */
     @ApiModelProperty(value = "微信号")
     private String wechatNumber;
 
-
-    /**
-     * 联系人
-     */
     @ApiModelProperty(value = "联系人")
     private String contacts;
 
+    @ApiModelProperty(value = "接受地址")
+    private String acceptAddress;
+
+    @ApiModelProperty(value = "银行卡号")
+    private String bankNo;
+
+    @ApiModelProperty(value = "支付宝收款二维码")
+    private String alipayCollectionCodeUrl;
+
+    @ApiModelProperty(value = "微信收款二维码")
+    private String wxCollectionCodeUrl;
 }

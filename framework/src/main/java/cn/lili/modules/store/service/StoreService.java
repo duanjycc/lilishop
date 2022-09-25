@@ -1,6 +1,7 @@
 package cn.lili.modules.store.service;
 
 import cn.lili.common.vo.PageVO;
+import cn.lili.modules.liande.entity.vo.MemberProfitVO;
 import cn.lili.modules.member.entity.dto.CollectionDTO;
 import cn.lili.modules.store.entity.dos.Store;
 import cn.lili.modules.store.entity.dto.*;
@@ -16,6 +17,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2020/11/18 11:45 上午
  */
 public interface StoreService extends IService<Store> {
+
+
 
     /**
      * 分页条件查询

@@ -5,18 +5,17 @@ import cn.lili.common.vo.PageVO;
 import cn.lili.common.vo.ResultMessage;
 import cn.lili.modules.liande.entity.dos.MemberIncome;
 import cn.lili.modules.liande.entity.dos.ServiceProviderIncome;
+import cn.lili.modules.liande.entity.vo.MemberProfitVO;
 import cn.lili.modules.liande.service.IMemberIncomeService;
 import cn.lili.modules.liande.service.IServiceProviderIncomeService;
+import cn.lili.modules.store.entity.vos.StoreVO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  *

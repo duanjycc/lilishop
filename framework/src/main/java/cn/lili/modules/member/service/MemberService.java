@@ -6,6 +6,8 @@ import cn.lili.common.security.enums.UserEnums;
 import cn.lili.common.security.token.Token;
 import cn.lili.common.vo.PageVO;
 import cn.lili.modules.connect.entity.dto.ConnectAuthUser;
+import cn.lili.modules.liande.entity.vo.MemberProfitVO;
+import cn.lili.modules.liande.entity.vo.StoreMemberTopVO;
 import cn.lili.modules.member.entity.dos.Member;
 import cn.lili.modules.member.entity.dto.ManagerMemberEditDTO;
 import cn.lili.modules.member.entity.dto.MemberAddDTO;
@@ -30,6 +32,20 @@ public interface MemberService extends IService<Member> {
      * 默认密码
      */
     static String DEFAULT_PASSWORD = "111111";
+
+
+    /**
+     * 商铺会员管理
+     * @param mobile
+     * @param page
+     * @return
+     */
+    IPage<MemberProfitVO> getStoreMember(String mobile, PageVO page);
+    /**
+     * 商铺会员管理-top显示
+     * @return
+     */
+    StoreMemberTopVO getStoreMemberTop();
 
     /**
      * 获取当前登录的用户信息

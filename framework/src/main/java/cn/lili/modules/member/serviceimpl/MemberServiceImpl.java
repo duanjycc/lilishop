@@ -22,6 +22,8 @@ import cn.lili.modules.connect.entity.Connect;
 import cn.lili.modules.connect.entity.dto.ConnectAuthUser;
 import cn.lili.modules.connect.service.ConnectService;
 import cn.lili.modules.liande.entity.enums.StatusEnum;
+import cn.lili.modules.liande.entity.vo.MemberProfitVO;
+import cn.lili.modules.liande.entity.vo.StoreMemberTopVO;
 import cn.lili.modules.member.aop.annotation.PointLogPoint;
 import cn.lili.modules.member.entity.dos.Member;
 import cn.lili.modules.member.entity.dto.*;
@@ -40,6 +42,7 @@ import cn.lili.modules.permission.service.DepartmentService;
 import cn.lili.modules.permission.service.RoleService;
 import cn.lili.modules.store.entity.dos.Store;
 import cn.lili.modules.store.entity.enums.StoreStatusEnum;
+import cn.lili.modules.store.entity.vos.StoreVO;
 import cn.lili.modules.store.service.StoreService;
 import cn.lili.mybatis.util.PageUtil;
 import cn.lili.rocketmq.RocketmqSendCallbackBuilder;
@@ -107,6 +110,51 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     @Autowired
     private RoleService roleService;
 
+
+
+
+    /**
+     * 商铺会员管理
+     *
+     * @param mobile
+     * @param page
+     * @return
+     */
+    @Override
+    public IPage<MemberProfitVO> getStoreMember(String mobile, PageVO page) {
+        AuthUser currentUser = UserContext.getCurrentUser();
+        Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
+        AdminUser admin = adminUserService.findByMobile(currentUser.getMember().getMobile());
+        if (ObjectUtils.isEmpty(admin)) {
+            return null;
+        }
+        Department dept = departmentService.getById(admin.getDepartmentId());
+        QueryWrapper<MemberProfitVO> wrapper = new QueryWrapper<>();
+
+        wrapper.apply("FIND_IN_SET(" + dept.getAreaCode() + ",s.store_address_id_path)");
+        wrapper.like(StringUtils.isNotEmpty(mobile),"m.username",mobile);
+        return baseMapper.getStoreMember(PageUtil.initPage(page),wrapper);
+    }
+
+    /**
+     * 商铺会员管理-top显示
+     *
+     * @return
+     */
+    @Override
+    public StoreMemberTopVO getStoreMemberTop() {
+        AuthUser currentUser = UserContext.getCurrentUser();
+        Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
+        AdminUser admin = adminUserService.findByMobile(currentUser.getMember().getMobile());
+        if (ObjectUtils.isEmpty(admin)) {
+            return null;
+        }
+        Department dept = departmentService.getById(admin.getDepartmentId());
+        Long sumMakeCount = baseMapper.getSumMakeCount(dept.getAreaCode());
+        Double sumProfit = baseMapper.getSumProfit(dept.getAreaCode());
+
+        return new StoreMemberTopVO(sumProfit,sumMakeCount);
+    }
 
     /**
      * 查询当前用户是那个区服务商
@@ -827,16 +875,16 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         }
     }
 
-    public static void main(String[] args) {
-        String mobilePhone = "18268154189" ;
-
-
-
-        String password = new BCryptPasswordEncoder().encode(StringUtils.md5(mobilePhone.substring(mobilePhone.length() - 6)));
-        System.out.println(  password );
-        System.out.println(  "===================" );
-        String st = "154189";
-        String encode = new BCryptPasswordEncoder().encode(StringUtils.md5(st));
-        System.out.println(  encode );
-    }
+//    public static void main(String[] args) {
+//        String mobilePhone = "18268154189" ;
+//
+//
+//
+//        String password = new BCryptPasswordEncoder().encode(StringUtils.md5(mobilePhone.substring(mobilePhone.length() - 6)));
+//        System.out.println(  password );
+//        System.out.println(  "===================" );
+//        String st = "154189";
+//        String encode = new BCryptPasswordEncoder().encode(StringUtils.md5(st));
+//        System.out.println(  encode );
+//    }
 }

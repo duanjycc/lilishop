@@ -1,6 +1,7 @@
 package cn.lili.modules.member.mapper;
 
 
+import cn.lili.modules.liande.entity.vo.MemberProfitVO;
 import cn.lili.modules.member.entity.dos.Member;
 import cn.lili.modules.member.entity.vo.MemberVO;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
@@ -29,4 +30,37 @@ public interface MemberMapper extends BaseMapper<Member> {
 
     @Select("select * from li_member ${ew.customSqlSegment}")
     IPage<MemberVO> pageByMemberVO(IPage<MemberVO> page, @Param(Constants.WRAPPER) Wrapper<Member> queryWrapper);
+
+
+    /**
+     * 商铺会员管理
+     * @param page
+     * @param queryWrapper
+     * @return
+     */
+    @Select("select \n" +
+            "\tm.username,m.SSD as ssd ,m.point\n" +
+            "\tfrom li_store s\n" +
+            "\tleft join li_member m on m.id = s.member_id ${ew.customSqlSegment} ")
+    IPage<MemberProfitVO> getStoreMember(IPage<MemberProfitVO> page,@Param(Constants.WRAPPER) Wrapper<MemberProfitVO> queryWrapper);
+
+    /**
+     * 总积分
+     * @return
+     */
+    @Select("select \n" +
+            "\tsum(m.point)\n" +
+            "\tfrom li_store s\n" +
+            "\tleft join li_member m on m.id = s.member_id where FIND_IN_SET(#{areaId},s.store_address_id_path) ")
+    Double getSumProfit(String areaId);
+
+    /**
+     * 商铺总做单数
+     * @return
+     */
+    @Select("select \n" +
+            "\tcount(w.id)\n" +
+            "\tfrom w_make_account w\n" +
+            "\tleft join li_store s on w.mer_id = s.id where FIND_IN_SET(#{areaId},s.store_address_id_path)  ")
+    Long getSumMakeCount(String areaId);
 }

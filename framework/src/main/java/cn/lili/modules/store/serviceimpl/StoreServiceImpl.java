@@ -16,6 +16,7 @@ import cn.lili.modules.file.entity.File;
 import cn.lili.modules.file.mapper.FileMapper;
 import cn.lili.modules.goods.service.GoodsService;
 import cn.lili.modules.liande.entity.enums.StatusEnum;
+import cn.lili.modules.liande.entity.vo.MemberProfitVO;
 import cn.lili.modules.member.entity.dos.Member;
 import cn.lili.modules.member.entity.dto.CollectionDTO;
 import cn.lili.modules.member.service.MemberService;
@@ -77,6 +78,8 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
 
     @Autowired
     private Cache cache;
+
+
 
     /**
      * 通过商品分类id获取店铺

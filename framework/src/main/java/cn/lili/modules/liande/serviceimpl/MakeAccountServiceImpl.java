@@ -38,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -94,16 +95,22 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
     public ResultMessage<Boolean> makeAccount(MakeAccountDTO makeAccountDTO) {
         //当前登陆会员
         Member member = UserContext.getCurrentUser().getMember();
+
+        if(!matchPhoneNumber(makeAccountDTO.getVipPhone())){
+            throw new ServiceException(ResultCode.TRANSFER_PHONE_ERROR);
+        }
         //验证支付密码
         QueryWrapper<Member> memberpassWrapper = new QueryWrapper();
         memberpassWrapper.eq("username", member.getUsername());
         Member memberpass = memberMapper.selectOne(memberpassWrapper);
-        if (!new BCryptPasswordEncoder().matches(makeAccountDTO.getSecondPassword(), memberpass.getPaymentPassword()))
+        if (!new BCryptPasswordEncoder().matches(makeAccountDTO.getSecondPassword(), memberpass.getPaymentPassword())) {
             throw new ServiceException(ResultCode.TRANSFER_SECOND_PASSWORD_ERROR);
-
+        }
         if(member.getUsername().equals(makeAccountDTO.getVipPhone())){
             throw new ServiceException(ResultCode.DISTRIBUTIONVIP_ERROR);
         }
+
+
 
         //用户积分倍数
         QueryWrapper<Configure> jfWrapper = new QueryWrapper();
@@ -389,11 +396,20 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
 
         return ResultUtil.success();
     }
+    /**
+     * 验证手机号 由于号码段不断的更新，只需要判断手机号有11位，并且全是数字以及1开头
+     * @param phoneNumber 手机号码
+     * @return
+     */
+    private static boolean matchPhoneNumber(String phoneNumber) {
+        String regex = "^1\\d{10}$";
+        if(phoneNumber==null||phoneNumber.length()<=0){
+            return false;
+        }
+        return Pattern.matches(regex, phoneNumber);
+    }
 
     public static void main(String[] args) {
-        int i=10;
-
-
-        System.out.println((double)i/100);
+        System.out.println(matchPhoneNumber("1826815418"));
     }
 }

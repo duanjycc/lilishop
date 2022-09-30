@@ -188,6 +188,10 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));//设置北京时间
         long mkid = Long.parseLong(simpleDateFormat.format(new Date()));
 
+        //查出店铺所属服务商
+        QueryWrapper<Store> storeWrapper = new QueryWrapper();
+        storeWrapper.eq("id", makeAccountDTO.getMerId());
+        Store st = storeMapper.selectOne(storeWrapper);
 
         //邀请人获得SSD卷
         QueryWrapper<Member> yqrWrapper = new QueryWrapper();
@@ -198,28 +202,35 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         yqrssdWrapper.eq("id", hy.getInviteeId());
         Member yqrMember = memberMapper.selectOne(yqrssdWrapper);
         if (yqrMember != null) {
-            yqrMember.setSsd(yqrMember.getSsd() + wantsum * (yq.getNumericalAlue().doubleValue()));
+//            yqrMember.setSsd(yqrMember.getSsd() + wantsum * (yq.getNumericalAlue().doubleValue()));
+            yqrMember.setPoint(yqrMember.getPoint()+makeAccountDTO.getSurrenderPrice().longValue());
             memberMapper.update(yqrMember, yqrssdWrapper);
+            ScoreAcquisition scoreAcquisition=new ScoreAcquisition();
+            scoreAcquisition.setCreateTime(new Date());
+            scoreAcquisition.setIntegralType(0l);
+            scoreAcquisition.setUserId(yqrMember.getId());
+            scoreAcquisition.setMerId(st.getId());
+            scoreAcquisition.setMerName(st.getStoreName());
+            scoreAcquisition.setOrderId(mkid);
+            scoreAcquisition.setIntegral(makeAccountDTO.getSurrenderPrice());
+            scoreAcquisitionMapper.insert(scoreAcquisition);
 
-            //邀请人获取SSD日志
-            MemberIncome mi = new MemberIncome();
-            mi.setConsumerUserid(Long.parseLong(hy.getId()));
-            mi.setUserId(Long.parseLong(yqrMember.getId()));
-            mi.setCreationTime(new Date());
-            mi.setQuantity(wantsum * (yq.getNumericalAlue().doubleValue()));
-            mi.setIncomeProportion(yq.getNumericalAlue() + "");
-            mi.setOrderId(mkid + "");
-            mi.setIncomeType("0");
-            memberIncomeMapper.insert(mi);
+
+//            //邀请人获取SSD日志
+//            MemberIncome mi = new MemberIncome();
+//            mi.setConsumerUserid(Long.parseLong(hy.getId()));
+//            mi.setUserId(Long.parseLong(yqrMember.getId()));
+//            mi.setCreationTime(new Date());
+//            mi.setQuantity(wantsum * (yq.getNumericalAlue().doubleValue()));
+//            mi.setIncomeProportion(yq.getNumericalAlue() + "");
+//            mi.setOrderId(mkid + "");
+//            mi.setIncomeType("0");
+//            memberIncomeMapper.insert(mi);
         }
 
 
 
         //区域服务商获得SSD卷
-        //查出店铺所属服务商
-        QueryWrapper<Store> storeWrapper = new QueryWrapper();
-        storeWrapper.eq("id", makeAccountDTO.getMerId());
-        Store st = storeMapper.selectOne(storeWrapper);
         String addressId =null;
         try {
         addressId = st.getStoreAddressIdPath();
@@ -410,6 +421,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
     }
 
     public static void main(String[] args) {
-        System.out.println(matchPhoneNumber("1826815418"));
+        Double a=27.098;
+        System.out.println(a.longValue());
     }
 }

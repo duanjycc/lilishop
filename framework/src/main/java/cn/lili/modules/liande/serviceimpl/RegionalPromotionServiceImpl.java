@@ -130,6 +130,7 @@ public class RegionalPromotionServiceImpl extends ServiceImpl<RegionalPromotionM
             return ResultUtil.error(ResultCode.PARAMS_ERROR);
         }
 
+
         if (userMember != null) {
             //根据手机号码查询部门
             QueryWrapper<AdminUser> adminUserQueryWrapper = new QueryWrapper();

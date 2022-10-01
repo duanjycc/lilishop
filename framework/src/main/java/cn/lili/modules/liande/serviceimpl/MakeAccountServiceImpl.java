@@ -103,9 +103,9 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         QueryWrapper<Member> memberpassWrapper = new QueryWrapper();
         memberpassWrapper.eq("username", member.getUsername());
         Member memberpass = memberMapper.selectOne(memberpassWrapper);
-        if (!new BCryptPasswordEncoder().matches(makeAccountDTO.getSecondPassword(), memberpass.getPaymentPassword())) {
-            throw new ServiceException(ResultCode.TRANSFER_SECOND_PASSWORD_ERROR);
-        }
+//        if (!new BCryptPasswordEncoder().matches(makeAccountDTO.getSecondPassword(), memberpass.getPaymentPassword())) {
+//            throw new ServiceException(ResultCode.TRANSFER_SECOND_PASSWORD_ERROR);
+//        }
         if(member.getUsername().equals(makeAccountDTO.getVipPhone())){
             throw new ServiceException(ResultCode.DISTRIBUTIONVIP_ERROR);
         }
@@ -375,7 +375,7 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         de.setCreateTime(new Date());
         de.setMerName(st.getStoreName());
         de.setPrice(makeAccountDTO.getSurrenderPrice());
-        de.setWantCount(wantsum*0.72);
+        de.setWantCount(wantsum*0.82);
         de.setStatus("0");
         de.setDestroyTime(new Date());
         de.setWantPrice(wantPrice+"");

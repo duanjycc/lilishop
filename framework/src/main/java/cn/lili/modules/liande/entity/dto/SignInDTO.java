@@ -18,12 +18,16 @@ public class SignInDTO {
     @NotBlank(message = "签约区域不能为空")
     private String signAreaId;
 
+    private String[] signAreaIds;
+
     @ApiModelProperty(value = "签约区域名称")
     private String signAreaName;
 
     @ApiModelProperty(value = "上级服务商")
     @NotBlank(message = "上级服务商不能为空")
     private String parentServiceProvider;
+
+    private String[] parentAreaIds;
 
     @ApiModelProperty(value = "会员手机号")
     @Length(min= 11 ,max = 11,message = "会员手机号只能11位")

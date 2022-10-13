@@ -47,7 +47,7 @@ public interface StoreMapper extends BaseMapper<Store> {
     @Select("select \n" +
             "\tif(sum(want_count),sum(want_count),0)\n" +
             "\tfrom w_destroy_detail w\n" +
-            "\t\tleft join li_store s on w.user_id =  cast(s.member_id as char)\n" +
+            "\t\tleft join li_store s on w.store_id =  cast(s.id as char)\n" +
             "\twhere \n" +
             "\t s.store_disable = 'OPEN' \n" +
             "\t and FIND_IN_SET( #{areaId},s.store_address_id_path) \n" +

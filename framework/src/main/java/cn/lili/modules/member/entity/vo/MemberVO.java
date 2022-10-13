@@ -5,6 +5,7 @@ import cn.lili.common.security.sensitive.Sensitive;
 import cn.lili.common.security.sensitive.enums.SensitiveStrategy;
 import cn.lili.common.utils.BeanUtil;
 import cn.lili.modules.member.entity.dos.Member;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -28,11 +29,11 @@ public class MemberVO implements Serializable {
     private String id;
 
     @ApiModelProperty(value = "会员用户名")
-    @Sensitive(strategy = SensitiveStrategy.PHONE)
+//    @Sensitive(strategy = SensitiveStrategy.PHONE)
     private String username;
 
     @ApiModelProperty(value = "昵称")
-    @Sensitive(strategy = SensitiveStrategy.PHONE)
+//    @Sensitive(strategy = SensitiveStrategy.PHONE)
     private String nickName;
 
     @ApiModelProperty(value = "会员性别,1为男，0为女")
@@ -50,7 +51,7 @@ public class MemberVO implements Serializable {
     private String region;
 
     @ApiModelProperty(value = "手机号码", required = true)
-    @Sensitive(strategy = SensitiveStrategy.PHONE)
+//    @Sensitive(strategy = SensitiveStrategy.PHONE)
     private String mobile;
 
     @ApiModelProperty(value = "积分数量")
@@ -73,7 +74,13 @@ public class MemberVO implements Serializable {
 
     @ApiModelProperty(value = "openId")
     private String openId;
+    @ApiModelProperty(value = "SSD卷冻结数量")
+    @TableField(value = "frozen_SSD")
+    private Double frozenSSD;
 
+    @ApiModelProperty(value = "SSD卷数量")
+    @TableField(value = "SSD")
+    private Double ssd;
     /**
      * @see ClientTypeEnum
      */

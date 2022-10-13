@@ -16,6 +16,7 @@ import cn.lili.modules.liande.entity.dto.StoreAchievementParams;
 import cn.lili.modules.liande.entity.enums.StatusEnum;
 import cn.lili.modules.liande.entity.vo.AchievementVO;
 import cn.lili.modules.liande.entity.vo.ServiceProviderParamsVO;
+import cn.lili.modules.liande.entity.vo.ServiceRegionVO;
 import cn.lili.modules.liande.entity.vo.StoreAchievementParamsVO;
 import cn.lili.modules.liande.mapper.ServiceLogMapper;
 import cn.lili.modules.member.entity.dos.Member;
@@ -79,6 +80,36 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
      * 角色长度
      */
     private final int rolesMaxSize = 10;
+
+    /**
+     * 根据区域id获取区域列表以及上级区域列表
+     *
+     * @param areaId
+     * @return
+     */
+    @Override
+    public ServiceRegionVO getRegion(String areaId) {
+        Department department = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getAreaCode, areaId));
+        Department parentDept = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getId, department.getParentId()));
+        AdminUser adminUser = baseMapper.selectOne(new QueryWrapper<AdminUser>().lambda().eq(AdminUser::getDepartmentId, department.getId()));
+        Region region = regionMapper.selectById(areaId);
+        Region parentRegion = regionMapper.selectById(parentDept.getAreaCode());
+        region.setPath(region.getPath()+","+ region.getId());
+        parentRegion.setPath(parentRegion.getPath()+","+ parentRegion.getId());
+        return new ServiceRegionVO(region.getPath().split(","),parentRegion.getPath().split(","),parentRegion.getId(),adminUser.getRoleIds());
+    }
+
+    /**
+     * 检测区域是否被签约
+     *
+     * @param areaId
+     * @return
+     */
+    @Override
+    public Boolean checkAreaHavSign(String areaId) {
+        Department dept = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getAreaCode,areaId));
+        return ObjectUtils.isEmpty(dept) ? true : false;
+    }
 
     /**
      * 服务商业绩
@@ -206,6 +237,38 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
         baseMapper.insert(adminUser);
     }
 
+    /**
+     * 服务商管理-修改
+     *
+     * @param signInDTO
+     */
+    @Override
+    public void update(SignInDTO signInDTO) {
+        // 查询服务商对应的签约区域
+        // 1,根据会员号找出所负责的deptId
+        AdminUser user = baseMapper.selectOne(new QueryWrapper<AdminUser>().lambda().eq(AdminUser::getMobile, signInDTO.getMobile()));
+        user.setMobile(signInDTO.getMobile());
+        user.setNickName(signInDTO.getUsername());
+        user.setRoleIds(signInDTO.getServiceProviderLevel());
+        baseMapper.updateById(user);
+        // 2,构造签约区域名称
+        List<Region> regions = regionMapper.selectList(new QueryWrapper<Region>().lambda().in(Region::getId, signInDTO.getSignAreaIds()));
+        String collect = regions.stream().map(Region::getName).collect(Collectors.joining());
+
+        Department department = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getId, user.getDepartmentId()));
+        department.setTitle(collect);
+        department.setAreaCode(signInDTO.getSignAreaId());
+        department.setParentId(signInDTO.getParentServiceProvider());
+        departmentService.updateById(department);
+
+        //查询该服务商所有的下级服务商
+        List<Department> list = departmentService.list(new QueryWrapper<Department>().lambda().eq(Department::getParentId, user.getDepartmentId()));
+        list.stream().forEach( s -> {
+            s.setParentId(signInDTO.getSignAreaId());
+            departmentService.updateById(department);
+        });
+
+    }
 
     /**
      * 服务商管理-删除签约

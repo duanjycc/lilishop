@@ -53,7 +53,7 @@ public interface AdminUserMapper extends BaseMapper<AdminUser> {
             "\t\t\ts.store_name as storeName,\n" +
             "\t\t\tif(sum( w.surrender_price),sum( w.surrender_price),0) as surrenderPrice,\n" +
             "\t\t\tif(count( w.id),count( w.id),0) as makeCount,\n" +
-            "\t\t\t(select if(sum(w.want_count),sum(w.want_count),0) from w_destroy_detail w where w.user_id in ( s.member_id  ) ) as destroyCount\n" +
+            "\t\t\t(select if(sum(w.want_count),sum(w.want_count),0) from w_destroy_detail w where w.store_id in ( s.id  ) ) as destroyCount\n" +
             "\t\t\tfrom li_store s \n" +
             "\t\t\t\t left join w_make_account w  on cast(s.id as char) = w.mer_id ${ew.customSqlSegment} group by s.id  ")
     IPage<StoreAchievementParamsVO>  queryStoreAchievement(IPage<StoreAchievementParamsVO> initPage, @Param(Constants.WRAPPER) QueryWrapper<StoreAchievementParams> queryWrapper);

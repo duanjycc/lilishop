@@ -65,9 +65,9 @@ public class RegionalPromotionServiceImpl extends ServiceImpl<RegionalPromotionM
      */
     @Override
     public boolean checkPromoters(String mobile) {
-        RegionalPromotion regionalPromotion = baseMapper.selectOne(new QueryWrapper<RegionalPromotion>().lambda()
+        List<RegionalPromotion> list = baseMapper.selectList(new QueryWrapper<RegionalPromotion>().lambda()
                 .eq(RegionalPromotion::getUserName, mobile));
-        return ObjectUtils.isEmpty(regionalPromotion) ? false : true ;
+        return list.size() > 0  ? true : false ;
     }
 
     /**

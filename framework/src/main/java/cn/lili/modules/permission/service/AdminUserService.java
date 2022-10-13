@@ -8,6 +8,7 @@ import cn.lili.modules.liande.entity.dto.SignInDTO;
 import cn.lili.modules.liande.entity.dto.StoreAchievementParams;
 import cn.lili.modules.liande.entity.vo.AchievementVO;
 import cn.lili.modules.liande.entity.vo.ServiceProviderParamsVO;
+import cn.lili.modules.liande.entity.vo.ServiceRegionVO;
 import cn.lili.modules.liande.entity.vo.StoreAchievementParamsVO;
 import cn.lili.modules.permission.entity.dos.AdminUser;
 import cn.lili.modules.permission.entity.dto.AdminUserDTO;
@@ -31,6 +32,20 @@ import java.util.List;
 @CacheConfig(cacheNames = "{adminuser}")
 public interface AdminUserService extends IService<AdminUser> {
 
+
+    /**
+     * 根据区域id获取区域列表以及上级区域列表
+     * @param areaId
+     * @return
+     */
+    ServiceRegionVO getRegion(String areaId);
+
+    /**
+     * 检测区域是否被签约
+     * @param areaId
+     * @return
+     */
+    Boolean checkAreaHavSign(String areaId);
 
     /**
      * 服务商业绩
@@ -63,6 +78,12 @@ public interface AdminUserService extends IService<AdminUser> {
      */
 
     void signIn(SignInDTO signInDTO);
+    /**
+     * 服务商管理-修改
+     * @param signInDTO
+     */
+
+    void update(SignInDTO signInDTO);
     /**
      * 服务商管理-删除签约
      * @param id

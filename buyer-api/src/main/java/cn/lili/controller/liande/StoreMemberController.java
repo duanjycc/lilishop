@@ -30,12 +30,14 @@ public class StoreMemberController {
     @ApiOperation(value = "商铺会员管理")
     @GetMapping
     public ResultMessage<IPage<MemberProfitVO>> getStoreMember(String mobile, PageVO page) {
-        return ResultUtil.data(memberService.getStoreMember(mobile, page));
+//        return ResultUtil.data(memberService.getStoreMember(mobile, page));
+        return ResultUtil.data(memberService.getStoreMemberV2(mobile, page));
     }
 
     @ApiOperation(value = "商铺会员管理-top显示")
     @GetMapping("/getStoreMember/top")
     public ResultMessage<StoreMemberTopVO> getStoreMemberTop() {
-        return ResultUtil.data(memberService.getStoreMemberTop());
+//        return ResultUtil.data(memberService.getStoreMemberTop());
+        return ResultUtil.data(memberService.getStoreMemberTopV2());
     }
 }

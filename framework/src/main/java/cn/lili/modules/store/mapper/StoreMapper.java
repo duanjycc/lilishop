@@ -53,6 +53,48 @@ public interface StoreMapper extends BaseMapper<Store> {
             "\t and FIND_IN_SET( #{areaId},s.store_address_id_path) \n" +
             "\t and w.status = 0 ")
     int queryDestroySumByAreaId(String areaId);
+
+
+
+
+
+
+    /**
+     * 根据区域id统计出该区域的店铺数量
+     * @param areaId
+     * @return
+     */
+    @Select("select count(s.id) from li_store s where  store_disable = 'OPEN' and FIND_IN_SET( #{areaId},store_address_id_path) AND left(create_time,10) >=#{startDate} AND left(create_time,10) <= #{endDate}")
+    int queryStoreCountByAreaIdLeft(String areaId,String startDate,String endDate );
+
+    /**
+     * 根据区域id统计出该区域的做单让利金额
+     * @param areaId
+     * @return
+     */
+    @Select("select \n" +
+            "\tif(sum(surrender_price),sum(surrender_price),0)\n" +
+            "\tfrom w_make_account w\n" +
+            "\t\tleft join li_store s on w.mer_id =  cast(s.id as char)\n" +
+            "\twhere \n" +
+            "\t s.store_disable = 'OPEN' and FIND_IN_SET( #{areaId},s.store_address_id_path)  AND left(w.create_time,10) >=#{startDate} AND  left(w.create_time,10) <= #{endDate} ")
+    double queryMakeSumByAreaIdLeft(String areaId,String startDate,String endDate);
+
+    /**
+     * 根据区域id统计出该区域的店铺做单销毁数量
+     * @param areaId
+     * @return
+     */
+    @Select("select \n" +
+            "\tif(sum(want_count),sum(want_count),0)\n" +
+            "\tfrom w_destroy_detail w\n" +
+            "\t\tleft join li_store s on w.store_id =  cast(s.id as char)\n" +
+            "\twhere \n" +
+            "\t s.store_disable = 'OPEN' \n" +
+            "\t and FIND_IN_SET( #{areaId},s.store_address_id_path) \n" +
+            "\t and w.status = 0 AND left(w.create_time,10) >=#{startDate} AND  left(w.create_time,10) <= #{endDate}")
+    int queryDestroySumByAreaIdLeft(String areaId,String startDate,String endDate);
+
     /**
      * 获取店铺详细
      *

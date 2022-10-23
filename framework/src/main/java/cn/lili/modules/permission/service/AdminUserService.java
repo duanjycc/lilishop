@@ -3,13 +3,11 @@ package cn.lili.modules.permission.service;
 
 import cn.lili.common.security.token.Token;
 import cn.lili.common.vo.PageVO;
+import cn.lili.modules.liande.entity.dto.SearchAchievementParams;
 import cn.lili.modules.liande.entity.dto.ServiceProviderParams;
 import cn.lili.modules.liande.entity.dto.SignInDTO;
 import cn.lili.modules.liande.entity.dto.StoreAchievementParams;
-import cn.lili.modules.liande.entity.vo.AchievementVO;
-import cn.lili.modules.liande.entity.vo.ServiceProviderParamsVO;
-import cn.lili.modules.liande.entity.vo.ServiceRegionVO;
-import cn.lili.modules.liande.entity.vo.StoreAchievementParamsVO;
+import cn.lili.modules.liande.entity.vo.*;
 import cn.lili.modules.permission.entity.dos.AdminUser;
 import cn.lili.modules.permission.entity.dto.AdminUserDTO;
 import cn.lili.modules.permission.entity.vo.AdminUserVO;
@@ -53,6 +51,13 @@ public interface AdminUserService extends IService<AdminUser> {
      * @return
      */
     AchievementVO queryAchievement(String mobile);
+    /**
+     * 服务商业绩-left
+     * @param params
+     * @return
+     */
+    SearchAchievementVO queryStoreAchievementLeft(SearchAchievementParams params);
+
     /**
      * 获取服务商后端管理分页
      *

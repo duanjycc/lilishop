@@ -40,7 +40,21 @@ public interface MemberService extends IService<Member> {
      * @param page
      * @return
      */
+    IPage<MemberProfitVO> getStoreMemberV2(String mobile, PageVO page);
+    /**
+     * 商铺会员管理-top显示
+     * @return
+     */
+    StoreMemberTopVO getStoreMemberTopV2();
+    /**
+     * 商铺会员管理
+     * @param mobile
+     * @param page
+     * @return
+     */
     IPage<MemberProfitVO> getStoreMember(String mobile, PageVO page);
+
+
     /**
      * 商铺会员管理-top显示
      * @return

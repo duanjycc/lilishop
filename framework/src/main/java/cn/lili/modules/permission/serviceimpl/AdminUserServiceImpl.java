@@ -10,14 +10,12 @@ import cn.lili.common.utils.BeanUtil;
 import cn.lili.common.utils.DateUtil;
 import cn.lili.common.utils.StringUtils;
 import cn.lili.modules.liande.entity.dos.ServiceLog;
+import cn.lili.modules.liande.entity.dto.SearchAchievementParams;
 import cn.lili.modules.liande.entity.dto.ServiceProviderParams;
 import cn.lili.modules.liande.entity.dto.SignInDTO;
 import cn.lili.modules.liande.entity.dto.StoreAchievementParams;
 import cn.lili.modules.liande.entity.enums.StatusEnum;
-import cn.lili.modules.liande.entity.vo.AchievementVO;
-import cn.lili.modules.liande.entity.vo.ServiceProviderParamsVO;
-import cn.lili.modules.liande.entity.vo.ServiceRegionVO;
-import cn.lili.modules.liande.entity.vo.StoreAchievementParamsVO;
+import cn.lili.modules.liande.entity.vo.*;
 import cn.lili.modules.liande.mapper.ServiceLogMapper;
 import cn.lili.modules.member.entity.dos.Member;
 import cn.lili.modules.member.serviceimpl.MemberServiceImpl;
@@ -94,8 +92,14 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
         AdminUser adminUser = baseMapper.selectOne(new QueryWrapper<AdminUser>().lambda().eq(AdminUser::getDepartmentId, department.getId()));
         Region region = regionMapper.selectById(areaId);
         Region parentRegion = regionMapper.selectById(parentDept.getAreaCode());
-        region.setPath(region.getPath()+","+ region.getId());
-        parentRegion.setPath(parentRegion.getPath()+","+ parentRegion.getId());
+        if (ObjectUtils.isNotEmpty(parentRegion)){
+            region.setPath(region.getPath()+","+ region.getId());
+            parentRegion.setPath(parentRegion.getPath()+","+ parentRegion.getId());
+        }else{
+            parentRegion = new Region();
+            parentRegion.setPath("0");
+            parentRegion.setId("0");
+        }
         return new ServiceRegionVO(region.getPath().split(","),parentRegion.getPath().split(","),parentRegion.getId(),adminUser.getRoleIds());
     }
 
@@ -148,6 +152,31 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
         achievementVO.setDestroySSD(destroySSD);
         achievementVO.setSurrenderPrice(surrenderPrice);
         return achievementVO;
+    }
+
+
+    /**
+     * 服务商业绩-left
+     *
+     * @param params
+     * @return
+     */
+    @Override
+    public SearchAchievementVO queryStoreAchievementLeft(SearchAchievementParams params) {
+        AdminUser user = baseMapper.selectOne(new QueryWrapper<AdminUser>().lambda().eq(AdminUser::getMobile, params.getMobile()));
+        if (ObjectUtils.isEmpty(user)) {
+            throw new ServiceException(ResultCode.AREA_IS_NOT_SIGN);
+        }
+        Department dept = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getId, user.getDepartmentId()));
+        if (ObjectUtils.isEmpty(dept)) {
+            throw new ServiceException(ResultCode.AREA_IS_HAVE_SIGN);
+        }
+
+        int storeCount = storeMapper.queryStoreCountByAreaIdLeft(dept.getAreaCode(),params.getStartDate(),params.getEndDate());
+        double surrenderPrice = storeMapper.queryMakeSumByAreaIdLeft(dept.getAreaCode(),params.getStartDate(),params.getEndDate());
+        double destroySSD = storeMapper.queryDestroySumByAreaIdLeft(dept.getAreaCode(),params.getStartDate(),params.getEndDate());
+
+        return new SearchAchievementVO(storeCount,destroySSD,surrenderPrice);
     }
 
     /**
@@ -210,10 +239,13 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
             throw new ServiceException(ResultCode.AREA_IS_HAVE_SIGN);
         }
 
+        Department parentDept = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getAreaCode, signInDTO.getParentServiceProvider()));
+
         // 插入部门表
         Department department = new Department();
+
         department.setAreaCode(signInDTO.getSignAreaId());
-        department.setParentId(signInDTO.getParentServiceProvider());
+        department.setParentId(parentDept.getId());
         department.setCreateTime(new Date());
         department.setTitle(signInDTO.getSignAreaName().replace("/", ""));
         department.setCreateBy(UserContext.getCurrentUser().getUsername());
@@ -256,15 +288,16 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
         String collect = regions.stream().map(Region::getName).collect(Collectors.joining());
 
         Department department = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getId, user.getDepartmentId()));
+        Department parentDepartment = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getAreaCode, signInDTO.getParentServiceProvider()));
         department.setTitle(collect);
         department.setAreaCode(signInDTO.getSignAreaId());
-        department.setParentId(signInDTO.getParentServiceProvider());
+        department.setParentId(parentDepartment.getId());
         departmentService.updateById(department);
 
         //查询该服务商所有的下级服务商
         List<Department> list = departmentService.list(new QueryWrapper<Department>().lambda().eq(Department::getParentId, user.getDepartmentId()));
         list.stream().forEach( s -> {
-            s.setParentId(signInDTO.getSignAreaId());
+            s.setParentId(department.getId());
             departmentService.updateById(department);
         });
 

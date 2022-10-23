@@ -44,6 +44,34 @@ public interface MemberMapper extends BaseMapper<Member> {
             "\tleft join li_member m on m.id = s.member_id ${ew.customSqlSegment} ")
     IPage<MemberProfitVO> getStoreMember(IPage<MemberProfitVO> page,@Param(Constants.WRAPPER) Wrapper<MemberProfitVO> queryWrapper);
 
+
+    /**
+     * 商铺会员管理
+     * @param page
+     * @param queryWrapper
+     * @return
+     */
+    @Select("select \n" +
+            "\t\tm.mobile as username,\n" +
+            "\t\tm.SSD as ssd,\n" +
+            "\t\tm.point as point\n" +
+            "\t\tfrom w_make_account  w \n" +
+            "\t\tleft join li_member m on w.vip_phone = m.mobile ${ew.customSqlSegment}  group by w.vip_phone order by  m.ssd desc")
+    IPage<MemberProfitVO> getStoreMemberV2(IPage<MemberProfitVO> page,@Param(Constants.WRAPPER) Wrapper<MemberProfitVO> queryWrapper);
+
+    /**
+     * 商铺会员管理top
+     * @param queryWrapper
+     * @return
+     */
+    @Select("select \n" +
+            "\t\tm.mobile as username,\n" +
+            "\t\tm.SSD as ssd,\n" +
+            "\t\tm.point as point\n" +
+            "\t\tfrom w_make_account  w \n" +
+            "\t\tleft join li_member m on w.vip_phone = m.mobile ${ew.customSqlSegment}  group by w.vip_phone order by  m.ssd desc")
+    List<MemberProfitVO> getStoreMemberTopV2(@Param(Constants.WRAPPER) Wrapper<MemberProfitVO> queryWrapper);
+
     /**
      * 总积分
      * @return
@@ -62,5 +90,5 @@ public interface MemberMapper extends BaseMapper<Member> {
             "\tcount(w.id)\n" +
             "\tfrom w_make_account w\n" +
             "\tleft join li_store s on w.mer_id = s.id where FIND_IN_SET(#{areaId},s.store_address_id_path)  ")
-    Long getSumMakeCount(String areaId);
+    Integer getSumMakeCount(String areaId);
 }

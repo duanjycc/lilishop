@@ -111,6 +111,48 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     private RoleService roleService;
 
 
+    /**
+     * 商铺会员管理
+     *
+     * @param mobile
+     * @param page
+     * @return
+     */
+    @Override
+    public IPage<MemberProfitVO> getStoreMemberV2(String mobile, PageVO page) {
+        AuthUser currentUser = UserContext.getCurrentUser();
+        Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
+        IPage<MemberProfitVO> storeMemberV2 = null;
+        QueryWrapper<MemberProfitVO> wrapper = new QueryWrapper<>();
+        if(StringUtils.isNotEmpty(currentUser.getMember().getStoreId())){
+            wrapper.apply("w.mer_id = "+ currentUser.getMember().getStoreId());
+            wrapper.like(StringUtils.isNotEmpty(mobile),"m.mobile",mobile);
+            storeMemberV2 = baseMapper.getStoreMemberV2(PageUtil.initPage(page), wrapper);
+        }
+        return storeMemberV2;
+    }
+    /**
+     * 商铺会员管理-top显示
+     *
+     * @return
+     */
+    @Override
+    public StoreMemberTopVO getStoreMemberTopV2() {
+        AuthUser currentUser = UserContext.getCurrentUser();
+        Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
+
+        QueryWrapper<MemberProfitVO> wrapper = new QueryWrapper<>();
+
+        wrapper.apply(StringUtils.isNotEmpty(currentUser.getMember().getStoreId()),"w.mer_id = "+ currentUser.getMember().getStoreId());
+        List<MemberProfitVO> tops = baseMapper.getStoreMemberTopV2(wrapper);
+        Double sumProfit = tops.stream().map(e -> e.getPoint()).reduce(Double::sum).get();
+        if (StringUtils.isNotEmpty(currentUser.getMember().getStoreId())){
+            return new StoreMemberTopVO(sumProfit,tops.size());
+        }else {
+            return new StoreMemberTopVO(0D,0);
+        }
+    }
+
 
 
     /**
@@ -133,9 +175,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
         wrapper.apply("FIND_IN_SET(" + dept.getAreaCode() + ",s.store_address_id_path)");
         wrapper.like(StringUtils.isNotEmpty(mobile),"m.username",mobile);
+
         return baseMapper.getStoreMember(PageUtil.initPage(page),wrapper);
     }
-
     /**
      * 商铺会员管理-top显示
      *
@@ -150,7 +192,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             return null;
         }
         Department dept = departmentService.getById(admin.getDepartmentId());
-        Long sumMakeCount = baseMapper.getSumMakeCount(dept.getAreaCode());
+        Integer sumMakeCount = baseMapper.getSumMakeCount(dept.getAreaCode());
         Double sumProfit = baseMapper.getSumProfit(dept.getAreaCode());
 
         return new StoreMemberTopVO(sumProfit,sumMakeCount);

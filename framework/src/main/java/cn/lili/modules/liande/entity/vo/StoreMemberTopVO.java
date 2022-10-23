@@ -15,6 +15,6 @@ public class StoreMemberTopVO {
 
     @ApiModelProperty(value = "总积分")
     private Double sumProfit;
-    @ApiModelProperty(value = "商铺总做单数")
-    private Long makeCount;
+    @ApiModelProperty(value = "总会员数")
+    private Integer memberCount;
 }

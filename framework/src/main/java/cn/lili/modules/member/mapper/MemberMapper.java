@@ -1,6 +1,7 @@
 package cn.lili.modules.member.mapper;
 
 
+import cn.lili.modules.liande.entity.vo.InvitationStoreVo;
 import cn.lili.modules.liande.entity.vo.MemberProfitVO;
 import cn.lili.modules.member.entity.dos.Member;
 import cn.lili.modules.member.entity.vo.MemberVO;
@@ -44,6 +45,22 @@ public interface MemberMapper extends BaseMapper<Member> {
             "\tleft join li_member m on m.id = s.member_id ${ew.customSqlSegment} ")
     IPage<MemberProfitVO> getStoreMember(IPage<MemberProfitVO> page,@Param(Constants.WRAPPER) Wrapper<MemberProfitVO> queryWrapper);
 
+
+    /**
+     * APP我邀请的商铺
+     * @param page
+     * @param queryWrapper
+     * @return
+     */
+    @Select("SELECT\n" +
+            "\ts.store_name as storeName,\n" +
+            "\ts.store_address_detail as storeAddressDetail,\n" +
+            "\ts.member_name as memberNname,\n" +
+            "\tsum(w.surrender_price) as sumSurrenderPrice\n" +
+            "FROM\n" +
+            "\tli_store s \n" +
+            "\tleft join w_make_account w on s.id = w.mer_id  ${ew.customSqlSegment} group by s.id  order by sumSurrenderPrice desc")
+    IPage<InvitationStoreVo> getAppInvitationStore(IPage<InvitationStoreVo> page, @Param(Constants.WRAPPER) Wrapper<InvitationStoreVo> queryWrapper);
 
     /**
      * 商铺会员管理

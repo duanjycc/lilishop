@@ -6,6 +6,7 @@ import cn.lili.common.security.enums.UserEnums;
 import cn.lili.common.security.token.Token;
 import cn.lili.common.vo.PageVO;
 import cn.lili.modules.connect.entity.dto.ConnectAuthUser;
+import cn.lili.modules.liande.entity.vo.InvitationStoreVo;
 import cn.lili.modules.liande.entity.vo.MemberProfitVO;
 import cn.lili.modules.liande.entity.vo.StoreMemberTopVO;
 import cn.lili.modules.member.entity.dos.Member;
@@ -41,6 +42,15 @@ public interface MemberService extends IService<Member> {
      * @return
      */
     IPage<MemberProfitVO> getStoreMemberV2(String mobile, PageVO page);
+
+    /**
+     * APP我邀请的商铺
+     * @param storeName
+     * @param page
+     * @return
+     */
+    IPage<InvitationStoreVo> getAppInvitationStore(String storeName, PageVO page);
+
     /**
      * 商铺会员管理-top显示
      * @return

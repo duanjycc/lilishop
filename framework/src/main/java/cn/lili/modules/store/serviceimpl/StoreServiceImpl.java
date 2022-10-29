@@ -215,6 +215,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         if (ObjectUtils.isEmpty(dto.getInvitationPhone()) || "null".equals(dto.getInvitationPhone())){
             String s = dto.getStoreAddressIdPath().split(",")[2];
             Department department = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getAreaCode, s).eq(Department::getDeleteFlag, StatusEnum.USE.getType()));
+            Optional.ofNullable(department).orElseThrow(() -> new ServiceException(ResultCode.AREA_SERVICE_PROVIDER_NOT_EXIST));
             AdminUser adminUser = adminUserService.getOne(new QueryWrapper<AdminUser>().lambda().eq(AdminUser::getDepartmentId, department.getId()).eq(AdminUser::getDeleteFlag, StatusEnum.USE.getType()));
             Optional.ofNullable(adminUser).orElseThrow(() -> new ServiceException(ResultCode.AREA_SERVICE_PROVIDER_NOT_EXIST));
 

@@ -22,6 +22,7 @@ import cn.lili.modules.connect.entity.Connect;
 import cn.lili.modules.connect.entity.dto.ConnectAuthUser;
 import cn.lili.modules.connect.service.ConnectService;
 import cn.lili.modules.liande.entity.enums.StatusEnum;
+import cn.lili.modules.liande.entity.vo.InvitationStoreVo;
 import cn.lili.modules.liande.entity.vo.MemberProfitVO;
 import cn.lili.modules.liande.entity.vo.StoreMemberTopVO;
 import cn.lili.modules.member.aop.annotation.PointLogPoint;
@@ -110,6 +111,25 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     @Autowired
     private RoleService roleService;
 
+    /**
+     * APP我邀请的商铺
+     *
+     * @param storeName
+     * @param page
+     * @return
+     */
+    @Override
+    public IPage<InvitationStoreVo> getAppInvitationStore(String storeName, PageVO page) {
+        AuthUser currentUser = UserContext.getCurrentUser();
+        Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
+
+        QueryWrapper<InvitationStoreVo> wrapper = new QueryWrapper<>();
+        wrapper.apply(" s.invitation_phone = "+ currentUser.getMember().getMobile());
+        wrapper.apply(" s.store_disable = 'OPEN'");
+        wrapper.like(StringUtils.isNotEmpty(storeName),"s.store_name",storeName);
+
+        return baseMapper.getAppInvitationStore(PageUtil.initPage(page), wrapper);
+    }
 
     /**
      * 商铺会员管理
@@ -657,6 +677,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         //按照会员状态查询
         queryWrapper.eq(CharSequenceUtil.isNotBlank(memberSearchVO.getDisabled()), "disabled",
                 memberSearchVO.getDisabled().equals(SwitchEnum.OPEN.name()) ? 1 : 0);
+        queryWrapper.notInSql("mobile","18606519031");
         queryWrapper.orderByDesc("create_time");
         return this.baseMapper.pageByMemberVO(PageUtil.initPage(page), queryWrapper);
     }

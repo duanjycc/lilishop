@@ -161,7 +161,7 @@ public class MemberBuyerController {
             @ApiImplicitParam(name = "newPassword", value = "新密码", required = true, paramType = "query")
     })
     @PutMapping("/modifyPass")
-    public ResultMessage<Member> modifyPass(@NotNull(message = "旧密码不能为空") @RequestParam String password,
+    public ResultMessage<Member> modifyPass(@NotNull(message = "旧密码不能为空") String password,
                                             @NotNull(message = "新密码不能为空") @RequestParam String newPassword) {
         return ResultUtil.data(memberService.modifyPass(password, newPassword));
     }

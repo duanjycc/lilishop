@@ -472,10 +472,14 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             throw new ServiceException(ResultCode.USER_NOT_LOGIN);
         }
         Member member = this.getById(tokenUser.getId());
-        //判断旧密码输入是否正确
-        if (!new BCryptPasswordEncoder().matches(oldPassword, member.getPassword())) {
-            throw new ServiceException(ResultCode.USER_OLD_PASSWORD_ERROR);
+
+        if (StringUtils.isNotEmpty(oldPassword)) {
+            //判断旧密码输入是否正确
+            if (!new BCryptPasswordEncoder().matches(oldPassword, member.getPassword())) {
+                throw new ServiceException(ResultCode.USER_OLD_PASSWORD_ERROR);
+            }
         }
+
         //修改会员密码
         LambdaUpdateWrapper<Member> lambdaUpdateWrapper = Wrappers.lambdaUpdate();
         lambdaUpdateWrapper.eq(Member::getId, member.getId());

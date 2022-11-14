@@ -18,8 +18,11 @@ public class StoreStatisticsDataVO {
     @ApiModelProperty(value = "店铺名称")
     private String storeName;
 
-    @ApiModelProperty(value = "销售数量")
+    @ApiModelProperty(value = "让利金额")
     private String num;
+
+    @ApiModelProperty(value = "联系号码")
+    private String phone;
 
     @ApiModelProperty(value = "销售金额")
     private Double price;

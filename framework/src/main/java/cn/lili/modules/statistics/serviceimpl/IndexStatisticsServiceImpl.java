@@ -127,6 +127,8 @@ public class IndexStatisticsServiceImpl implements IndexStatisticsService {
         indexStatisticsVO.setOrderNum(orderStatisticsService.orderNum(null));
         //获取总会员数量
         indexStatisticsVO.setMemberNum(memberStatisticsService.getMemberCount());
+        //获取全国SSD数量
+        indexStatisticsVO.setSsdAllNum(memberStatisticsService.getSSDCount());
         //获取总上架商品数量
         indexStatisticsVO.setGoodsNum(goodsStatisticsService.goodsNum(GoodsStatusEnum.UPPER, GoodsAuthEnum.PASS));
         //获取总店铺数量
@@ -248,6 +250,25 @@ public class IndexStatisticsServiceImpl implements IndexStatisticsService {
         Page page = new Page<StoreStatisticsDataVO>(1, 10);
 
         return storeFlowStatisticsService.getStoreStatisticsData(page, queryWrapper);
+    }
+
+    @Override
+    public List<StoreStatisticsDataVO> getStoreStatisticsTop(StatisticsQueryParam statisticsQueryParam) {
+
+        QueryWrapper queryWrapper = Wrappers.query();
+
+        Date[] dates = StatisticsDateUtil.getDateArray(statisticsQueryParam);
+        Date startTime = dates[0], endTime = dates[1];
+//        queryWrapper.between("create_time", startTime, endTime);
+
+        queryWrapper.orderByDesc("price");
+
+        queryWrapper.groupBy("mer_id,mer_name ");
+
+        //查询前十条记录
+        Page page = new Page<StoreStatisticsDataVO>(1, 10);
+
+        return storeFlowStatisticsService.getStoreStatisticsTopData(page, queryWrapper);
     }
 
 

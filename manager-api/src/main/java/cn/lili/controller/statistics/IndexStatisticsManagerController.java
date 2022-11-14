@@ -63,7 +63,7 @@ public class IndexStatisticsManagerController {
     @ApiOperation(value = "获取首页查询热卖店铺TOP10")
     @GetMapping("/storeStatistics")
     public ResultMessage<List<StoreStatisticsDataVO>> storeStatistics(StatisticsQueryParam statisticsQueryParam) {
-        return ResultUtil.data(indexStatisticsService.storeStatistics(statisticsQueryParam));
+        return ResultUtil.data(indexStatisticsService.getStoreStatisticsTop(statisticsQueryParam));
     }
 
     @ApiOperation(value = "通知提示信息")

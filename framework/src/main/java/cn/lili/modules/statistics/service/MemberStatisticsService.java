@@ -24,6 +24,13 @@ public interface MemberStatisticsService extends IService<MemberStatisticsData> 
     long getMemberCount();
 
     /**
+     * 获取会员SSD数量
+     *
+     * @return SSD统计
+     */
+    long getSSDCount();
+
+    /**
      * 获取今日新增会员数量
      *
      * @return 今日新增会员数量

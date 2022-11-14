@@ -69,6 +69,11 @@ public class StoreFlowStatisticsServiceImpl extends ServiceImpl<StoreFlowStatist
     }
 
     @Override
+    public List<StoreStatisticsDataVO> getStoreStatisticsTopData(Page page, QueryWrapper queryWrapper) {
+        return this.baseMapper.getStoreStatisticsTopData(page, queryWrapper);
+    }
+
+    @Override
     public Map<String, Object> getOrderStatisticsPrice() {
         QueryWrapper queryWrapper = Wrappers.query();
         //支付订单

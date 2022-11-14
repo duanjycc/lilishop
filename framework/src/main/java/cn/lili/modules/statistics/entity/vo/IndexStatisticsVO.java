@@ -20,6 +20,8 @@ public class IndexStatisticsVO {
     private Long memberNum;
     @ApiModelProperty(value = "店铺总数量")
     private Long storeNum;
+    @ApiModelProperty(value = "SSD总数量")
+    private Long ssdAllNum;
 
     /**
      * 流量概括

@@ -34,6 +34,14 @@ public class MemberStatisticsServiceImpl extends ServiceImpl<MemberStatisticsMap
     }
 
     @Override
+    public long getSSDCount() {
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("disabled", true);
+        queryWrapper.notInSql("mobile","18888888888");
+        return this.baseMapper.customSsdSqlQuery(queryWrapper);
+    }
+
+    @Override
     public long todayMemberNum() {
         QueryWrapper queryWrapper = Wrappers.query();
         queryWrapper.ge("create_time", DateUtil.beginOfDay(new Date()));

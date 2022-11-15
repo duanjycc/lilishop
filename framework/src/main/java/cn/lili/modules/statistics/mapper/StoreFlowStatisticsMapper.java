@@ -4,6 +4,7 @@ import cn.lili.modules.order.order.entity.dos.StoreFlow;
 import cn.lili.modules.statistics.entity.vo.CategoryStatisticsDataVO;
 import cn.lili.modules.statistics.entity.vo.GoodsStatisticsDataVO;
 import cn.lili.modules.statistics.entity.vo.StoreStatisticsDataVO;
+import cn.lili.modules.statistics.entity.vo.WssdHisDataVO;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -61,5 +62,15 @@ public interface StoreFlowStatisticsMapper extends BaseMapper<StoreFlow> {
      */
     @Select("SELECT mer_id as store_id ,mer_name AS storeName,username as phone,SUM(surrender_price) AS price,SUM(monetary) AS num FROM w_make_account ${ew.customSqlSegment}")
     List<StoreStatisticsDataVO> getStoreStatisticsTopData(IPage<StoreStatisticsDataVO> page, @Param(Constants.WRAPPER) Wrapper<StoreStatisticsDataVO> queryWrapper);
+
+    /**
+     * 近期价格走势
+     *
+     * @param page         分页
+     * @param queryWrapper 查询参数
+     * @return 近期价格列表
+     */
+    @Select("SELECT date_id as dateId ,numerical_alue AS numericalAlue,create_time as createTime FROM w_ssd_his ${ew.customSqlSegment}")
+    List<WssdHisDataVO> getSsdPriceTopData(IPage<WssdHisDataVO> page, @Param(Constants.WRAPPER) Wrapper<StoreStatisticsDataVO> queryWrapper);
 
 }

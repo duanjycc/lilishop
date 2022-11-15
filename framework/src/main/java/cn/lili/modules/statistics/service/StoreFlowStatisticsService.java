@@ -3,10 +3,7 @@ package cn.lili.modules.statistics.service;
 import cn.lili.modules.order.order.entity.dos.StoreFlow;
 import cn.lili.modules.statistics.entity.dto.GoodsStatisticsQueryParam;
 import cn.lili.modules.statistics.entity.dto.StatisticsQueryParam;
-import cn.lili.modules.statistics.entity.vo.CategoryStatisticsDataVO;
-import cn.lili.modules.statistics.entity.vo.GoodsStatisticsDataVO;
-import cn.lili.modules.statistics.entity.vo.OrderOverviewVO;
-import cn.lili.modules.statistics.entity.vo.StoreStatisticsDataVO;
+import cn.lili.modules.statistics.entity.vo.*;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -59,6 +56,15 @@ public interface StoreFlowStatisticsService extends IService<StoreFlow> {
      * @return
      */
     List<StoreStatisticsDataVO> getStoreStatisticsTopData(Page page, QueryWrapper queryWrapper);
+
+    /**
+     * 近期价格走势
+     *
+     * @param page
+     * @param queryWrapper
+     * @return
+     */
+    List<WssdHisDataVO> getSsdPriceTopData(Page page, QueryWrapper queryWrapper);
 
     /**
      * 查询今日付款统计

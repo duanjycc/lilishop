@@ -46,6 +46,15 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     @Override
+    public IPage<ArticleVO> articleList(ArticleSearchParams articleSearchParams) {
+        articleSearchParams.setSort("a.sort");
+        QueryWrapper queryWrapper = articleSearchParams.queryWrapper();
+        queryWrapper.eq("open_status", true);
+        queryWrapper.eq("parent_id", "1369921726825103362");
+        return this.baseMapper.getArticleByPrentIdList(PageUtil.initPage(articleSearchParams), queryWrapper);
+    }
+
+    @Override
     public List<Article> list(String categoryId) {
 
         QueryWrapper<Article> queryWrapper = Wrappers.query();

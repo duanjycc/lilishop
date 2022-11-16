@@ -74,7 +74,7 @@ public interface ArticleService extends IService<Article> {
      * @param id
      * @return 文章
      */
-
+    @Cacheable(key = "#id")
     Article customGet(String id);
 
     /**

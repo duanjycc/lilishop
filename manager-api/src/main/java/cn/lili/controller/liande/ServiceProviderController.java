@@ -57,6 +57,18 @@ public class ServiceProviderController {
         return ResultUtil.data(userService.checkAreaHavSign(areaId));
     }
 
+    @ApiOperation(value = "检测区域是否被签约")
+    @GetMapping(value = "/checks/{areaId}")
+    public ResultMessage<Object> checksAreaHavSign(@PathVariable String areaId) {
+        return ResultUtil.data(userService.checksAreaHavSign(areaId));
+    }
+
+    @ApiOperation(value = "检测上级区域是否被签约")
+    @GetMapping(value = "/checkp/{areaId}")
+    public ResultMessage<Object> checkpAreaHavSign(@PathVariable String areaId) {
+        return ResultUtil.data(userService.checkpAreaHavSign(areaId));
+    }
+
     @ApiOperation(value = "查询服务商业绩")
     @GetMapping(value = "/store/achievement")
     public ResultMessage<IPage<StoreAchievementParamsVO>> queryStoreAchievement(StoreAchievementParams params,

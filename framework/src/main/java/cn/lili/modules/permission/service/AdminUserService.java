@@ -46,6 +46,20 @@ public interface AdminUserService extends IService<AdminUser> {
     Boolean checkAreaHavSign(String areaId);
 
     /**
+     * 检测区域是否被签约
+     * @param areaId
+     * @return
+     */
+    ServiceRegionVO checksAreaHavSign(String areaId);
+
+    /**
+     * 检测上级区域是否被签约
+     * @param areaId
+     * @return
+     */
+    ServiceRegionVO checkpAreaHavSign(String areaId);
+
+    /**
      * 服务商业绩
      * @param mobile
      * @return

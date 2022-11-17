@@ -83,7 +83,6 @@ public interface ArticleService extends IService<Article> {
      * @param type
      * @return 文章
      */
-    @Cacheable(key = "#type")
     Article customGetByType(String type);
 
     /**

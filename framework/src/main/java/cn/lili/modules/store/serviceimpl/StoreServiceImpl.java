@@ -509,14 +509,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         Date startTime = dates[0], endTime = dates[1];
 //        queryWrapper.between("create_time", startTime, endTime);
 
-        queryWrapper.orderByDesc("price");
-
-        queryWrapper.groupBy("mer_id,mer_name ");
-
-        //查询前十条记录
-        Page page = new Page<StoreStatisticsDataVO>(1, 10);
-
-        return storeFlowStatisticsService.getStoreStatisticsTopData(page, queryWrapper);
+        return storeFlowStatisticsService.getStoreNickNumTopData(null, queryWrapper);
     }
 
     /**

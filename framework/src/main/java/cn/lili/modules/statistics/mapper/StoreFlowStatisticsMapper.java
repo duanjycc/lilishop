@@ -64,6 +64,17 @@ public interface StoreFlowStatisticsMapper extends BaseMapper<StoreFlow> {
     List<StoreStatisticsDataVO> getStoreStatisticsTopData(IPage<StoreStatisticsDataVO> page, @Param(Constants.WRAPPER) Wrapper<StoreStatisticsDataVO> queryWrapper);
 
     /**
+     * 店铺消费会员统计列表
+     *
+     * @param page         分页
+     * @param queryWrapper 查询参数
+     * @return 店铺统计列表
+     */
+    @Select("SELECT mer_id as store_id ,mer_name AS storeName,count(DISTINCT vip_phone) AS nickNum FROM w_make_account GROUP BY mer_id,mer_name ORDER BY nickNum desc limit 0, 10")
+    List<StoreStatisticsDataVO> getStoreNickNumTopData(IPage<StoreStatisticsDataVO> page, @Param(Constants.WRAPPER) Wrapper<StoreStatisticsDataVO> queryWrapper);
+
+
+    /**
      * 近期价格走势
      *
      * @param page         分页

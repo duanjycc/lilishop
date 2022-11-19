@@ -144,26 +144,30 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
     public IPage<StoreVO> findByConditionPage(StoreSearchParams storeSearchParams, PageVO page) {
         AuthUser currentUser = UserContext.getCurrentUser();
         Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
+
         // 查询服务商
-        QueryWrapper<StoreVO> queryWrapper = storeSearchParams.queryWrapper();
-//        queryWrapperAdminUser admin = adminUserService.findByMobile(currentUser.getMember().getMobile());
-//        if (ObjectUtils.isNotEmpty(admin)) {
-//            Department dept = departmentService.getById(admin.getDepartmentId());
-//            wrapper.apply("FIND_IN_SET(" + dept.getAreaCode() + ",store_address_id_path)");
-//            wrapper.or().eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
-//        }else {
-//            wrapper.eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
-//        }
+        QueryWrapper<StoreVO> wrapper = storeSearchParams.queryWrapper();
+        if (currentUser.getMember() != null) {
+            AdminUser admin = adminUserService.findByMobile(currentUser.getMember().getMobile());
+            if (ObjectUtils.isNotEmpty(admin)) {
+                Department dept = departmentService.getById(admin.getDepartmentId());
+                wrapper.apply("FIND_IN_SET(" + dept.getAreaCode() + ",store_address_id_path)");
+                wrapper.or().eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
+            }else {
+                wrapper.eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
+            }
+        }
+
         //wrapper.orderByAsc(" field(state,1,4,2,3)");
         //用户名查询
-        queryWrapper.like(CharSequenceUtil.isNotBlank(storeSearchParams.getMemberName()), "member_name", storeSearchParams.getMemberName());
+        wrapper.like(CharSequenceUtil.isNotBlank(storeSearchParams.getMemberName()), "member_name", storeSearchParams.getMemberName());
         //店铺名查询
-        queryWrapper.like(CharSequenceUtil.isNotBlank(storeSearchParams.getStoreName()), "store_name", storeSearchParams.getStoreName());
+        wrapper.like(CharSequenceUtil.isNotBlank(storeSearchParams.getStoreName()), "store_name", storeSearchParams.getStoreName());
         //店铺状态
-        queryWrapper.like(CharSequenceUtil.isNotBlank(storeSearchParams.getStoreDisable()), "store_disable", storeSearchParams.getStoreDisable());
-        queryWrapper.orderByAsc("field(store_disable,'APPLYING','REFUSED','OPEN')");
+        wrapper.like(CharSequenceUtil.isNotBlank(storeSearchParams.getStoreDisable()), "store_disable", storeSearchParams.getStoreDisable());
+        wrapper.orderByAsc("field(store_disable,'APPLYING','REFUSED','OPEN')");
 
-        return this.baseMapper.getStoreList(PageUtil.initPage(page), queryWrapper);
+        return this.baseMapper.getStoreList(PageUtil.initPage(page), wrapper);
     }
 
     @Override

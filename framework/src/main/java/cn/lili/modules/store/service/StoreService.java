@@ -3,12 +3,16 @@ package cn.lili.modules.store.service;
 import cn.lili.common.vo.PageVO;
 import cn.lili.modules.liande.entity.vo.MemberProfitVO;
 import cn.lili.modules.member.entity.dto.CollectionDTO;
+import cn.lili.modules.statistics.entity.dto.StatisticsQueryParam;
+import cn.lili.modules.statistics.entity.vo.StoreStatisticsDataVO;
 import cn.lili.modules.store.entity.dos.Store;
 import cn.lili.modules.store.entity.dto.*;
 import cn.lili.modules.store.entity.vos.StoreSearchParams;
 import cn.lili.modules.store.entity.vos.StoreVO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * 店铺业务层
@@ -167,4 +171,6 @@ public interface StoreService extends IService<Store> {
      * @param collectionDTO 收藏信息
      */
     void updateStoreCollectionNum(CollectionDTO collectionDTO);
+
+    List<StoreStatisticsDataVO> getStoreStatisticsTop(StatisticsQueryParam statisticsQueryParam);
 }

@@ -24,6 +24,10 @@ import cn.lili.modules.permission.entity.dos.AdminUser;
 import cn.lili.modules.permission.entity.dos.Department;
 import cn.lili.modules.permission.service.AdminUserService;
 import cn.lili.modules.permission.service.DepartmentService;
+import cn.lili.modules.statistics.entity.dto.StatisticsQueryParam;
+import cn.lili.modules.statistics.entity.vo.StoreStatisticsDataVO;
+import cn.lili.modules.statistics.service.StoreFlowStatisticsService;
+import cn.lili.modules.statistics.util.StatisticsDateUtil;
 import cn.lili.modules.store.entity.dos.Store;
 import cn.lili.modules.store.entity.dos.StoreDetail;
 import cn.lili.modules.store.entity.dto.*;
@@ -41,11 +45,14 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -75,11 +82,14 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
     @Autowired
     private FileMapper fileMapper;
 
-
     @Autowired
     private Cache cache;
 
-
+    /**
+     * 商品统计
+     */
+    @Autowired
+    private StoreFlowStatisticsService storeFlowStatisticsService;
 
     /**
      * 通过商品分类id获取店铺
@@ -489,6 +499,24 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
     @Override
     public void updateStoreCollectionNum(CollectionDTO collectionDTO) {
         baseMapper.updateCollection(collectionDTO.getId(), collectionDTO.getNum());
+    }
+
+    @Override
+    public List<StoreStatisticsDataVO> getStoreStatisticsTop(StatisticsQueryParam statisticsQueryParam) {
+        QueryWrapper queryWrapper = Wrappers.query();
+
+        Date[] dates = StatisticsDateUtil.getDateArray(statisticsQueryParam);
+        Date startTime = dates[0], endTime = dates[1];
+//        queryWrapper.between("create_time", startTime, endTime);
+
+        queryWrapper.orderByDesc("price");
+
+        queryWrapper.groupBy("mer_id,mer_name ");
+
+        //查询前十条记录
+        Page page = new Page<StoreStatisticsDataVO>(1, 10);
+
+        return storeFlowStatisticsService.getStoreStatisticsTopData(page, queryWrapper);
     }
 
     /**

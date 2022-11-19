@@ -29,4 +29,7 @@ public class ArticleVO {
 
     @ApiModelProperty(value = "标题图像")
     private String url;
+
+    @ApiModelProperty(value = "创建日期")
+    private String createTime;
 }

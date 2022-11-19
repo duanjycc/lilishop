@@ -58,6 +58,15 @@ public interface StoreFlowStatisticsService extends IService<StoreFlow> {
     List<StoreStatisticsDataVO> getStoreStatisticsTopData(Page page, QueryWrapper queryWrapper);
 
     /**
+     * 店铺会员数 统计
+     *
+     * @param page
+     * @param queryWrapper
+     * @return
+     */
+    List<StoreStatisticsDataVO> getStoreNickNumTopData(Page page, QueryWrapper queryWrapper);
+
+    /**
      * 近期价格走势
      *
      * @param page

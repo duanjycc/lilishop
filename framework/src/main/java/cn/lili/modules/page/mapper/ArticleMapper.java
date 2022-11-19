@@ -36,7 +36,7 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * @param queryWrapper 查询条件
      * @return 文章VO分页
      */
-    @Select("select a.id,a.title,a.sort,ac.article_category_name,a.open_status,ac.url from " +
+    @Select("select a.id,a.title,a.sort,ac.article_category_name,a.open_status,ac.url,a.create_time from " +
             "li_article as a inner join li_article_category ac on a.category_id=ac.id ${ew.customSqlSegment}")
     IPage<ArticleVO> getArticleByPrentIdList(IPage<ArticleVO> page, @Param(Constants.WRAPPER) Wrapper<ArticleVO> queryWrapper);
 }

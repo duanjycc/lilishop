@@ -71,6 +71,11 @@ public class StoreFlowStatisticsServiceImpl extends ServiceImpl<StoreFlowStatist
     }
 
     @Override
+    public List<StoreStatisticsDataVO> getStoreNickNumTopData(Page page, QueryWrapper queryWrapper) {
+        return this.baseMapper.getStoreNickNumTopData(page, queryWrapper);
+    }
+
+    @Override
     public List<WssdHisDataVO> getSsdPriceTopData(Page page, QueryWrapper queryWrapper) {
         return this.baseMapper.getSsdPriceTopData(page, queryWrapper);
     }

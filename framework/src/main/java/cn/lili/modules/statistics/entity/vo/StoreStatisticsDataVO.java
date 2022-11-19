@@ -26,4 +26,7 @@ public class StoreStatisticsDataVO {
 
     @ApiModelProperty(value = "销售金额")
     private Double price;
+
+    @ApiModelProperty(value = "会员数")
+    private String nickNum;
 }

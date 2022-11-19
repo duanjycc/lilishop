@@ -144,7 +144,6 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
     public IPage<StoreVO> findByConditionPage(StoreSearchParams storeSearchParams, PageVO page) {
         AuthUser currentUser = UserContext.getCurrentUser();
         Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
-
         // 查询服务商
         QueryWrapper<StoreVO> wrapper = storeSearchParams.queryWrapper();
         if (currentUser.getMember() != null) {

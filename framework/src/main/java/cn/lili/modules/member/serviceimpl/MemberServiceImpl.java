@@ -473,8 +473,10 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         }
         Member member = this.getById(tokenUser.getId());
         //判断旧密码输入是否正确
-        if (!new BCryptPasswordEncoder().matches(oldPassword, member.getPassword())) {
-            throw new ServiceException(ResultCode.USER_OLD_PASSWORD_ERROR);
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(oldPassword)) {
+            if (!new BCryptPasswordEncoder().matches(oldPassword, member.getPassword())) {
+                throw new ServiceException(ResultCode.USER_OLD_PASSWORD_ERROR);
+            }
         }
         //修改会员密码
         LambdaUpdateWrapper<Member> lambdaUpdateWrapper = Wrappers.lambdaUpdate();

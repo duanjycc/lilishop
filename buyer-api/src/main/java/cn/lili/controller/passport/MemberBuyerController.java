@@ -157,11 +157,11 @@ public class MemberBuyerController {
 
     @ApiOperation(value = "修改密码")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "password", value = "旧密码", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "password", value = "旧密码", paramType = "query"),
             @ApiImplicitParam(name = "newPassword", value = "新密码", required = true, paramType = "query")
     })
     @PutMapping("/modifyPass")
-    public ResultMessage<Member> modifyPass(@NotNull(message = "旧密码不能为空") @RequestParam String password,
+    public ResultMessage<Member> modifyPass(@NotNull(message = "旧密码不能为空") String password,
                                             @NotNull(message = "新密码不能为空") @RequestParam String newPassword) {
         return ResultUtil.data(memberService.modifyPass(password, newPassword));
     }

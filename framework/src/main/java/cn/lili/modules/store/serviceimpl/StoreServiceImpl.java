@@ -511,7 +511,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
 
         Date[] dates = StatisticsDateUtil.getDateArray(statisticsQueryParam);
         Date startTime = dates[0], endTime = dates[1];
-//        queryWrapper.between("create_time", startTime, endTime);
+        queryWrapper.between("create_time", startTime, endTime);
 
         return storeFlowStatisticsService.getStoreNickNumTopData(null, queryWrapper);
     }

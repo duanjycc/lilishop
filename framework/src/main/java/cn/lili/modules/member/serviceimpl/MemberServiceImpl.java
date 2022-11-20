@@ -680,7 +680,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         queryWrapper.eq(CharSequenceUtil.isNotBlank(memberSearchVO.getDisabled()), "disabled",
                 memberSearchVO.getDisabled().equals(SwitchEnum.OPEN.name()) ? 1 : 0);
         queryWrapper.notInSql("mobile","18606519031");
-        queryWrapper.orderByDesc("create_time");
+        queryWrapper.notInSql("mobile","18888888888");
+        queryWrapper.orderByDesc("ssd");
         return this.baseMapper.pageByMemberVO(PageUtil.initPage(page), queryWrapper);
     }
 

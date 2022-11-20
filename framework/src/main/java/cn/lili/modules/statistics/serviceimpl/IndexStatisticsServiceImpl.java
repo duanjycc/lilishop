@@ -2,6 +2,7 @@ package cn.lili.modules.statistics.serviceimpl;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateTime;
+import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.context.UserContext;
 import cn.lili.common.security.enums.UserEnums;
 import cn.lili.common.utils.BeanUtil;
@@ -120,9 +121,10 @@ public class IndexStatisticsServiceImpl implements IndexStatisticsService {
     @Override
     public IndexStatisticsVO indexStatistics() {
 
+        AuthUser currentUser = UserContext.getCurrentUser();
         //首页统计内容
         IndexStatisticsVO indexStatisticsVO = new IndexStatisticsVO();
-
+        indexStatisticsVO.setIsSuper(currentUser.getIsSuper());
         //获取总订单数量
         indexStatisticsVO.setOrderNum(orderStatisticsService.orderNum(null));
         //获取总会员数量

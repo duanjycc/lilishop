@@ -52,4 +52,6 @@ public class IndexStatisticsVO {
     private Long todayMemberEvaluation;
     @ApiModelProperty(value = "当前在线人数")
     private Long currentNumberPeopleOnline;
+    @ApiModelProperty(value = "当前用户角色")
+    private Boolean isSuper;
 }

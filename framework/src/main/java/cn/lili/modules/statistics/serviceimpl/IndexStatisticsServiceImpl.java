@@ -261,14 +261,13 @@ public class IndexStatisticsServiceImpl implements IndexStatisticsService {
 
         Date[] dates = StatisticsDateUtil.getDateArray(statisticsQueryParam);
         Date startTime = dates[0], endTime = dates[1];
-//        queryWrapper.between("create_time", startTime, endTime);
 
         queryWrapper.orderByDesc("price");
 
         queryWrapper.groupBy("mer_id,mer_name ");
 
         //查询前十条记录
-        Page page = new Page<StoreStatisticsDataVO>(1, 10);
+        Page page = new Page<StoreStatisticsDataVO>(1, 200);
 
         return storeFlowStatisticsService.getStoreStatisticsTopData(page, queryWrapper);
     }

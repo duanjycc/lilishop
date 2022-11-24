@@ -1,6 +1,7 @@
 package cn.lili.modules.system.service;
 
 import cn.lili.modules.system.entity.dos.Region;
+import cn.lili.modules.system.entity.vo.CityVo;
 import cn.lili.modules.system.entity.vo.RegionVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.cache.annotation.CacheConfig;
@@ -60,4 +61,13 @@ public interface RegionService extends IService<Region> {
      */
     @Cacheable(key = "'ALL_CITY'")
     List<RegionVO> getAllCity();
+
+
+    /**
+     * 获取所有的城市
+     *
+     * @return
+     */
+    @Cacheable(key = "'ALL_CITY2'")
+    List<CityVo> getAllCity2();
 }

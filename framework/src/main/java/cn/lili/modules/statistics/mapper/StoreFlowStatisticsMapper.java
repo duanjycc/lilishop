@@ -60,7 +60,7 @@ public interface StoreFlowStatisticsMapper extends BaseMapper<StoreFlow> {
      * @param queryWrapper 查询参数
      * @return 店铺统计列表
      */
-    @Select("SELECT mer_id as store_id ,mer_name AS storeName,username as phone,SUM(surrender_price) AS price,SUM(monetary) AS num FROM w_make_account ${ew.customSqlSegment}")
+    @Select("SELECT mer_id as store_id ,mer_name AS storeName,username as phone,SUM(surrender_price) AS price,SUM(monetary) AS num FROM w_make_account where DATE_FORMAT(create_time,'%Y-%m-%d')=curdate() ${ew.customSqlSegment}")
     List<StoreStatisticsDataVO> getStoreStatisticsTopData(IPage<StoreStatisticsDataVO> page, @Param(Constants.WRAPPER) Wrapper<StoreStatisticsDataVO> queryWrapper);
 
     /**

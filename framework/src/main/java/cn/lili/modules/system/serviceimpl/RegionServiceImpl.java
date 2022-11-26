@@ -135,6 +135,14 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
         return regionTree(this.list(lambdaQueryWrapper));
     }
 
+    @Override
+    public List<RegionVO> getRegionCity() {
+        LambdaQueryWrapper<Region> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        //查询所有省市
+        lambdaQueryWrapper.in(Region::getLevel, "city", "province");
+        return regionTree(this.list(lambdaQueryWrapper));
+    }
+
     private List<RegionVO> regionTree(List<Region> regions) {
 
         List<RegionVO> regionVOS = new ArrayList<>();

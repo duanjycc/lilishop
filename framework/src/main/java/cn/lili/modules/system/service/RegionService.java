@@ -70,4 +70,12 @@ public interface RegionService extends IService<Region> {
      */
     @Cacheable(key = "'ALL_CITY2'")
     List<CityVo> getAllCity2();
+
+    /**
+     * 获取省市
+     *
+     * @return
+     */
+    @Cacheable(key = "'PRO_CITY'")
+    List<RegionVO> getRegionCity();
 }

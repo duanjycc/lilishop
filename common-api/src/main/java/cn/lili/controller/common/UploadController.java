@@ -20,6 +20,11 @@ import cn.lili.modules.system.service.SettingService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
+import org.apache.poi.hpsf.Thumbnail;
+import org.apache.tomcat.util.http.fileupload.FileItem;
+import org.apache.tomcat.util.http.fileupload.FileItemFactory;
+import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -27,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
+import java.io.*;
 import java.util.Objects;
 
 /**
@@ -59,6 +64,10 @@ public class UploadController {
                                         @RequestHeader String accessToken) {
 
         AuthUser authUser =  UserContext.getCurrentUser();
+
+        if (file.getSize() > 120*1024) {
+            throw new ServiceException(ResultCode.IMAGE_FILE_SIZE_BIG_ERROR);
+        }
         //如果用户未登录，则无法上传图片
         if (authUser == null) {
             throw new ServiceException(ResultCode.USER_AUTHORITY_ERROR);

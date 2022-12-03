@@ -145,6 +145,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         IPage<MemberProfitVO> storeMemberV2 = null;
         QueryWrapper<MemberProfitVO> wrapper = new QueryWrapper<>();
         if(StringUtils.isNotEmpty(currentUser.getMember().getStoreId())){
+            wrapper.notInSql("mobile","18606519031");
+            wrapper.notInSql("mobile","18888888888");
             wrapper.apply("w.mer_id = "+ currentUser.getMember().getStoreId());
             wrapper.like(StringUtils.isNotEmpty(mobile),"m.mobile",mobile);
             storeMemberV2 = baseMapper.getStoreMemberV2(PageUtil.initPage(page), wrapper);
@@ -162,7 +164,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
 
         QueryWrapper<MemberProfitVO> wrapper = new QueryWrapper<>();
-
+        wrapper.notInSql("mobile","18606519031");
+        wrapper.notInSql("mobile","18888888888");
         wrapper.apply(StringUtils.isNotEmpty(currentUser.getMember().getStoreId()),"w.mer_id = "+ currentUser.getMember().getStoreId());
         List<MemberProfitVO> tops = baseMapper.getStoreMemberTopV2(wrapper);
         Double sumProfit = tops.stream().map(e -> e.getPoint()).reduce(Double::sum).get();

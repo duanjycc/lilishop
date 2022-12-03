@@ -136,6 +136,25 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
     }
 
     /**
+     * 检测区域是否被签约
+     *
+     * @param areaId
+     * @return
+     */
+    @Override
+    public ServiceRegionVO getCityPath(String areaId) {
+
+        if (StringUtils.isEmpty(areaId)) {
+            return null;
+        }
+        Region region = regionMapper.selectById(areaId);
+        if (ObjectUtils.isNotEmpty(region)){
+            region.setPath(region.getPath()+","+ region.getId());
+        }
+        return new ServiceRegionVO(region.getPath().split(","),null,null,null);
+    }
+
+    /**
      * 检测上级区域是否被签约
      *
      * @param areaId

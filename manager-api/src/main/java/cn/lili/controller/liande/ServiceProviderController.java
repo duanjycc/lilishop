@@ -56,6 +56,12 @@ public class ServiceProviderController {
         return ResultUtil.data(userService.getRegion(areaId));
     }
 
+    @ApiOperation(value = "根据区域id获取区域列表以及上级区域列表")
+    @GetMapping(value = "/regionCity/{areaId}")
+    public ResultMessage<ServiceRegionVO> getCityPath(@PathVariable String areaId) {
+        return ResultUtil.data(userService.getCityPath(areaId));
+    }
+
     @ApiOperation(value = "检测区域是否被签约")
     @GetMapping(value = "/check/{areaId}")
     public ResultMessage<Object> checkAreaHavSign(@PathVariable String areaId) {

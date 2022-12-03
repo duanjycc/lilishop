@@ -12,6 +12,18 @@ import lombok.Data;
 @Data
 public class StoreStatisticsDataVO {
 
+    @ApiModelProperty(value = "省份名称")
+    private String areaName;
+
+    @ApiModelProperty(value = "SSD")
+    private String areaSsd;
+
+    @ApiModelProperty(value = "积分")
+    private String areaPoint;
+
+    @ApiModelProperty(value = "让利金额")
+    private String areaPrice;
+
     @ApiModelProperty(value = "店铺ID")
     private String storeId;
 

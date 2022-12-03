@@ -59,4 +59,12 @@ public interface IndexStatisticsService {
      */
     List<StoreStatisticsDataVO> getStoreStatisticsTop(StatisticsQueryParam statisticsQueryParam);
 
+    /**
+     * 查询各省份的SSD
+     * @param statisticsQueryParam 统计查询参数
+     *
+     * @return
+     */
+    List<StoreStatisticsDataVO> getAreasSsdStatistics(StatisticsQueryParam statisticsQueryParam);
+
 }

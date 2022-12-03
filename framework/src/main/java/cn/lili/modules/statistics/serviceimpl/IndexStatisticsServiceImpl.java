@@ -272,6 +272,13 @@ public class IndexStatisticsServiceImpl implements IndexStatisticsService {
         return storeFlowStatisticsService.getStoreStatisticsTopData(page, queryWrapper);
     }
 
+    @Override
+    public List<StoreStatisticsDataVO> getAreasSsdStatistics(StatisticsQueryParam statisticsQueryParam) {
+
+        QueryWrapper queryWrapper = Wrappers.query();
+
+        return storeFlowStatisticsService.getStorePathStatisticsSsdData(null, queryWrapper);
+    }
 
     /**
      * 获取当月查询参数

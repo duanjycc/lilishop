@@ -60,9 +60,9 @@ public class UploadController {
 
         AuthUser authUser =  UserContext.getCurrentUser();
 
-        if (file.getSize() > 120*1024) {
-            throw new ServiceException(ResultCode.IMAGE_FILE_SIZE_BIG_ERROR);
-        }
+//        if (file.getSize() > 120*1024) {
+//            throw new ServiceException(ResultCode.IMAGE_FILE_SIZE_BIG_ERROR);
+//        }
         //如果用户未登录，则无法上传图片
         if (authUser == null) {
             throw new ServiceException(ResultCode.USER_AUTHORITY_ERROR);

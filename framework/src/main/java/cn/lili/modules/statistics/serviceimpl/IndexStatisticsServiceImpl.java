@@ -264,7 +264,7 @@ public class IndexStatisticsServiceImpl implements IndexStatisticsService {
 
         queryWrapper.orderByDesc("price");
 
-        queryWrapper.groupBy("mer_id,mer_name ");
+        queryWrapper.groupBy("mer_id,mer_name,phone ");
 
         //查询前十条记录
         Page page = new Page<StoreStatisticsDataVO>(1, 200);

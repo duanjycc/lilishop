@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
+import java.io.*;
 import java.util.Objects;
 
 /**
@@ -59,6 +59,10 @@ public class UploadController {
                                         @RequestHeader String accessToken) {
 
         AuthUser authUser =  UserContext.getCurrentUser();
+
+//        if (file.getSize() > 120*1024) {
+//            throw new ServiceException(ResultCode.IMAGE_FILE_SIZE_BIG_ERROR);
+//        }
         //如果用户未登录，则无法上传图片
         if (authUser == null) {
             throw new ServiceException(ResultCode.USER_AUTHORITY_ERROR);

@@ -68,12 +68,12 @@ public interface MemberMapper extends BaseMapper<Member> {
      * @param queryWrapper
      * @return
      */
-    @Select("select \n" +
+    @Select("select distinct \n" +
             "\t\tm.mobile as username,\n" +
             "\t\tm.SSD as ssd,\n" +
             "\t\tm.point as point\n" +
             "\t\tfrom w_make_account  w \n" +
-            "\t\tleft join li_member m on w.vip_phone = m.mobile ${ew.customSqlSegment}  group by w.vip_phone order by  m.ssd desc")
+            "\t\tleft join li_member m on w.vip_phone = m.mobile ${ew.customSqlSegment}  order by  m.ssd desc")
     IPage<MemberProfitVO> getStoreMemberV2(IPage<MemberProfitVO> page,@Param(Constants.WRAPPER) Wrapper<MemberProfitVO> queryWrapper);
 
     /**
@@ -81,12 +81,12 @@ public interface MemberMapper extends BaseMapper<Member> {
      * @param queryWrapper
      * @return
      */
-    @Select("select \n" +
+    @Select("select distinct \n" +
             "\t\tm.mobile as username,\n" +
             "\t\tm.SSD as ssd,\n" +
             "\t\tm.point as point\n" +
             "\t\tfrom w_make_account  w \n" +
-            "\t\tleft join li_member m on w.vip_phone = m.mobile ${ew.customSqlSegment}  group by w.vip_phone order by  m.ssd desc")
+            "\t\tleft join li_member m on w.vip_phone = m.mobile ${ew.customSqlSegment} order by  m.ssd desc")
     List<MemberProfitVO> getStoreMemberTopV2(@Param(Constants.WRAPPER) Wrapper<MemberProfitVO> queryWrapper);
 
     /**

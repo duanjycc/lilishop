@@ -157,7 +157,7 @@ public class MemberBuyerController {
 
     @ApiOperation(value = "修改密码")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "password", value = "旧密码", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "password", value = "旧密码", paramType = "query"),
             @ApiImplicitParam(name = "newPassword", value = "新密码", required = true, paramType = "query")
     })
     @PutMapping("/modifyPass")

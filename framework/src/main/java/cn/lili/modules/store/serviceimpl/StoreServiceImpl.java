@@ -24,6 +24,10 @@ import cn.lili.modules.permission.entity.dos.AdminUser;
 import cn.lili.modules.permission.entity.dos.Department;
 import cn.lili.modules.permission.service.AdminUserService;
 import cn.lili.modules.permission.service.DepartmentService;
+import cn.lili.modules.statistics.entity.dto.StatisticsQueryParam;
+import cn.lili.modules.statistics.entity.vo.StoreStatisticsDataVO;
+import cn.lili.modules.statistics.service.StoreFlowStatisticsService;
+import cn.lili.modules.statistics.util.StatisticsDateUtil;
 import cn.lili.modules.store.entity.dos.Store;
 import cn.lili.modules.store.entity.dos.StoreDetail;
 import cn.lili.modules.store.entity.dto.*;
@@ -41,11 +45,14 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -75,11 +82,14 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
     @Autowired
     private FileMapper fileMapper;
 
-
     @Autowired
     private Cache cache;
 
-
+    /**
+     * 商品统计
+     */
+    @Autowired
+    private StoreFlowStatisticsService storeFlowStatisticsService;
 
     /**
      * 通过商品分类id获取店铺
@@ -125,7 +135,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         if (StringUtils.isNotEmpty(storeSearchParams.getStoreDisable())) {
             wrapper.eq("store_disable", storeSearchParams.getStoreDisable());
         } else {
-            wrapper.eq("store_disable", StoreStatusEnum.OPEN.name()).or().eq("store_disable", StoreStatusEnum.CLOSED.name());
+            wrapper.eq("store_disable", StoreStatusEnum.OPEN.name());
         }
         return this.baseMapper.getStoreList(PageUtil.initPage(page), wrapper);
     }
@@ -136,15 +146,24 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
         // 查询服务商
         QueryWrapper<StoreVO> wrapper = storeSearchParams.queryWrapper();
-        AdminUser admin = adminUserService.findByMobile(currentUser.getMember().getMobile());
-        if (ObjectUtils.isNotEmpty(admin)) {
-            Department dept = departmentService.getById(admin.getDepartmentId());
-            wrapper.apply("FIND_IN_SET(" + dept.getAreaCode() + ",store_address_id_path)");
-            wrapper.or().eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
-        }else {
-            wrapper.eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
+        if (currentUser.getMember() != null) {
+            AdminUser admin = adminUserService.findByMobile(currentUser.getMember().getMobile());
+            if (ObjectUtils.isNotEmpty(admin)) {
+                Department dept = departmentService.getById(admin.getDepartmentId());
+                wrapper.apply("FIND_IN_SET(" + dept.getAreaCode() + ",store_address_id_path)");
+                wrapper.or().eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
+            }else {
+                wrapper.eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
+            }
         }
+
         //wrapper.orderByAsc(" field(state,1,4,2,3)");
+        //用户名查询
+        wrapper.like(CharSequenceUtil.isNotBlank(storeSearchParams.getMemberName()), "member_name", storeSearchParams.getMemberName());
+        //店铺名查询
+        wrapper.like(CharSequenceUtil.isNotBlank(storeSearchParams.getStoreName()), "store_name", storeSearchParams.getStoreName());
+        //店铺状态
+        wrapper.like(CharSequenceUtil.isNotBlank(storeSearchParams.getStoreDisable()), "store_disable", storeSearchParams.getStoreDisable());
         wrapper.orderByAsc("field(store_disable,'APPLYING','REFUSED','OPEN')");
 
         return this.baseMapper.getStoreList(PageUtil.initPage(page), wrapper);
@@ -483,6 +502,17 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
     @Override
     public void updateStoreCollectionNum(CollectionDTO collectionDTO) {
         baseMapper.updateCollection(collectionDTO.getId(), collectionDTO.getNum());
+    }
+
+    @Override
+    public List<StoreStatisticsDataVO> getStoreStatisticsTop(StatisticsQueryParam statisticsQueryParam) {
+        QueryWrapper queryWrapper = Wrappers.query();
+
+        Date[] dates = StatisticsDateUtil.getDateArray(statisticsQueryParam);
+        Date startTime = dates[0], endTime = dates[1];
+        queryWrapper.between("create_time", startTime, endTime);
+
+        return storeFlowStatisticsService.getStoreNickNumTopData(null, queryWrapper);
     }
 
     /**

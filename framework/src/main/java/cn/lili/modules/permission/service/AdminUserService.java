@@ -39,11 +39,32 @@ public interface AdminUserService extends IService<AdminUser> {
     ServiceRegionVO getRegion(String areaId);
 
     /**
+     * 根据区域id获取区域列表以及上级区域列表
+     * @param areaId
+     * @return
+     */
+    ServiceRegionVO getCityPath(String areaId);
+
+    /**
      * 检测区域是否被签约
      * @param areaId
      * @return
      */
     Boolean checkAreaHavSign(String areaId);
+
+    /**
+     * 检测区域是否被签约
+     * @param areaId
+     * @return
+     */
+    ServiceRegionVO checksAreaHavSign(String areaId);
+
+    /**
+     * 检测上级区域是否被签约
+     * @param areaId
+     * @return
+     */
+    ServiceRegionVO checkpAreaHavSign(String areaId);
 
     /**
      * 服务商业绩

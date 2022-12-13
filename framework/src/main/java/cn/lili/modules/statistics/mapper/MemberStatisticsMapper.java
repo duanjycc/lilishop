@@ -27,6 +27,14 @@ public interface MemberStatisticsMapper extends BaseMapper<MemberStatisticsData>
     @Select("SELECT  COUNT(0)  FROM li_member  ${ew.customSqlSegment}")
     long customSqlQuery(@Param(Constants.WRAPPER) Wrapper queryWrapper);
 
+    /**
+     * 获取SSD统计数量
+     *
+     * @param queryWrapper 查询条件
+     * @return SSD统计数量
+     */
+    @Select("SELECT  sum(ssd)  FROM li_member  ${ew.customSqlSegment}")
+    long customSsdSqlQuery(@Param(Constants.WRAPPER) Wrapper queryWrapper);
 
     /**
      * 获取会员分布列表

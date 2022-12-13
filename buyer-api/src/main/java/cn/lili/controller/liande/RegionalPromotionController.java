@@ -5,7 +5,11 @@ import cn.lili.common.vo.PageVO;
 import cn.lili.common.vo.ResultMessage;
 import cn.lili.modules.liande.entity.dos.RegionalPromotion;
 import cn.lili.modules.liande.entity.dto.RegionalPromotionDTO;
+import cn.lili.modules.liande.entity.dto.ServiceProviderParams;
+import cn.lili.modules.liande.entity.vo.ServiceProviderParamsVO;
 import cn.lili.modules.liande.service.IRegionalPromotionService;
+import cn.lili.modules.permission.service.AdminUserService;
+import cn.lili.mybatis.util.PageUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class RegionalPromotionController {
     @Autowired
     private IRegionalPromotionService regionalPromotionService;
+
+    @Autowired
+    private AdminUserService userService;
 
     @ApiOperation(value = "区域推广员列表")
     @GetMapping("/listOfPromoters")
@@ -45,4 +52,14 @@ public class RegionalPromotionController {
     public ResultMessage<Object> deleteOfPromoters(RegionalPromotionDTO regionalPromotionDTO) {
         return regionalPromotionService.deleteOfPromoters(regionalPromotionDTO);
     }
+
+    @ApiOperation(value = "区域代理")
+    @GetMapping("/serviceProvider")
+    public ResultMessage<IPage<ServiceProviderParamsVO>> queryServiceProvider(ServiceProviderParams params,
+                                                                              PageVO pageVo) {
+        IPage<ServiceProviderParamsVO> page = userService.queryServiceProvider(PageUtil.initPage(pageVo), params);
+        return ResultUtil.data(page);
+    }
+
+
 }

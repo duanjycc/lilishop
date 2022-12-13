@@ -7,6 +7,8 @@ import cn.lili.common.vo.PageVO;
 import cn.lili.common.vo.ResultMessage;
 import cn.lili.modules.goods.entity.vos.StoreGoodsLabelVO;
 import cn.lili.modules.goods.service.StoreGoodsLabelService;
+import cn.lili.modules.statistics.entity.dto.StatisticsQueryParam;
+import cn.lili.modules.statistics.entity.vo.StoreStatisticsDataVO;
 import cn.lili.modules.store.entity.dto.*;
 import cn.lili.modules.store.entity.vos.*;
 import cn.lili.modules.store.service.StoreDetailService;
@@ -143,5 +145,11 @@ public class StoreBuyerController {
     @GetMapping(value = "/apply")
     public ResultMessage<StoreDetailVO> apply() {
         return ResultUtil.data(storeDetailService.getStoreDetailVOByMemberId(UserContext.getCurrentUser().getId()));
+    }
+
+    @ApiOperation(value = " 商家前十的")
+    @GetMapping(value = "/getStoreStatisticsTop")
+    public ResultMessage<List<StoreStatisticsDataVO>> getStoreStatisticsTop(StatisticsQueryParam statisticsQueryParam) {
+        return ResultUtil.data(storeService.getStoreStatisticsTop(statisticsQueryParam));
     }
 }

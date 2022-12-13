@@ -5,6 +5,7 @@ import cn.lili.cache.Cache;
 import cn.lili.common.utils.HttpClientUtils;
 import cn.lili.common.utils.SnowFlake;
 import cn.lili.modules.system.entity.dos.Region;
+import cn.lili.modules.system.entity.vo.CityVo;
 import cn.lili.modules.system.entity.vo.RegionVO;
 import cn.lili.modules.system.mapper.RegionMapper;
 import cn.lili.modules.system.service.RegionService;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 行政地区业务层实现
@@ -133,6 +135,14 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
         return regionTree(this.list(lambdaQueryWrapper));
     }
 
+    @Override
+    public List<RegionVO> getRegionCity() {
+        LambdaQueryWrapper<Region> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        //查询所有省市
+        lambdaQueryWrapper.in(Region::getLevel, "city", "province");
+        return regionTree(this.list(lambdaQueryWrapper));
+    }
+
     private List<RegionVO> regionTree(List<Region> regions) {
 
         List<RegionVO> regionVOS = new ArrayList<>();
@@ -149,6 +159,42 @@ public class RegionServiceImpl extends ServiceImpl<RegionMapper, Region> impleme
                 for ( RegionVO regionVO : region.getChildren()){
                     if (regionVO.getId().equals(item.getParentId())) {
                         regionVO.getChildren().add(new RegionVO(item));
+                    }
+                }
+
+            }
+        });
+        return regionVOS;
+    }
+
+    @Override
+    public List<CityVo> getAllCity2() {
+        LambdaQueryWrapper<Region> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        //查询所有省市
+        lambdaQueryWrapper.in(Region::getLevel, "city", "province","district");
+        return regionTree2(this.list(lambdaQueryWrapper));
+    }
+
+    private List<CityVo> regionTree2(List<Region> regions) {
+
+        List<CityVo> regionVOS = regions.stream().filter(region -> ("province").equals(region.getLevel())).map(item ->
+                {
+                    return new CityVo(item.getId(), item.getName());
+                }).collect(Collectors.toList());
+
+        regions.stream().filter(region -> ("city").equals(region.getLevel())).forEach(item -> {
+            for (CityVo cityVo : regionVOS) {
+                if (cityVo.getValue().equals(item.getParentId())) {
+                    cityVo.getChildren().add(new CityVo(item.getId(), item.getName()));
+                }
+            }
+        });
+
+        regions.stream().filter(region ->("district").equals(region.getLevel())).forEach(item ->{
+            for (CityVo cityVoProvince : regionVOS) {
+                for ( CityVo cityVo : cityVoProvince.getChildren()){
+                    if (cityVo.getValue().equals(item.getParentId())) {
+                        cityVo.getChildren().add(new CityVo(item.getId(), item.getName()));
                     }
                 }
 

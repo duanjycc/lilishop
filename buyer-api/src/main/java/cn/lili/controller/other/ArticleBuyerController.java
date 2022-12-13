@@ -56,6 +56,12 @@ public class ArticleBuyerController {
         return ResultUtil.data(articleService.articlePage(articleSearchParams));
     }
 
+    @ApiOperation(value = "联德新闻获取")
+    @GetMapping(value = "/getNewList")
+    public ResultMessage<IPage<ArticleVO>> getNewList(ArticleSearchParams articleSearchParams) {
+        return ResultUtil.data(articleService.articleList(articleSearchParams));
+    }
+
     @ApiOperation(value = "通过id获取文章")
     @ApiImplicitParam(name = "id", value = "文章ID", required = true, paramType = "path")
     @GetMapping(value = "/get/{id}")

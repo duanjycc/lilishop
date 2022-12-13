@@ -2,6 +2,7 @@ package cn.lili.modules.statistics.serviceimpl;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateTime;
+import cn.lili.common.security.AuthUser;
 import cn.lili.common.security.context.UserContext;
 import cn.lili.common.security.enums.UserEnums;
 import cn.lili.common.utils.BeanUtil;
@@ -120,13 +121,16 @@ public class IndexStatisticsServiceImpl implements IndexStatisticsService {
     @Override
     public IndexStatisticsVO indexStatistics() {
 
+        AuthUser currentUser = UserContext.getCurrentUser();
         //首页统计内容
         IndexStatisticsVO indexStatisticsVO = new IndexStatisticsVO();
-
+        indexStatisticsVO.setIsSuper(currentUser.getIsSuper());
         //获取总订单数量
         indexStatisticsVO.setOrderNum(orderStatisticsService.orderNum(null));
         //获取总会员数量
         indexStatisticsVO.setMemberNum(memberStatisticsService.getMemberCount());
+        //获取全国SSD数量
+        indexStatisticsVO.setSsdAllNum(memberStatisticsService.getSSDCount());
         //获取总上架商品数量
         indexStatisticsVO.setGoodsNum(goodsStatisticsService.goodsNum(GoodsStatusEnum.UPPER, GoodsAuthEnum.PASS));
         //获取总店铺数量
@@ -250,6 +254,31 @@ public class IndexStatisticsServiceImpl implements IndexStatisticsService {
         return storeFlowStatisticsService.getStoreStatisticsData(page, queryWrapper);
     }
 
+    @Override
+    public List<StoreStatisticsDataVO> getStoreStatisticsTop(StatisticsQueryParam statisticsQueryParam) {
+
+        QueryWrapper queryWrapper = Wrappers.query();
+
+        Date[] dates = StatisticsDateUtil.getDateArray(statisticsQueryParam);
+        Date startTime = dates[0], endTime = dates[1];
+
+        queryWrapper.orderByDesc("price");
+
+        queryWrapper.groupBy("mer_id,mer_name,phone ");
+
+        //查询前十条记录
+        Page page = new Page<StoreStatisticsDataVO>(1, 200);
+
+        return storeFlowStatisticsService.getStoreStatisticsTopData(page, queryWrapper);
+    }
+
+    @Override
+    public List<StoreStatisticsDataVO> getAreasSsdStatistics(StatisticsQueryParam statisticsQueryParam) {
+
+        QueryWrapper queryWrapper = Wrappers.query();
+
+        return storeFlowStatisticsService.getStorePathStatisticsSsdData(null, queryWrapper);
+    }
 
     /**
      * 获取当月查询参数

@@ -20,6 +20,8 @@ public class IndexStatisticsVO {
     private Long memberNum;
     @ApiModelProperty(value = "店铺总数量")
     private Long storeNum;
+    @ApiModelProperty(value = "SSD总数量")
+    private Long ssdAllNum;
 
     /**
      * 流量概括
@@ -50,4 +52,6 @@ public class IndexStatisticsVO {
     private Long todayMemberEvaluation;
     @ApiModelProperty(value = "当前在线人数")
     private Long currentNumberPeopleOnline;
+    @ApiModelProperty(value = "当前用户角色")
+    private Boolean isSuper;
 }

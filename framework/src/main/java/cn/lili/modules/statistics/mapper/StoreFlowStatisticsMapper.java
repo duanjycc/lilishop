@@ -4,6 +4,7 @@ import cn.lili.modules.order.order.entity.dos.StoreFlow;
 import cn.lili.modules.statistics.entity.vo.CategoryStatisticsDataVO;
 import cn.lili.modules.statistics.entity.vo.GoodsStatisticsDataVO;
 import cn.lili.modules.statistics.entity.vo.StoreStatisticsDataVO;
+import cn.lili.modules.statistics.entity.vo.WssdHisDataVO;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -51,5 +52,49 @@ public interface StoreFlowStatisticsMapper extends BaseMapper<StoreFlow> {
      */
     @Select("SELECT store_id AS storeId,store_name AS storeName,SUM(final_price) AS price,SUM(num) AS num FROM li_store_flow ${ew.customSqlSegment}")
     List<StoreStatisticsDataVO> getStoreStatisticsData(IPage<GoodsStatisticsDataVO> page, @Param(Constants.WRAPPER) Wrapper<GoodsStatisticsDataVO> queryWrapper);
+
+    /**
+     * 店铺消费金额统计列表
+     *
+     * @param page         分页
+     * @param queryWrapper 查询参数
+     * @return 店铺统计列表
+     */
+    @Select("SELECT mer_id as store_id ,mer_name AS storeName,username as phone,SUM(surrender_price) AS price,SUM(monetary) AS num FROM w_make_account where DATE_FORMAT(create_time,'%Y-%m-%d')=curdate() ${ew.customSqlSegment}")
+    List<StoreStatisticsDataVO> getStoreStatisticsTopData(IPage<StoreStatisticsDataVO> page, @Param(Constants.WRAPPER) Wrapper<StoreStatisticsDataVO> queryWrapper);
+
+    /**
+     * 店铺消费会员统计列表
+     *
+     * @param page         分页
+     * @param queryWrapper 查询参数
+     * @return 店铺统计列表
+     */
+    @Select("SELECT mer_id as store_id ,mer_name AS storeName,count(DISTINCT vip_phone) AS nickNum FROM w_make_account GROUP BY mer_id,mer_name ORDER BY nickNum desc limit 0, 10")
+    List<StoreStatisticsDataVO> getStoreNickNumTopData(IPage<StoreStatisticsDataVO> page, @Param(Constants.WRAPPER) Wrapper<StoreStatisticsDataVO> queryWrapper);
+
+    /**
+     * 近期价格走势
+     *
+     * @param page         分页
+     * @param queryWrapper 查询参数
+     * @return 近期价格列表
+     */
+    @Select("SELECT date_id as dateId ,numerical_alue AS numericalAlue,create_time as createTime FROM w_ssd_his ${ew.customSqlSegment}")
+    List<WssdHisDataVO> getSsdPriceTopData(IPage<WssdHisDataVO> page, @Param(Constants.WRAPPER) Wrapper<StoreStatisticsDataVO> queryWrapper);
+
+    /**
+     * 全国各省份SSD统计列表
+     *
+     * @param page         分页
+     * @param queryWrapper 查询参数
+     * @return 店铺统计列表
+     */
+    @Select("SELECT po1.price AS areaPrice, lr. NAME AS areaName FROM " +
+            "(SELECT sum(wm.surrender_price) price, LEFT (ls.store_address_id_path, 19 ) pathId FROM w_make_account wm " +
+            "INNER JOIN li_store ls ON ls.id = wm.mer_id AND ls.store_disable = 'OPEN' GROUP BY LEFT (ls.store_address_id_path, 19)) po1 " +
+            "LEFT JOIN li_region lr ON po1.pathId = lr.id ORDER BY areaPrice DESC "
+    )
+    List<StoreStatisticsDataVO> getStorePathStatisticsSsdData(IPage<StoreStatisticsDataVO> page, @Param(Constants.WRAPPER) Wrapper<StoreStatisticsDataVO> queryWrapper);
 
 }

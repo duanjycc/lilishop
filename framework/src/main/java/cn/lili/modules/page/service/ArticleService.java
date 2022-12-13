@@ -36,6 +36,14 @@ public interface ArticleService extends IService<Article> {
     IPage<ArticleVO> articlePage(ArticleSearchParams articleSearchParams);
 
     /**
+     * 获取联德新闻文章分页
+     *
+     * @param articleSearchParams 文章搜索条件
+     * @return 文章分页
+     */
+    IPage<ArticleVO> articleList(ArticleSearchParams articleSearchParams);
+
+    /**
      * 获取文章分页
      *
      * @param categoryId 文章分类ID
@@ -75,7 +83,6 @@ public interface ArticleService extends IService<Article> {
      * @param type
      * @return 文章
      */
-    @Cacheable(key = "#type")
     Article customGetByType(String type);
 
     /**

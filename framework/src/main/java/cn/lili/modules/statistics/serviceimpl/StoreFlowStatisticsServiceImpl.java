@@ -9,10 +9,7 @@ import cn.lili.modules.order.order.entity.enums.FlowTypeEnum;
 import cn.lili.modules.statistics.entity.dto.GoodsStatisticsQueryParam;
 import cn.lili.modules.statistics.entity.dto.StatisticsQueryParam;
 import cn.lili.modules.statistics.entity.enums.StatisticsQuery;
-import cn.lili.modules.statistics.entity.vo.CategoryStatisticsDataVO;
-import cn.lili.modules.statistics.entity.vo.GoodsStatisticsDataVO;
-import cn.lili.modules.statistics.entity.vo.OrderOverviewVO;
-import cn.lili.modules.statistics.entity.vo.StoreStatisticsDataVO;
+import cn.lili.modules.statistics.entity.vo.*;
 import cn.lili.modules.statistics.mapper.StoreFlowStatisticsMapper;
 import cn.lili.modules.statistics.service.OrderStatisticsService;
 import cn.lili.modules.statistics.service.StoreFlowStatisticsService;
@@ -66,6 +63,26 @@ public class StoreFlowStatisticsServiceImpl extends ServiceImpl<StoreFlowStatist
     @Override
     public List<StoreStatisticsDataVO> getStoreStatisticsData(Page page, QueryWrapper queryWrapper) {
         return this.baseMapper.getStoreStatisticsData(page, queryWrapper);
+    }
+
+    @Override
+    public List<StoreStatisticsDataVO> getStoreStatisticsTopData(Page page, QueryWrapper queryWrapper) {
+        return this.baseMapper.getStoreStatisticsTopData(page, queryWrapper);
+    }
+
+    @Override
+    public List<StoreStatisticsDataVO> getStoreNickNumTopData(Page page, QueryWrapper queryWrapper) {
+        return this.baseMapper.getStoreNickNumTopData(page, queryWrapper);
+    }
+
+    @Override
+    public List<StoreStatisticsDataVO> getStorePathStatisticsSsdData(Page page, QueryWrapper queryWrapper) {
+        return this.baseMapper.getStorePathStatisticsSsdData(page, queryWrapper);
+    }
+
+    @Override
+    public List<WssdHisDataVO> getSsdPriceTopData(Page page, QueryWrapper queryWrapper) {
+        return this.baseMapper.getSsdPriceTopData(page, queryWrapper);
     }
 
     @Override

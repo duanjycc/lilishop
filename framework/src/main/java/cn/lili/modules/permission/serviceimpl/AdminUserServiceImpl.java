@@ -116,6 +116,65 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
     }
 
     /**
+     * 检测区域是否被签约
+     *
+     * @param areaId
+     * @return
+     */
+    @Override
+    public ServiceRegionVO checksAreaHavSign(String areaId) {
+        Department dept = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getAreaCode,areaId));
+        if (ObjectUtils.isNotEmpty(dept)) {
+            return null;
+        }
+
+        Region region = regionMapper.selectById(areaId);
+        if (ObjectUtils.isNotEmpty(region)){
+            region.setPath(region.getPath()+","+ region.getId());
+        }
+        return new ServiceRegionVO(region.getPath().split(","),null,null,null);
+    }
+
+    /**
+     * 检测区域是否被签约
+     *
+     * @param areaId
+     * @return
+     */
+    @Override
+    public ServiceRegionVO getCityPath(String areaId) {
+
+        if (StringUtils.isEmpty(areaId)) {
+            return null;
+        }
+        Region region = regionMapper.selectById(areaId);
+        if (ObjectUtils.isNotEmpty(region)){
+            region.setPath(region.getPath()+","+ region.getId());
+        }
+        return new ServiceRegionVO(region.getPath().split(","),null,null,null);
+    }
+
+    /**
+     * 检测上级区域是否被签约
+     *
+     * @param areaId
+     * @return
+     */
+    @Override
+    public ServiceRegionVO checkpAreaHavSign(String areaId) {
+        Department dept = departmentService.getOne(new QueryWrapper<Department>().lambda().eq(Department::getAreaCode,areaId));
+        if (ObjectUtils.isEmpty(dept)) {
+            return null;
+        }
+
+        Region region = regionMapper.selectById(areaId);
+        if (ObjectUtils.isNotEmpty(region)){
+            region.setPath(region.getPath()+","+ region.getId());
+        }
+        return new ServiceRegionVO(null,region.getPath().split(","),null,null);
+    }
+
+    /**
      * 服务商业绩
      *
      * @param mobile

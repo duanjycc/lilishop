@@ -60,10 +60,17 @@ public class IndexStatisticsManagerController {
         return ResultUtil.data(indexStatisticsService.goodsStatistics(goodsStatisticsQueryParam));
     }
 
+    @ApiOperation(value = "获取首页查询各省份的SSD")
+    @GetMapping("/areasSsdStatistics")
+    public ResultMessage<List<StoreStatisticsDataVO>> areasSsdStatistics(StatisticsQueryParam statisticsQueryParam) {
+
+        return ResultUtil.data(indexStatisticsService.getAreasSsdStatistics(statisticsQueryParam));
+    }
+
     @ApiOperation(value = "获取首页查询热卖店铺TOP10")
     @GetMapping("/storeStatistics")
     public ResultMessage<List<StoreStatisticsDataVO>> storeStatistics(StatisticsQueryParam statisticsQueryParam) {
-        return ResultUtil.data(indexStatisticsService.storeStatistics(statisticsQueryParam));
+        return ResultUtil.data(indexStatisticsService.getStoreStatisticsTop(statisticsQueryParam));
     }
 
     @ApiOperation(value = "通知提示信息")

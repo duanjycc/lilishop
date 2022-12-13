@@ -9,6 +9,8 @@ import cn.lili.modules.liande.entity.dto.SignInDTO;
 import cn.lili.modules.liande.entity.dto.StoreAchievementParams;
 import cn.lili.modules.liande.entity.vo.*;
 import cn.lili.modules.permission.service.AdminUserService;
+import cn.lili.modules.system.entity.vo.RegionVO;
+import cn.lili.modules.system.service.RegionService;
 import cn.lili.mybatis.util.PageUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  *
@@ -32,6 +35,8 @@ public class ServiceProviderController {
     @Autowired
     private AdminUserService userService;
 
+    @Autowired
+    private RegionService regionService;
 
     @ApiOperation(value = "查询服务商信息")
     @GetMapping(value = "/achievement/{mobile}")
@@ -51,10 +56,28 @@ public class ServiceProviderController {
         return ResultUtil.data(userService.getRegion(areaId));
     }
 
+    @ApiOperation(value = "根据区域id获取区域列表以及上级区域列表")
+    @GetMapping(value = "/regionCity/{areaId}")
+    public ResultMessage<ServiceRegionVO> getCityPath(@PathVariable String areaId) {
+        return ResultUtil.data(userService.getCityPath(areaId));
+    }
+
     @ApiOperation(value = "检测区域是否被签约")
     @GetMapping(value = "/check/{areaId}")
     public ResultMessage<Object> checkAreaHavSign(@PathVariable String areaId) {
         return ResultUtil.data(userService.checkAreaHavSign(areaId));
+    }
+
+    @ApiOperation(value = "检测区域是否被签约")
+    @GetMapping(value = "/checks/{areaId}")
+    public ResultMessage<Object> checksAreaHavSign(@PathVariable String areaId) {
+        return ResultUtil.data(userService.checksAreaHavSign(areaId));
+    }
+
+    @ApiOperation(value = "检测上级区域是否被签约")
+    @GetMapping(value = "/checkp/{areaId}")
+    public ResultMessage<Object> checkpAreaHavSign(@PathVariable String areaId) {
+        return ResultUtil.data(userService.checkpAreaHavSign(areaId));
     }
 
     @ApiOperation(value = "查询服务商业绩")
@@ -93,5 +116,11 @@ public class ServiceProviderController {
     public ResultMessage<Object> deleteSignIn(@PathVariable String id) {
         userService.deleteSignIn(id);
         return ResultUtil.success();
+    }
+
+    @GetMapping(value = "/regionCity")
+    @ApiOperation(value = "获取所有的省-市")
+    public ResultMessage<List<RegionVO>> getRegionCity() {
+        return ResultUtil.data(regionService.getRegionCity());
     }
 }

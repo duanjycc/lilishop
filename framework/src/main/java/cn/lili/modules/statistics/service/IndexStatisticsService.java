@@ -51,5 +51,20 @@ public interface IndexStatisticsService {
      */
     List<StoreStatisticsDataVO> storeStatistics(StatisticsQueryParam statisticsQueryParam);
 
+    /**
+     * 查询热卖店铺TOP10
+     * @param statisticsQueryParam 统计查询参数
+     *
+     * @return 当月的热卖店铺TOP10
+     */
+    List<StoreStatisticsDataVO> getStoreStatisticsTop(StatisticsQueryParam statisticsQueryParam);
+
+    /**
+     * 查询各省份的SSD
+     * @param statisticsQueryParam 统计查询参数
+     *
+     * @return
+     */
+    List<StoreStatisticsDataVO> getAreasSsdStatistics(StatisticsQueryParam statisticsQueryParam);
 
 }

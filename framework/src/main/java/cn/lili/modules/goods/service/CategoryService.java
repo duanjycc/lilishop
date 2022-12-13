@@ -4,6 +4,7 @@ package cn.lili.modules.goods.service;
 import cn.lili.modules.goods.entity.dos.Category;
 import cn.lili.modules.goods.entity.vos.CategoryVO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
 
@@ -61,6 +62,7 @@ public interface CategoryService extends IService<Category> {
      *
      * @return 所有的分类，父子关系
      */
+    @Cacheable(key = "'CATEGORY_FIRST'")
     List<Category> getFirstList();
 
     /**

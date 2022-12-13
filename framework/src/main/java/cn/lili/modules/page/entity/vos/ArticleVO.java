@@ -26,4 +26,10 @@ public class ArticleVO {
 
     @ApiModelProperty(value = "开启状态")
     private Boolean openStatus;
+
+    @ApiModelProperty(value = "标题图像")
+    private String url;
+
+    @ApiModelProperty(value = "创建日期")
+    private String createTime;
 }

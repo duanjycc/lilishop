@@ -145,6 +145,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         IPage<MemberProfitVO> storeMemberV2 = null;
         QueryWrapper<MemberProfitVO> wrapper = new QueryWrapper<>();
         if(StringUtils.isNotEmpty(currentUser.getMember().getStoreId())){
+            wrapper.notInSql("mobile","18606519031");
+            wrapper.notInSql("mobile","18888888888");
             wrapper.apply("w.mer_id = "+ currentUser.getMember().getStoreId());
             wrapper.like(StringUtils.isNotEmpty(mobile),"m.mobile",mobile);
             storeMemberV2 = baseMapper.getStoreMemberV2(PageUtil.initPage(page), wrapper);
@@ -162,7 +164,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
 
         QueryWrapper<MemberProfitVO> wrapper = new QueryWrapper<>();
-
+        wrapper.notInSql("mobile","18606519031");
+        wrapper.notInSql("mobile","18888888888");
         wrapper.apply(StringUtils.isNotEmpty(currentUser.getMember().getStoreId()),"w.mer_id = "+ currentUser.getMember().getStoreId());
         List<MemberProfitVO> tops = baseMapper.getStoreMemberTopV2(wrapper);
         Double sumProfit = tops.stream().map(e -> e.getPoint()).reduce(Double::sum).get();
@@ -472,14 +475,12 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             throw new ServiceException(ResultCode.USER_NOT_LOGIN);
         }
         Member member = this.getById(tokenUser.getId());
-
-        if (StringUtils.isNotEmpty(oldPassword)) {
-            //判断旧密码输入是否正确
+        //判断旧密码输入是否正确
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(oldPassword)) {
             if (!new BCryptPasswordEncoder().matches(oldPassword, member.getPassword())) {
                 throw new ServiceException(ResultCode.USER_OLD_PASSWORD_ERROR);
             }
         }
-
         //修改会员密码
         LambdaUpdateWrapper<Member> lambdaUpdateWrapper = Wrappers.lambdaUpdate();
         lambdaUpdateWrapper.eq(Member::getId, member.getId());
@@ -682,7 +683,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         queryWrapper.eq(CharSequenceUtil.isNotBlank(memberSearchVO.getDisabled()), "disabled",
                 memberSearchVO.getDisabled().equals(SwitchEnum.OPEN.name()) ? 1 : 0);
         queryWrapper.notInSql("mobile","18606519031");
-        queryWrapper.orderByDesc("create_time");
+        queryWrapper.notInSql("mobile","18888888888");
+        queryWrapper.orderByDesc("ssd");
         return this.baseMapper.pageByMemberVO(PageUtil.initPage(page), queryWrapper);
     }
 

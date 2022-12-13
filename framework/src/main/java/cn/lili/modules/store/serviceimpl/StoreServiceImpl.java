@@ -135,7 +135,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         if (StringUtils.isNotEmpty(storeSearchParams.getStoreDisable())) {
             wrapper.eq("store_disable", storeSearchParams.getStoreDisable());
         } else {
-            wrapper.eq("store_disable", StoreStatusEnum.OPEN.name()).or().eq("store_disable", StoreStatusEnum.CLOSED.name());
+            wrapper.eq("store_disable", StoreStatusEnum.OPEN.name());
         }
         return this.baseMapper.getStoreList(PageUtil.initPage(page), wrapper);
     }

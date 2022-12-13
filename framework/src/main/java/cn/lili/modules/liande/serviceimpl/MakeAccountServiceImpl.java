@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -264,10 +265,10 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
                     QueryWrapper<RegionalPromotion> regionalWrapper = new QueryWrapper();
                     regionalWrapper.eq("user_name", st.getInvitationPhone());
                     regionalWrapper.eq("area_code",addressId);
-                    RegionalPromotion r=regionalPromotionMapper.selectOne(regionalWrapper);
-                    if(r!=null){
+                    List<RegionalPromotion> r=regionalPromotionMapper.selectList(regionalWrapper);
+                    if(r!=null && r.size() > 0){
                         //分配邀请人收益
-                        yqr=  ((double)r.getIncomeComparison()/100.00);
+                        yqr=  ((double)r.get(0).getIncomeComparison()/100.00);
                         QueryWrapper<Member> shqqrWrapper = new QueryWrapper();
                         shqqrWrapper.eq("username", st.getInvitationPhone());
                         Member spyqr = memberMapper.selectOne(shqqrWrapper);

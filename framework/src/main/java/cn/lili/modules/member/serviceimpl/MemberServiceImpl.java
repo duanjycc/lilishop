@@ -147,6 +147,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         if(StringUtils.isNotEmpty(currentUser.getMember().getStoreId())){
             wrapper.notInSql("mobile","18606519031");
             wrapper.notInSql("mobile","18888888888");
+            wrapper.notInSql("mobile","15306594570");
             wrapper.apply("w.mer_id = "+ currentUser.getMember().getStoreId());
             wrapper.like(StringUtils.isNotEmpty(mobile),"m.mobile",mobile);
             storeMemberV2 = baseMapper.getStoreMemberV2(PageUtil.initPage(page), wrapper);
@@ -166,6 +167,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         QueryWrapper<MemberProfitVO> wrapper = new QueryWrapper<>();
         wrapper.notInSql("mobile","18606519031");
         wrapper.notInSql("mobile","18888888888");
+        wrapper.notInSql("mobile","15306594570");
         wrapper.apply(StringUtils.isNotEmpty(currentUser.getMember().getStoreId()),"w.mer_id = "+ currentUser.getMember().getStoreId());
         List<MemberProfitVO> tops = baseMapper.getStoreMemberTopV2(wrapper);
         Double sumProfit = tops.stream().map(e -> e.getPoint()).reduce(Double::sum).get();
@@ -375,6 +377,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         if (Boolean.TRUE.equals(member.getHaveStore())) {
             Store store = storeService.getById(member.getStoreId());
             if (!store.getStoreDisable().equals(StoreStatusEnum.OPEN.name())) {
+            //|| !"1".equals(store.getStoreSale())) {
                 throw new ServiceException(ResultCode.STORE_CLOSE_ERROR);
             }
         } else {
@@ -684,6 +687,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
                 memberSearchVO.getDisabled().equals(SwitchEnum.OPEN.name()) ? 1 : 0);
         queryWrapper.notInSql("mobile","18606519031");
         queryWrapper.notInSql("mobile","18888888888");
+        queryWrapper.notInSql("mobile","15306594570");
         queryWrapper.orderByDesc("ssd");
         return this.baseMapper.pageByMemberVO(PageUtil.initPage(page), queryWrapper);
     }
@@ -892,7 +896,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     public void logout(UserEnums userEnums) {
         AuthUser currentUser = UserContext.getCurrentUser();
         if (ObjectUtils.isNotEmpty(currentUser)) {
-            String mobile = UserContext.getCurrentUser().getMember().getMobile();
+            String mobile = UserContext.getCurrentUser().getUsername();
             String key = CachePrefix.ACCESS_TOKEN.getPrefix(userEnums) + ":" + mobile;
             String jwt = (String) cache.get(key);
             if (CharSequenceUtil.isNotEmpty(mobile) && StringUtils.isNotEmpty(jwt)) {

@@ -2,6 +2,7 @@ package cn.lili.modules.goods.serviceimpl;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -14,13 +15,8 @@ import cn.lili.common.exception.ServiceException;
 import cn.lili.common.properties.RocketmqCustomProperties;
 import cn.lili.common.security.context.UserContext;
 import cn.lili.common.utils.SnowFlake;
-import cn.lili.modules.goods.entity.dos.Goods;
-import cn.lili.modules.goods.entity.dos.GoodsGallery;
-import cn.lili.modules.goods.entity.dos.GoodsSku;
-import cn.lili.modules.goods.entity.dto.GoodsOperationDTO;
-import cn.lili.modules.goods.entity.dto.GoodsSearchParams;
-import cn.lili.modules.goods.entity.dto.GoodsSkuDTO;
-import cn.lili.modules.goods.entity.dto.GoodsSkuStockDTO;
+import cn.lili.modules.goods.entity.dos.*;
+import cn.lili.modules.goods.entity.dto.*;
 import cn.lili.modules.goods.entity.enums.GoodsAuthEnum;
 import cn.lili.modules.goods.entity.enums.GoodsStatusEnum;
 import cn.lili.modules.goods.entity.vos.GoodsSkuSpecVO;
@@ -39,6 +35,7 @@ import cn.lili.modules.promotion.entity.dos.PromotionGoods;
 import cn.lili.modules.promotion.entity.dto.search.PromotionGoodsSearchParams;
 import cn.lili.modules.promotion.entity.enums.CouponGetEnum;
 import cn.lili.modules.promotion.service.PromotionGoodsService;
+import cn.lili.modules.promotion.service.PromotionService;
 import cn.lili.modules.search.entity.dos.EsGoodsIndex;
 import cn.lili.modules.search.service.EsGoodsIndexService;
 import cn.lili.modules.search.utils.EsIndexUtil;
@@ -121,6 +118,19 @@ public class GoodsSkuServiceImpl extends ServiceImpl<GoodsSkuMapper, GoodsSku> i
 
     @Autowired
     private List<SalesModelRender> salesModelRenders;
+    /**
+     * 品牌
+     */
+    @Autowired
+    private BrandService brandService;
+    /**
+     * 店铺商品分类
+     */
+    @Autowired
+    private StoreGoodsLabelService storeGoodsLabelService;
+
+    @Autowired
+    private PromotionService promotionService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -622,6 +632,62 @@ public class GoodsSkuServiceImpl extends ServiceImpl<GoodsSkuMapper, GoodsSku> i
                 .eq(GoodsSku::getMarketEnable, GoodsStatusEnum.UPPER.name());
         return this.count(queryWrapper);
     }
+
+    @Override
+    public IPage<EsGoodsIndex> getEsGoodsIndexPage(GoodsSearchParams searchParams) {
+        IPage<GoodsSku> page = this.page(PageUtil.initPage(searchParams), searchParams.queryWrapper());
+
+        IPage<EsGoodsIndex> esGoodsIndexIPage = new Page<>(page.getCurrent(), page.getSize());
+        esGoodsIndexIPage.setTotal(page.getTotal());
+        esGoodsIndexIPage.setRecords(page.getRecords().stream().map(goodsSku -> {
+            Goods goods = goodsService.getById(goodsSku.getGoodsId());
+            EsGoodsIndex goodsIndex = new EsGoodsIndex(goodsSku);
+            if (goods.getParams() != null && !goods.getParams().isEmpty()) {
+                List<GoodsParamsDTO> goodsParamDTOS = JSONUtil.toList(goods.getParams(), GoodsParamsDTO.class);
+                goodsIndex = new EsGoodsIndex(goodsSku, goodsParamDTOS);
+            }
+            goodsIndex.setAuthFlag(goods.getAuthFlag());
+            goodsIndex.setMarketEnable(goods.getMarketEnable());
+            this.settingUpGoodsIndexOtherParam(goodsIndex);
+
+            if (goodsIndex.getMobileIntro() == null) {
+                goodsIndex.setMobileIntro("");
+            }
+
+            return goodsIndex;
+        }).collect(Collectors.toList()));
+
+        return esGoodsIndexIPage;
+    }
+
+    /**
+     * 设置商品索引的其他参数（非商品自带）
+     *
+     * @param goodsIndex 商品索引信息
+     */
+    private void settingUpGoodsIndexOtherParam(EsGoodsIndex goodsIndex) {
+        List<Category> categories = categoryService.listByIdsOrderByLevel(Arrays.asList(goodsIndex.getCategoryPath().split(",")));
+        if (!categories.isEmpty()) {
+            goodsIndex.setCategoryNamePath(ArrayUtil.join(categories.stream().map(Category::getName).toArray(), ","));
+        }
+        Brand brand = brandService.getById(goodsIndex.getBrandId());
+        if (brand != null) {
+            goodsIndex.setBrandName(brand.getName());
+            goodsIndex.setBrandUrl(brand.getLogo());
+        }
+        if (goodsIndex.getStoreCategoryPath() != null && CharSequenceUtil.isNotEmpty(goodsIndex.getStoreCategoryPath())) {
+            List<StoreGoodsLabel> storeGoodsLabels = storeGoodsLabelService.listByStoreIds(Arrays.asList(goodsIndex.getStoreCategoryPath().split(",")));
+            if (!storeGoodsLabels.isEmpty()) {
+                goodsIndex.setStoreCategoryNamePath(ArrayUtil.join(storeGoodsLabels.stream().map(StoreGoodsLabel::getLabelName).toArray(), ","));
+            }
+        }
+
+        if (goodsIndex.getOriginPromotionMap() == null || goodsIndex.getOriginPromotionMap().isEmpty()) {
+            Map<String, Object> goodsCurrentPromotionMap = promotionService.getGoodsSkuPromotionMap(goodsIndex.getStoreId(), goodsIndex.getId());
+            goodsIndex.setPromotionMapJson(JSONUtil.toJsonStr(goodsCurrentPromotionMap));
+        }
+    }
+
 
     /**
      * 修改库存

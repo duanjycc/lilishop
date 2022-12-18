@@ -146,7 +146,8 @@ public class Member extends BaseEntity {
     @TableField(exist = false)
     private String serviceProvider;
 
-
+    @ApiModelProperty(value = "是否能开多家店")
+    private String doubleStore;
 
     public Member(String username, String password, String mobile) {
         this.username = username;

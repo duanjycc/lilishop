@@ -207,6 +207,12 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
                 .eq(File::getUrl, dto.getStoreLogo())
                 .eq(File::getOwnerId, currentUser.getId()));
 
+        StoreEditDTO storeEditDTO = new StoreEditDTO();
+        storeEditDTO.setStoreId(dto.getStoreId());
+        storeEditDTO.setGoodsManagementCategory(dto.getGoodsManagementCategory());
+        //修改店铺详细信息
+        updateStoreDetail(storeEditDTO);
+
         return baseMapper.updateById(store);
     }
 
@@ -226,7 +232,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
                 .eq(Store::getMemberId, currentUser.getId())
                 .eq(Store::getStoreDisable, StoreStatusEnum.APPLYING.value()));
 
-        if (ObjectUtils.isNotEmpty(memberStore)){
+        if (ObjectUtils.isNotEmpty(memberStore) && !"1".equals(currentUser.getMember().getDoubleStore())){
             throw new ServiceException(ResultCode.MEMBER_HAVE_OPEN_STORE);
         }
 

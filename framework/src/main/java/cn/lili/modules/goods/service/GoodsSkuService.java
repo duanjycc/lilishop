@@ -8,6 +8,7 @@ import cn.lili.modules.goods.entity.dto.GoodsSearchParams;
 import cn.lili.modules.goods.entity.dto.GoodsSkuDTO;
 import cn.lili.modules.goods.entity.dto.GoodsSkuStockDTO;
 import cn.lili.modules.goods.entity.vos.GoodsSkuVO;
+import cn.lili.modules.search.entity.dos.EsGoodsIndex;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -240,4 +241,6 @@ public interface GoodsSkuService extends IService<GoodsSku> {
      * @return sku总数
      */
     Long countSkuNum(String storeId);
+
+    IPage<EsGoodsIndex> getEsGoodsIndexPage(GoodsSearchParams goodsSearchParams);
 }

@@ -277,7 +277,7 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
             throw new ServiceException(ResultCode.USER_NOT_EXIST);
         }
         //判断是否拥有店铺
-        if (Boolean.TRUE.equals(member.getHaveStore())) {
+        if (Boolean.TRUE.equals(member.getHaveStore()) && !"1".equals(member.getDoubleStore())) {
             throw new ServiceException(ResultCode.STORE_APPLY_DOUBLE_ERROR);
         }
 

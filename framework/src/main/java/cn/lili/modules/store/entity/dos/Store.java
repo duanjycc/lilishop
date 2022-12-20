@@ -109,6 +109,9 @@ public class Store extends BaseEntity {
     @ApiModelProperty(value = "店铺邀请人")
     private String invitationPhone;
 
+    @ApiModelProperty(value = "是否允许开店")
+    private String storeSale;
+
     public Store(StoreSettleInDTO dto) {
         BeanUtil.copyProperties(dto, this);
         this.memberId = UserContext.getCurrentUser().getId();

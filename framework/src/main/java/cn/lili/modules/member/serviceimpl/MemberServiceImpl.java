@@ -376,8 +376,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         //对店铺状态的判定处理
         if (Boolean.TRUE.equals(member.getHaveStore())) {
             Store store = storeService.getById(member.getStoreId());
-            if (!store.getStoreDisable().equals(StoreStatusEnum.OPEN.name())) {
-            //|| !"1".equals(store.getStoreSale())) {
+            if (!store.getStoreDisable().equals(StoreStatusEnum.OPEN.name()) || !"1".equals(store.getStoreSale())) {
                 throw new ServiceException(ResultCode.STORE_CLOSE_ERROR);
             }
         } else {

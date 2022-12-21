@@ -104,8 +104,8 @@ public class GoodsSkuServiceImpl extends ServiceImpl<GoodsSkuMapper, GoodsSku> i
     /**
      * 商品索引
      */
-    @Autowired
-    private EsGoodsIndexService goodsIndexService;
+//    @Autowired
+//    private EsGoodsIndexService goodsIndexService;
 
     @Autowired
     private PromotionGoodsService promotionGoodsService;
@@ -185,7 +185,7 @@ public class GoodsSkuServiceImpl extends ServiceImpl<GoodsSkuMapper, GoodsSku> i
                 skuList.add(sku);
                 //如果商品状态值不对，则es索引移除
                 if (goods.getAuthFlag().equals(GoodsAuthEnum.PASS.name()) && goods.getMarketEnable().equals(GoodsStatusEnum.UPPER.name())) {
-                    goodsIndexService.deleteIndexById(sku.getId());
+//                    goodsIndexService.deleteIndexById(sku.getId());
                     this.clearCache(sku.getId());
                 }
             }
@@ -274,15 +274,16 @@ public class GoodsSkuServiceImpl extends ServiceImpl<GoodsSkuMapper, GoodsSku> i
         }
 
         //获取当前商品的索引信息
-        EsGoodsIndex goodsIndex = goodsIndexService.findById(skuId);
-        if (goodsIndex == null) {
-            goodsIndex = goodsIndexService.getResetEsGoodsIndex(goodsSku, goodsVO.getGoodsParamsDTOList());
-        }
+//        EsGoodsIndex goodsIndex = goodsIndexService.findById(skuId);
+//        if (goodsIndex == null) {
+//            goodsIndex = goodsIndexService.getResetEsGoodsIndex(goodsSku, goodsVO.getGoodsParamsDTOList());
+//        }
 
         //商品规格
         GoodsSkuVO goodsSkuDetail = this.getGoodsSkuVO(goodsSku);
 
-        Map<String, Object> promotionMap = goodsIndex.getPromotionMap();
+//        Map<String, Object> promotionMap = goodsIndex.getPromotionMap();
+        Map<String, Object> promotionMap = null;
         //设置当前商品的促销价格
         if (promotionMap != null && !promotionMap.isEmpty()) {
             promotionMap = promotionMap.entrySet().stream().parallel().filter(i -> {
@@ -496,7 +497,7 @@ public class GoodsSkuServiceImpl extends ServiceImpl<GoodsSkuMapper, GoodsSku> i
         GoodsSku goodsSku = getGoodsSkuByIdFromCache(skuId);
         if (goodsSku != null) {
             if (quantity <= 0) {
-                goodsIndexService.deleteIndexById(goodsSku.getId());
+//                goodsIndexService.deleteIndexById(goodsSku.getId());
             }
             goodsSku.setQuantity(quantity);
             boolean update = this.update(new LambdaUpdateWrapper<GoodsSku>().eq(GoodsSku::getId, skuId).set(GoodsSku::getQuantity, quantity));

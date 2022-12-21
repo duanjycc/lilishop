@@ -39,6 +39,7 @@ public class MemberStatisticsServiceImpl extends ServiceImpl<MemberStatisticsMap
         queryWrapper.eq("disabled", true);
         queryWrapper.notInSql("mobile","18888888888");
         queryWrapper.notInSql("mobile","18606519031");
+        queryWrapper.notInSql("mobile","15306594570");
         return this.baseMapper.customSsdSqlQuery(queryWrapper);
     }
 

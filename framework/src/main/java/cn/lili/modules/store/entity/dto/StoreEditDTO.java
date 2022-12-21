@@ -188,4 +188,6 @@ public class StoreEditDTO {
     @ApiModelProperty(value = "腾讯云智服小程序唯一标识")
     private String yzfMpSign;
 
+    @ApiModelProperty(value = "邀请人")
+    private String invitationPhone;
 }

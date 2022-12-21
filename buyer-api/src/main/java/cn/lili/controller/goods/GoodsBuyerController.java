@@ -102,6 +102,12 @@ public class GoodsBuyerController {
         return ResultUtil.data(goodsService.queryByParams(goodsSearchParams));
     }
 
+    @ApiOperation(value = "获取商品分页列表")
+    @GetMapping(value = "/skuList")
+    public ResultMessage<IPage<EsGoodsIndex>> getEsGoodsIndexPage(GoodsSearchParams goodsSearchParams) {
+        return ResultUtil.data(goodsSkuService.getEsGoodsIndexPage(goodsSearchParams));
+    }
+
     @ApiOperation(value = "从ES中获取商品信息")
     @GetMapping("/es")
     public ResultMessage<SearchPage<EsGoodsIndex>> getGoodsByPageFromEs(EsGoodsSearchDTO goodsSearchParams, PageVO pageVO) {

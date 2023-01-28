@@ -97,10 +97,6 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         //当前登陆会员
         Member member = UserContext.getCurrentUser().getMember();
 
-        if (makeAccountDTO.getSurrenderPrice() < 1) {
-            throw new ServiceException("让利金额不能小于1元");
-        }
-
         if(!matchPhoneNumber(makeAccountDTO.getVipPhone())){
             throw new ServiceException(ResultCode.TRANSFER_PHONE_ERROR);
         }
@@ -115,7 +111,9 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
             throw new ServiceException(ResultCode.DISTRIBUTIONVIP_ERROR);
         }
 
-
+        if (makeAccountDTO.getSurrenderPrice() < 1) {
+            throw new ServiceException(ResultCode.SURRENDERSMALLPRICE_ERRORW);
+        }
 
         //用户积分倍数
         QueryWrapper<Configure> jfWrapper = new QueryWrapper();

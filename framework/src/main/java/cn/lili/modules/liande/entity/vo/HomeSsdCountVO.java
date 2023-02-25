@@ -14,4 +14,6 @@ public class HomeSsdCountVO {
     private Double sum;
     @ApiModelProperty(value = "昨日销毁量")
     private Double yesterdayCount;
+    @ApiModelProperty(value = "是否查看销毁量")
+    private boolean xhlFlg;
 }

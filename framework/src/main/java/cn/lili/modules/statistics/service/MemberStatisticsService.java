@@ -31,6 +31,20 @@ public interface MemberStatisticsService extends IService<MemberStatisticsData> 
     long getSSDCount();
 
     /**
+     * 获取SSD销毁总量数量
+     *
+     * @return SSD统计
+     */
+    long setSsdDest();
+
+    /**
+     * 获取会员SSD数量
+     *
+     * @return SSD统计
+     */
+    long setYesterdaySsdDest();
+
+    /**
      * 获取今日新增会员数量
      *
      * @return 今日新增会员数量

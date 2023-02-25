@@ -145,28 +145,28 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         AuthUser currentUser = UserContext.getCurrentUser();
         Optional.ofNullable(currentUser).orElseThrow(() -> new ServiceException(ResultCode.USER_NOT_LOGIN));
         // 查询服务商
-        QueryWrapper<StoreVO> wrapper = storeSearchParams.queryWrapper();
+        QueryWrapper<StoreVO> queryWrapper = storeSearchParams.queryWrapper();
+        queryWrapper.ne("store_disable", "REFUSED");
         if (currentUser.getMember() != null) {
             AdminUser admin = adminUserService.findByMobile(currentUser.getMember().getMobile());
             if (ObjectUtils.isNotEmpty(admin)) {
                 Department dept = departmentService.getById(admin.getDepartmentId());
-                wrapper.apply("FIND_IN_SET(" + dept.getAreaCode() + ",store_address_id_path)");
-                wrapper.or().eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
+                queryWrapper.and(wrapper -> wrapper.apply("FIND_IN_SET(" + dept.getAreaCode() + ",store_address_id_path)").or().eq("member_id", Long.parseLong(storeSearchParams.getMemberId())));
             }else {
-                wrapper.eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
+                queryWrapper.eq("member_id", Long.parseLong(storeSearchParams.getMemberId()));
             }
         }
 
         //wrapper.orderByAsc(" field(state,1,4,2,3)");
         //用户名查询
-        wrapper.like(CharSequenceUtil.isNotBlank(storeSearchParams.getMemberName()), "member_name", storeSearchParams.getMemberName());
+        queryWrapper.like(CharSequenceUtil.isNotBlank(storeSearchParams.getMemberName()), "member_name", storeSearchParams.getMemberName());
         //店铺名查询
-        wrapper.like(CharSequenceUtil.isNotBlank(storeSearchParams.getStoreName()), "store_name", storeSearchParams.getStoreName());
+        queryWrapper.like(CharSequenceUtil.isNotBlank(storeSearchParams.getStoreName()), "store_name", storeSearchParams.getStoreName());
         //店铺状态
-        wrapper.like(CharSequenceUtil.isNotBlank(storeSearchParams.getStoreDisable()), "store_disable", storeSearchParams.getStoreDisable());
-        wrapper.orderByAsc("field(store_disable,'APPLYING','REFUSED','OPEN')");
+        queryWrapper.like(CharSequenceUtil.isNotBlank(storeSearchParams.getStoreDisable()), "store_disable", storeSearchParams.getStoreDisable());
+        queryWrapper.orderByAsc("field(store_disable,'APPLYING','REFUSED','OPEN')");
 
-        return this.baseMapper.getStoreList(PageUtil.initPage(page), wrapper);
+        return this.baseMapper.getStoreList(PageUtil.initPage(page), queryWrapper);
     }
 
     @Override
@@ -276,10 +276,27 @@ public class StoreServiceImpl extends ServiceImpl<StoreMapper, Store> implements
         if (member == null) {
             throw new ServiceException(ResultCode.USER_NOT_EXIST);
         }
-        //判断是否拥有店铺
-        if (Boolean.TRUE.equals(member.getHaveStore()) && !"1".equals(member.getDoubleStore())) {
+
+        //店铺状态取得
+        QueryWrapper<Store> storeWrapper = Wrappers.query();
+        boolean hasStore = false;
+        if (StringUtils.isNotEmpty(member.getStoreId()) && "0".equals(member.getDoubleStore())) {
+            storeWrapper.eq("id", member.getStoreId());
+            Store storeObj = null;
+            storeObj = this.getOne(storeWrapper);
+            if ((storeObj != null && !StoreStatusEnum.REFUSED.value().equals(storeObj.getStoreDisable()))) {
+                hasStore = true;
+            }
+        }
+
+        if (hasStore && "0".equals(member.getDoubleStore())) {
             throw new ServiceException(ResultCode.STORE_APPLY_DOUBLE_ERROR);
         }
+
+        //判断是否拥有店铺
+//        if ((Boolean.TRUE.equals(member.getHaveStore()) && !hasStore && !"1".equals(member.getDoubleStore()))) {
+//            throw new ServiceException(ResultCode.STORE_APPLY_DOUBLE_ERROR);
+//        }
 
         //添加店铺
         Store store = new Store(member, adminStoreApplyDTO);

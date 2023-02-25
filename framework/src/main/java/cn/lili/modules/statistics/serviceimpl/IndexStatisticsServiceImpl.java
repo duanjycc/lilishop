@@ -8,6 +8,7 @@ import cn.lili.common.security.enums.UserEnums;
 import cn.lili.common.utils.BeanUtil;
 import cn.lili.modules.goods.entity.enums.GoodsAuthEnum;
 import cn.lili.modules.goods.entity.enums.GoodsStatusEnum;
+import cn.lili.modules.liande.service.IHomeSsdCountService;
 import cn.lili.modules.order.order.entity.enums.FlowTypeEnum;
 import cn.lili.modules.order.order.entity.enums.OrderStatusEnum;
 import cn.lili.modules.order.trade.entity.enums.AfterSaleTypeEnum;
@@ -99,6 +100,9 @@ public class IndexStatisticsServiceImpl implements IndexStatisticsService {
     @Autowired
     private SeckillStatisticsService seckillStatisticsService;
 
+    @Autowired
+    private IHomeSsdCountService IHomeSsdCountService;
+
     @Override
     public IndexNoticeVO indexNotice() {
 
@@ -135,7 +139,8 @@ public class IndexStatisticsServiceImpl implements IndexStatisticsService {
         indexStatisticsVO.setGoodsNum(goodsStatisticsService.goodsNum(GoodsStatusEnum.UPPER, GoodsAuthEnum.PASS));
         //获取总店铺数量
         indexStatisticsVO.setStoreNum(storeStatisticsService.storeNum());
-
+        //SSD总计销毁数量
+        indexStatisticsVO.setHomeSsdCountVO(IHomeSsdCountService.count());
         //下单统计
         Map<String, Object> map = storeFlowStatisticsService.getOrderStatisticsPrice();
         //今日下单数

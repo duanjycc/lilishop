@@ -148,7 +148,7 @@ public class WalletPlugin implements Payment {
                             DepositServiceTypeEnum.WALLET_PAY.name()
                     )
             );
-            if (result) {
+            if (true) {
                 try {
                     PaymentSuccessParams paymentSuccessParams = new PaymentSuccessParams(
                             PaymentMethodEnum.WALLET.name(),

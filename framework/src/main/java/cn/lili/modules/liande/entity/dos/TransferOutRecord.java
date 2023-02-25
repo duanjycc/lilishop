@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableField;

@@ -59,5 +59,8 @@ public class AdminUser extends BaseEntity {
      */
     @ApiModelProperty(value = "角色id集合")
     private String roleIds;
+    @ApiModelProperty(value = "是否看销毁量")
+    private String isXhl;
+
 
 }

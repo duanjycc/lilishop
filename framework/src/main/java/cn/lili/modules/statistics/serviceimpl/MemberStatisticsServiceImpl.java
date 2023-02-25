@@ -38,9 +38,24 @@ public class MemberStatisticsServiceImpl extends ServiceImpl<MemberStatisticsMap
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.eq("disabled", true);
         queryWrapper.notInSql("mobile","18888888888");
+        queryWrapper.notInSql("mobile","13333333333");
         queryWrapper.notInSql("mobile","18606519031");
         queryWrapper.notInSql("mobile","15306594570");
         return this.baseMapper.customSsdSqlQuery(queryWrapper);
+    }
+
+    @Override
+    public long setSsdDest() {
+        QueryWrapper queryWrapper = Wrappers.query();
+        queryWrapper.ge("create_time", DateUtil.beginOfDay(new Date()));
+        return this.baseMapper.customSqlQuery(queryWrapper);
+    }
+
+    @Override
+    public long setYesterdaySsdDest() {
+        QueryWrapper queryWrapper = Wrappers.query();
+        queryWrapper.ge("create_time", DateUtil.beginOfDay(new Date()));
+        return this.baseMapper.customSqlQuery(queryWrapper);
     }
 
     @Override

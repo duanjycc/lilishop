@@ -147,6 +147,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         if(StringUtils.isNotEmpty(currentUser.getMember().getStoreId())){
             wrapper.notInSql("mobile","18606519031");
             wrapper.notInSql("mobile","18888888888");
+            wrapper.notInSql("mobile","13333333333");
             wrapper.notInSql("mobile","15306594570");
             wrapper.apply("w.mer_id = "+ currentUser.getMember().getStoreId());
             wrapper.like(StringUtils.isNotEmpty(mobile),"m.mobile",mobile);
@@ -167,6 +168,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         QueryWrapper<MemberProfitVO> wrapper = new QueryWrapper<>();
         wrapper.notInSql("mobile","18606519031");
         wrapper.notInSql("mobile","18888888888");
+        wrapper.notInSql("mobile","13333333333");
         wrapper.notInSql("mobile","15306594570");
         wrapper.apply(StringUtils.isNotEmpty(currentUser.getMember().getStoreId()),"w.mer_id = "+ currentUser.getMember().getStoreId());
         List<MemberProfitVO> tops = baseMapper.getStoreMemberTopV2(wrapper);
@@ -686,6 +688,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
                 memberSearchVO.getDisabled().equals(SwitchEnum.OPEN.name()) ? 1 : 0);
         queryWrapper.notInSql("mobile","18606519031");
         queryWrapper.notInSql("mobile","18888888888");
+        queryWrapper.notInSql("mobile","13333333333");
         queryWrapper.notInSql("mobile","15306594570");
         queryWrapper.orderByDesc("ssd");
         return this.baseMapper.pageByMemberVO(PageUtil.initPage(page), queryWrapper);

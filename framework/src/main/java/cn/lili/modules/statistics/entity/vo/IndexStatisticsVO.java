@@ -1,5 +1,6 @@
 package cn.lili.modules.statistics.entity.vo;
 
+import cn.lili.modules.liande.entity.vo.HomeSsdCountVO;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -54,4 +55,6 @@ public class IndexStatisticsVO {
     private Long currentNumberPeopleOnline;
     @ApiModelProperty(value = "当前用户角色")
     private Boolean isSuper;
+    @ApiModelProperty(value = "SSD销毁数量")
+    private HomeSsdCountVO homeSsdCountVO;
 }

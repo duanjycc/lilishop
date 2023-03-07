@@ -351,7 +351,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setPaymentTime(new Date());
         order.setPaymentMethod(paymentMethod);
         order.setPayStatus(PayStatusEnum.PAID.name());
-        order.setOrderStatus(OrderStatusEnum.PAID.name());
+        order.setOrderStatus(OrderStatusEnum.UNDELIVERED.name());
         order.setReceivableNo(receivableNo);
         order.setCanReturn(!PaymentMethodEnum.BANK_TRANSFER.name().equals(order.getPaymentMethod()));
         this.updateById(order);

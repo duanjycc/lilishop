@@ -5,6 +5,14 @@ import cn.lili.common.enums.ResultUtil;
 import cn.lili.common.exception.ServiceException;
 import cn.lili.common.security.context.UserContext;
 import cn.lili.common.vo.ResultMessage;
+import cn.lili.modules.goods.entity.dos.Goods;
+import cn.lili.modules.liande.entity.dos.Configure;
+import cn.lili.modules.liande.mapper.MemberIncomeMapper;
+import cn.lili.modules.liande.service.IConfigureService;
+import cn.lili.modules.member.entity.dos.Member;
+import cn.lili.modules.member.mapper.MemberMapper;
+import cn.lili.modules.order.order.entity.dos.Order;
+import cn.lili.modules.order.order.service.OrderService;
 import cn.lili.modules.payment.entity.RefundLog;
 import cn.lili.modules.payment.entity.enums.CashierEnum;
 import cn.lili.modules.payment.entity.enums.PaymentMethodEnum;
@@ -15,9 +23,13 @@ import cn.lili.modules.payment.kit.dto.PaymentSuccessParams;
 import cn.lili.modules.payment.kit.params.dto.CashierParam;
 import cn.lili.modules.payment.service.PaymentService;
 import cn.lili.modules.payment.service.RefundLogService;
+import cn.lili.modules.store.entity.dos.Store;
+import cn.lili.modules.store.mapper.StoreMapper;
 import cn.lili.modules.wallet.entity.dto.MemberWalletUpdateDTO;
 import cn.lili.modules.wallet.entity.enums.DepositServiceTypeEnum;
 import cn.lili.modules.wallet.service.MemberWalletService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import cn.lili.modules.liande.entity.dos.MemberIncome;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -26,6 +38,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 
 /**
  * WalletPlugin
@@ -61,6 +74,22 @@ public class WalletPlugin implements Payment {
 
     @Autowired
     private RedissonClient redisson;
+
+    @Autowired
+    private IConfigureService iConfigureService;
+
+    @Autowired
+    private MemberMapper memberMapper;
+
+    @Autowired
+    private StoreMapper storeMapper;
+
+    @Autowired
+    private
+    OrderService orderService;
+
+    @Autowired
+    MemberIncomeMapper memberIncomeMapper;
 
     @Override
     public ResultMessage<Object> h5pay(HttpServletRequest request, HttpServletResponse response, PayParam payParam) {
@@ -141,13 +170,69 @@ public class WalletPlugin implements Payment {
             if (UserContext.getCurrentUser() == null) {
                 throw new ServiceException(ResultCode.USER_NOT_LOGIN);
             }
-            boolean result = memberWalletService.reduce(new MemberWalletUpdateDTO(
-                            cashierParam.getPrice(),
-                            UserContext.getCurrentUser().getId(),
-                            "订单[" + cashierParam.getOrderSns() + "]支付金额[" + cashierParam.getPrice() + "]",
-                            DepositServiceTypeEnum.WALLET_PAY.name()
-                    )
-            );
+            Order order = orderService.getBySn(cashierParam.getOrderSns());
+
+//            boolean result = memberWalletService.reduce(new MemberWalletUpdateDTO(
+//                            cashierParam.getPrice(),
+//                            UserContext.getCurrentUser().getId(),
+//                            "订单[" + cashierParam.getOrderSns() + "]支付金额[" + cashierParam.getPrice() + "]",
+//                            DepositServiceTypeEnum.WALLET_PAY.name()
+//                    )
+//            );
+            //价格
+            QueryWrapper<Configure> jgWrapper = new QueryWrapper();
+            jgWrapper.eq("type", "unitPrice");
+            Configure jg = iConfigureService.getOne(jgWrapper);
+
+            QueryWrapper<Member> memberpassWrapper = new QueryWrapper();
+            memberpassWrapper.eq("id", UserContext.getCurrentUser().getId());
+            Member memberpass = memberMapper.selectOne(memberpassWrapper);
+
+            //计算需要卷的数量
+            Double wantPrice = jg.getNumericalAlue();
+            Double wantsum = cashierParam.getPrice() / wantPrice;
+            if (wantsum > memberpass.getSsd()) {
+                throw new ServiceException(ResultCode.INSUFFICIENT_QUANTITY_ERROR);
+            }
+
+            //会员扣除一笔ssd
+            QueryWrapper<Member> huiyuanWrapper = new QueryWrapper();
+            huiyuanWrapper.eq("id", UserContext.getCurrentUser().getId());
+            Member huiyuanMember = memberMapper.selectOne(huiyuanWrapper);
+            huiyuanMember.setSsd(memberpass.getSsd() - wantsum);
+            memberMapper.update(huiyuanMember, huiyuanWrapper);
+
+            //商家得到一笔ssd
+            QueryWrapper<Store> storeWrapper = new QueryWrapper();
+            storeWrapper.eq("id", order.getStoreId());
+            Store store = storeMapper.selectOne(storeWrapper);
+            QueryWrapper<Member> shangjWrapper = new QueryWrapper();
+            shangjWrapper.eq("id", store.getMemberId());
+            Member sjMember = memberMapper.selectOne(shangjWrapper);
+            sjMember.setSsd(sjMember.getSsd() + wantsum);
+            memberMapper.update(sjMember, shangjWrapper);
+
+            //会员消费SSD日志
+            MemberIncome mi = new MemberIncome();
+            mi.setConsumerUserid(Long.parseLong(UserContext.getCurrentUser().getId()));
+            mi.setUserId(Long.parseLong( UserContext.getCurrentUser().getId()));
+            mi.setCreationTime(new Date());
+            mi.setQuantity(wantsum);
+            mi.setIncomeProportion(cashierParam.getPrice() + "");
+            mi.setOrderId(order.getSn() + "");
+            mi.setIncomeType("3");
+            memberIncomeMapper.insert(mi);
+            //店家获取SSD日志
+            mi = new MemberIncome();
+            mi.setConsumerUserid(Long.parseLong(UserContext.getCurrentUser().getId()));
+            mi.setUserId(Long.parseLong( store.getMemberId()));
+            mi.setCreationTime(new Date());
+            mi.setQuantity(wantsum);
+            mi.setIncomeProportion(cashierParam.getPrice() + "");
+            mi.setOrderId(order.getSn() + "");
+            mi.setIncomeType("4");
+            memberIncomeMapper.insert(mi);
+
             if (true) {
                 try {
                     PaymentSuccessParams paymentSuccessParams = new PaymentSuccessParams(

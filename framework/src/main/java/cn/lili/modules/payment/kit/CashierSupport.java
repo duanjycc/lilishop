@@ -7,6 +7,8 @@ import cn.lili.common.exception.ServiceException;
 import cn.lili.common.security.context.UserContext;
 import cn.lili.common.utils.SpringContextUtil;
 import cn.lili.common.vo.ResultMessage;
+import cn.lili.modules.member.entity.dos.Member;
+import cn.lili.modules.member.mapper.MemberMapper;
 import cn.lili.modules.payment.entity.enums.PaymentClientEnum;
 import cn.lili.modules.payment.entity.enums.PaymentMethodEnum;
 import cn.lili.modules.payment.kit.dto.PayParam;
@@ -19,8 +21,10 @@ import cn.lili.modules.system.entity.dto.payment.dto.PaymentSupportItem;
 import cn.lili.modules.system.entity.enums.SettingEnum;
 import cn.lili.modules.system.service.SettingService;
 import cn.lili.modules.wallet.service.MemberWalletService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -52,6 +56,9 @@ public class CashierSupport {
     @Autowired
     private SettingService settingService;
 
+    @Autowired
+    private MemberMapper memberMapper;
+
     /**
      * 支付
      *
@@ -65,6 +72,15 @@ public class CashierSupport {
         if (paymentClientEnum == null || paymentMethodEnum == null) {
             throw new ServiceException(ResultCode.PAY_NOT_SUPPORT);
         }
+
+        //验证支付密码
+        QueryWrapper<Member> memberpassWrapper = new QueryWrapper();
+        memberpassWrapper.eq("id", UserContext.getCurrentUser().getId());
+        Member memberpass = memberMapper.selectOne(memberpassWrapper);
+        if (!new BCryptPasswordEncoder().matches(payParam.getPaymentPass(), memberpass.getPaymentPassword())) {
+            throw new ServiceException(ResultCode.TRANSFER_SECOND_PASSWORD_ERROR);
+        }
+
         //获取支付插件
         Payment payment = (Payment) SpringContextUtil.getBean(paymentMethodEnum.getPlugin());
         log.info("支付请求：客户端：{},支付类型：{},请求：{}", paymentClientEnum.name(), paymentMethodEnum.name(), payParam.toString());

@@ -4,6 +4,7 @@ import cn.lili.common.enums.ResultCode;
 import cn.lili.common.enums.ResultUtil;
 import cn.lili.common.exception.ServiceException;
 import cn.lili.common.security.context.UserContext;
+import cn.lili.common.utils.StringUtils;
 import cn.lili.common.vo.ResultMessage;
 import cn.lili.modules.goods.entity.dos.Goods;
 import cn.lili.modules.liande.entity.dos.Configure;
@@ -202,6 +203,14 @@ public class WalletPlugin implements Payment {
             huiyuanMember.setSsd(memberpass.getSsd() - wantsum);
             memberMapper.update(huiyuanMember, huiyuanWrapper);
 
+            Double sjwantssd = 0.00;
+            Double ptwantssd = 0.00;
+            if (StringUtils.isNotEmpty(order.getShouxufei())) {
+                sjwantssd = wantsum * (1- Double.valueOf(order.getShouxufei()));
+                ptwantssd = wantsum - sjwantssd;
+            } else {
+                sjwantssd = wantsum;
+            }
             //商家得到一笔ssd
             QueryWrapper<Store> storeWrapper = new QueryWrapper();
             storeWrapper.eq("id", order.getStoreId());
@@ -209,8 +218,24 @@ public class WalletPlugin implements Payment {
             QueryWrapper<Member> shangjWrapper = new QueryWrapper();
             shangjWrapper.eq("id", store.getMemberId());
             Member sjMember = memberMapper.selectOne(shangjWrapper);
-            sjMember.setSsd(sjMember.getSsd() + wantsum);
+            sjMember.setSsd(sjMember.getSsd() + sjwantssd);
             memberMapper.update(sjMember, shangjWrapper);
+
+            String shouxfId = null;
+            if (StringUtils.isNotEmpty(order.getShouxufei())) {
+                jgWrapper = new QueryWrapper();
+                jgWrapper.eq("type", "shouxufei");
+                Configure jgsxuf = iConfigureService.getOne(jgWrapper);
+                //平台货得手续费
+                QueryWrapper<Member> pingtaiWrapper = new QueryWrapper();
+                shouxfId = jgsxuf.getRemark();
+                pingtaiWrapper.eq("id", jgsxuf.getRemark());
+                Member pingtaiMember = memberMapper.selectOne(pingtaiWrapper);
+
+                pingtaiMember.setSsd(pingtaiMember.getSsd() + ptwantssd);
+
+                memberMapper.update(pingtaiMember, pingtaiWrapper);
+            }
 
             //会员消费SSD日志
             MemberIncome mi = new MemberIncome();
@@ -227,11 +252,24 @@ public class WalletPlugin implements Payment {
             mi.setConsumerUserid(Long.parseLong(UserContext.getCurrentUser().getId()));
             mi.setUserId(Long.parseLong( store.getMemberId()));
             mi.setCreationTime(new Date());
-            mi.setQuantity(wantsum);
+            mi.setQuantity(sjwantssd);
             mi.setIncomeProportion(cashierParam.getPrice() + "");
             mi.setOrderId(order.getSn() + "");
             mi.setIncomeType("4");
             memberIncomeMapper.insert(mi);
+
+            //平台获取SSD日志
+            if (StringUtils.isNotEmpty(order.getShouxufei())) {
+                mi = new MemberIncome();
+                mi.setConsumerUserid(Long.parseLong(UserContext.getCurrentUser().getId()));
+                mi.setUserId(Long.parseLong(shouxfId));
+                mi.setCreationTime(new Date());
+                mi.setQuantity(ptwantssd);
+                mi.setIncomeProportion(cashierParam.getPrice() + "");
+                mi.setOrderId(order.getSn() + "");
+                mi.setIncomeType("5");
+                memberIncomeMapper.insert(mi);
+            }
 
             if (true) {
                 try {

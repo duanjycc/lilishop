@@ -203,6 +203,9 @@ public class Order extends BaseEntity {
     @ApiModelProperty(value = "使用的平台会员优惠券id")
     private String usePlatformMemberCouponId;
 
+    @ApiModelProperty(value = "手续费")
+    private String shouxufei;
+
     /**
      * 构建订单
      *
@@ -243,7 +246,7 @@ public class Order extends BaseEntity {
             }
             this.setUseStoreMemberCouponIds(storeCouponIds.toString());
         }
-
+        this.shouxufei = cartVO.getSkuList().get(0).getGoodsSku().getShouxufei();
     }
 
 

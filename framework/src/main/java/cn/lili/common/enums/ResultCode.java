@@ -37,7 +37,7 @@ public enum ResultCode {
     LIMIT_ERROR(1003, "访问过于频繁，请稍后再试"),
     ILLEGAL_REQUEST_ERROR(1004, "非法请求，请重新刷新页面操作"),
     IMAGE_FILE_EXT_ERROR(1005, "不支持图片格式"),
-    IMAGE_FILE_SIZE_BIG_ERROR(1005, "图片size过大，不能超过120KB"),
+    IMAGE_FILE_SIZE_BIG_ERROR(1005, "图片size过大，不能超过200KB"),
     FILE_TYPE_NOT_SUPPORT(1010, "不支持上传的文件类型！"),
     PLATFORM_NOT_SUPPORTED_IM(1006, "平台未开启IM"),
     STORE_NOT_SUPPORTED_IM(1007, "店铺未开启IM"),

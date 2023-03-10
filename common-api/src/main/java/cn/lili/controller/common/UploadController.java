@@ -60,9 +60,69 @@ public class UploadController {
 
         AuthUser authUser =  UserContext.getCurrentUser();
 
-//        if (file.getSize() > 120*1024) {
-//            throw new ServiceException(ResultCode.IMAGE_FILE_SIZE_BIG_ERROR);
-//        }
+        if (file.getSize() > 200*1024) {
+            throw new ServiceException(ResultCode.IMAGE_FILE_SIZE_BIG_ERROR);
+        }
+        //如果用户未登录，则无法上传图片
+        if (authUser == null) {
+            throw new ServiceException(ResultCode.USER_AUTHORITY_ERROR);
+        }
+        Setting setting = settingService.get(SettingEnum.OSS_SETTING.name());
+        Setting prefixOss = settingService.get(SettingEnum.PREFIX_OSS_PATH.name());
+        Setting initOss = settingService.get(SettingEnum.INIT_OSS_PATH.name());
+        if (setting == null || CharSequenceUtil.isBlank(setting.getSettingValue())) {
+            throw new ServiceException(ResultCode.OSS_NOT_EXIST);
+        }
+        if (file == null || CharSequenceUtil.isEmpty(file.getContentType())) {
+            throw new ServiceException(ResultCode.IMAGE_FILE_EXT_ERROR);
+        }
+
+
+        if (!CharSequenceUtil.containsAny(file.getContentType().toLowerCase(), "image")) {
+            throw new ServiceException(ResultCode.FILE_TYPE_NOT_SUPPORT);
+        }
+
+        if (CharSequenceUtil.isNotBlank(base64)) {
+            //base64上传
+            file = Base64DecodeMultipartFile.base64Convert(base64);
+        }
+        String result;
+        String fileKey = CommonUtil.rename(Objects.requireNonNull(file.getOriginalFilename()));
+        File newFile = new File();
+        try {
+            InputStream inputStream = file.getInputStream();
+            //上传至第三方云服务或服务器
+            result = filePluginFactory.filePlugin().inputStreamUpload(inputStream, fileKey);
+            //保存数据信息至数据库
+            newFile.setName(file.getOriginalFilename());
+            newFile.setFileSize(file.getSize());
+            newFile.setFileType(file.getContentType());
+            newFile.setFileKey(fileKey);
+            newFile.setUrl(result.replace(initOss.getSettingValue(),prefixOss.getSettingValue()));
+            newFile.setCreateBy(authUser.getUsername());
+            newFile.setUserEnums(authUser.getRole().name());
+            //如果是店铺，则记录店铺id
+            if (authUser.getRole().equals(UserEnums.STORE)) {
+                newFile.setOwnerId(authUser.getStoreId());
+            } else {
+                newFile.setOwnerId(authUser.getId());
+            }
+            fileService.save(newFile);
+        } catch (Exception e) {
+            log.error("文件上传失败", e);
+            throw new ServiceException(ResultCode.OSS_EXCEPTION_ERROR);
+        }
+        return ResultUtil.data(result);
+    }
+
+    @ApiOperation(value = "文件上传")
+    @PostMapping(value = "/fileSize")
+    public ResultMessage<Object> uploadMaxSize(MultipartFile file,
+                                        String base64,
+                                        @RequestHeader String accessToken) {
+
+        AuthUser authUser =  UserContext.getCurrentUser();
+
         //如果用户未登录，则无法上传图片
         if (authUser == null) {
             throw new ServiceException(ResultCode.USER_AUTHORITY_ERROR);

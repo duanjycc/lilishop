@@ -636,6 +636,7 @@ public class GoodsSkuServiceImpl extends ServiceImpl<GoodsSkuMapper, GoodsSku> i
 
     @Override
     public IPage<EsGoodsIndex> getEsGoodsIndexPage(GoodsSearchParams searchParams) {
+        searchParams.setMarketEnable(GoodsStatusEnum.UPPER.name());
         IPage<GoodsSku> page = this.page(PageUtil.initPage(searchParams), searchParams.queryWrapper());
 
         IPage<EsGoodsIndex> esGoodsIndexIPage = new Page<>(page.getCurrent(), page.getSize());

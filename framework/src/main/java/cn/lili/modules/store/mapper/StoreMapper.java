@@ -121,7 +121,7 @@ public interface StoreMapper extends BaseMapper<Store> {
      * @param queryWrapper 查询条件
      * @return 店铺VO分页列表
      */
-    @Select("select s.*, st_distance_sphere( point ( left(store_center, LOCATE(',',store_center)-1), right(store_center, LOCATE(',',store_center)-2) ),point ( ${local} ) ) / 1000 AS distance  from li_store as s ${ew.customSqlSegment}")
+    @Select("select s.id,s.store_logo,s.store_name, st_distance_sphere( point ( left(store_center, LOCATE(',',store_center)-1), right(store_center, LOCATE(',',store_center)-2) ),point ( ${local} ) ) / 1000 AS distance  from li_store as s inner join (select f.owner_id from li_file f where f.file_size < 204800 GROUP BY f.owner_id) f on s.id=f.owner_id ${ew.customSqlSegment}")
     IPage<StoreVO> getAppByPage(IPage<StoreVO> page,@Param("local") String local, @Param(Constants.WRAPPER) Wrapper<StoreVO> queryWrapper);
 
     /**
@@ -130,7 +130,7 @@ public interface StoreMapper extends BaseMapper<Store> {
      * @param page         分页
      * @param queryWrapper 查询条件
      */
-    @Select("select s.* from li_store s left join li_store_detail d on s.id = d.store_id ${ew.customSqlSegment}")
+    @Select("select s.* from li_store s inner join (select f.owner_id from li_file f where f.file_size < 204800 GROUP BY f.owner_id) f on s.id=f.owner_id  inner join li_store_detail d on s.id = d.store_id ${ew.customSqlSegment}")
     IPage<StoreVO> listStoreByCategory(IPage<StoreVO> page, @Param(Constants.WRAPPER) Wrapper<StoreVO> queryWrapper);
 
 

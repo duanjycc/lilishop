@@ -41,6 +41,11 @@ public class Goods extends BaseEntity {
 
     private static final long serialVersionUID = 370683495251252601L;
 
+    @ApiModelProperty(value = "商品id")
+    @NotEmpty(message = "商品id不能为空")
+    @Length(max = 100, message = "商品id太长，不能超过100个字符")
+    private String id;
+
     @ApiModelProperty(value = "商品名称")
     @NotEmpty(message = "商品名称不能为空")
     @Length(max = 100, message = "商品名称太长，不能超过100个字符")

@@ -185,7 +185,7 @@ public class GoodsSkuServiceImpl extends ServiceImpl<GoodsSkuMapper, GoodsSku> i
                 skuList.add(sku);
                 //如果商品状态值不对，则es索引移除
                 if (goods.getAuthFlag().equals(GoodsAuthEnum.PASS.name()) && goods.getMarketEnable().equals(GoodsStatusEnum.UPPER.name())) {
-                    goodsIndexService.deleteIndexById(sku.getId());
+                   // goodsIndexService.deleteIndexById(sku.getId());
                     this.clearCache(sku.getId());
                 }
             }
@@ -280,35 +280,37 @@ public class GoodsSkuServiceImpl extends ServiceImpl<GoodsSkuMapper, GoodsSku> i
 //            goodsIndex = goodsIndexService.getResetEsGoodsIndex(goodsSku, goodsVO.getGoodsParamsDTOList());
 //        }
 
+        EsGoodsIndex goodsIndex = goodsIndexService.getResetEsGoodsIndex(goodsSku, goodsVO.getGoodsParamsDTOList());
+
         //商品规格
         GoodsSkuVO goodsSkuDetail = this.getGoodsSkuVO(goodsSku);
 
-//        Map<String, Object> promotionMap = goodsIndex.getPromotionMap();
+        Map<String, Object> promotionMap = goodsIndex.getPromotionMap();
         //设置当前商品的促销价格
-//        if (promotionMap != null && !promotionMap.isEmpty()) {
-//            promotionMap = promotionMap.entrySet().stream().parallel().filter(i -> {
-//                JSONObject jsonObject = JSONUtil.parseObj(i.getValue());
-//                // 过滤活动赠送优惠券和无效时间的活动
-//                return (jsonObject.get("getType") == null || jsonObject.get("getType", String.class).equals(CouponGetEnum.FREE.name())) && (jsonObject.get("startTime") != null && jsonObject.get("startTime", Date.class).getTime() <= System.currentTimeMillis()) && (jsonObject.get("endTime") == null || jsonObject.get("endTime", Date.class).getTime() >= System.currentTimeMillis());
-//            }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-//
-//            Optional<Map.Entry<String, Object>> containsPromotion = promotionMap.entrySet().stream().filter(i -> i.getKey().contains(PromotionTypeEnum.SECKILL.name()) || i.getKey().contains(PromotionTypeEnum.PINTUAN.name())).findFirst();
-//            if (containsPromotion.isPresent()) {
-//                JSONObject jsonObject = JSONUtil.parseObj(containsPromotion.get().getValue());
-//                PromotionGoodsSearchParams searchParams = new PromotionGoodsSearchParams();
-//                searchParams.setSkuId(skuId);
-//                searchParams.setPromotionId(jsonObject.get("id").toString());
-//                PromotionGoods promotionsGoods = promotionGoodsService.getPromotionsGoods(searchParams);
-//                if (promotionsGoods != null && promotionsGoods.getPrice() != null) {
-//                    goodsSkuDetail.setPromotionFlag(true);
-//                    goodsSkuDetail.setPromotionPrice(promotionsGoods.getPrice());
-//                }
-//            } else {
-//                goodsSkuDetail.setPromotionFlag(false);
-//                goodsSkuDetail.setPromotionPrice(null);
-//            }
-//
-//        }
+        if (promotionMap != null && !promotionMap.isEmpty()) {
+            promotionMap = promotionMap.entrySet().stream().parallel().filter(i -> {
+                JSONObject jsonObject = JSONUtil.parseObj(i.getValue());
+                // 过滤活动赠送优惠券和无效时间的活动
+                return (jsonObject.get("getType") == null || jsonObject.get("getType", String.class).equals(CouponGetEnum.FREE.name())) && (jsonObject.get("startTime") != null && jsonObject.get("startTime", Date.class).getTime() <= System.currentTimeMillis()) && (jsonObject.get("endTime") == null || jsonObject.get("endTime", Date.class).getTime() >= System.currentTimeMillis());
+            }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+            Optional<Map.Entry<String, Object>> containsPromotion = promotionMap.entrySet().stream().filter(i -> i.getKey().contains(PromotionTypeEnum.SECKILL.name()) || i.getKey().contains(PromotionTypeEnum.PINTUAN.name())).findFirst();
+            if (containsPromotion.isPresent()) {
+                JSONObject jsonObject = JSONUtil.parseObj(containsPromotion.get().getValue());
+                PromotionGoodsSearchParams searchParams = new PromotionGoodsSearchParams();
+                searchParams.setSkuId(skuId);
+                searchParams.setPromotionId(jsonObject.get("id").toString());
+                PromotionGoods promotionsGoods = promotionGoodsService.getPromotionsGoods(searchParams);
+                if (promotionsGoods != null && promotionsGoods.getPrice() != null) {
+                    goodsSkuDetail.setPromotionFlag(true);
+                    goodsSkuDetail.setPromotionPrice(promotionsGoods.getPrice());
+                }
+            } else {
+                goodsSkuDetail.setPromotionFlag(false);
+                goodsSkuDetail.setPromotionPrice(null);
+            }
+
+        }
         map.put("data", goodsSkuDetail);
 
         //获取分类
@@ -318,7 +320,7 @@ public class GoodsSkuServiceImpl extends ServiceImpl<GoodsSkuMapper, GoodsSku> i
 
         //获取规格信息
         map.put("specs", this.groupBySkuAndSpec(goodsVO.getSkuList()));
-//        map.put("promotionMap", promotionMap);
+        map.put("promotionMap", promotionMap);
 
         //获取参数信息
         if (goodsVO.getGoodsParamsDTOList() != null && !goodsVO.getGoodsParamsDTOList().isEmpty()) {
@@ -637,17 +639,21 @@ public class GoodsSkuServiceImpl extends ServiceImpl<GoodsSkuMapper, GoodsSku> i
     @Override
     public IPage<EsGoodsIndex> getEsGoodsIndexPage(GoodsSearchParams searchParams) {
         searchParams.setMarketEnable(GoodsStatusEnum.UPPER.name());
-        IPage<GoodsSku> page = this.page(PageUtil.initPage(searchParams), searchParams.queryWrapper());
+        IPage<Goods> page = goodsService.queryByParams(searchParams);
+
+        IPage<GoodsSku> pageSku = this.page(PageUtil.initPage(searchParams), searchParams.queryWrapper());
 
         IPage<EsGoodsIndex> esGoodsIndexIPage = new Page<>(page.getCurrent(), page.getSize());
         esGoodsIndexIPage.setTotal(page.getTotal());
-        esGoodsIndexIPage.setRecords(page.getRecords().stream().map(goodsSku -> {
-            Goods goods = goodsService.getById(goodsSku.getGoodsId());
-            EsGoodsIndex goodsIndex = new EsGoodsIndex(goodsSku);
-            if (goods.getParams() != null && !goods.getParams().isEmpty()) {
-                List<GoodsParamsDTO> goodsParamDTOS = JSONUtil.toList(goods.getParams(), GoodsParamsDTO.class);
-                goodsIndex = new EsGoodsIndex(goodsSku, goodsParamDTOS);
+        esGoodsIndexIPage.setRecords(page.getRecords().stream().map(goods -> {
+            GoodsSku goodsSku = new GoodsSku();
+            for (GoodsSku goodsku : pageSku.getRecords()) {
+                if (goodsku.getGoodsId().equals(goods.getId())) {
+                    goodsSku = goodsku;
+                    break;
+                }
             }
+            EsGoodsIndex goodsIndex = new EsGoodsIndex(goodsSku);
             goodsIndex.setAuthFlag(goods.getAuthFlag());
             goodsIndex.setMarketEnable(goods.getMarketEnable());
             this.settingUpGoodsIndexOtherParam(goodsIndex);
@@ -655,7 +661,6 @@ public class GoodsSkuServiceImpl extends ServiceImpl<GoodsSkuMapper, GoodsSku> i
             if (goodsIndex.getMobileIntro() == null) {
                 goodsIndex.setMobileIntro("");
             }
-
             return goodsIndex;
         }).collect(Collectors.toList()));
 

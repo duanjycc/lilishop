@@ -344,14 +344,14 @@ public class EsGoodsIndexServiceImpl extends BaseElasticsearchService implements
         }
         update.setScript(new Script(script.toString()));
         update.setConflicts("proceed");
-        try {
-            BulkByScrollResponse bulkByScrollResponse = client.updateByQuery(update, RequestOptions.DEFAULT);
-            if (bulkByScrollResponse.getVersionConflicts() > 0) {
-                throw new RetryException("更新商品索引失败，es内容版本冲突");
-            }
-        } catch (IOException e) {
-            log.error("更新商品索引异常", e);
-        }
+//        try {
+//            BulkByScrollResponse bulkByScrollResponse = client.updateByQuery(update, RequestOptions.DEFAULT);
+//            if (bulkByScrollResponse.getVersionConflicts() > 0) {
+//                throw new RetryException("更新商品索引失败，es内容版本冲突");
+//            }
+//        } catch (IOException e) {
+//            log.error("更新商品索引异常", e);
+//        }
     }
 
     /**

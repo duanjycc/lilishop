@@ -124,7 +124,7 @@ public class GoodsMessageListener implements RocketMQListener<MessageExt> {
             //查看商品
             case VIEW_GOODS:
                 FootPrint footPrint = JSONUtil.toBean(new String(messageExt.getBody()), FootPrint.class);
-                footprintService.saveFootprint(footPrint);
+                //footprintService.saveFootprint(footPrint);
                 break;
             //生成索引
             case GENERATOR_GOODS_INDEX:
@@ -484,9 +484,9 @@ public class GoodsMessageListener implements RocketMQListener<MessageExt> {
                 goodsSku.setBuyCount(buyCount);
                 goodsSkuService.update(goodsSku);
 
-                this.goodsIndexService.updateIndex(
-                        MapUtil.builder(new HashMap<String, Object>()).put("id", goodsCompleteMessage.getSkuId()).build(),
-                        MapUtil.builder(new HashMap<String, Object>()).put("buyCount", buyCount).build());
+//                this.goodsIndexService.updateIndex(
+//                        MapUtil.builder(new HashMap<String, Object>()).put("id", goodsCompleteMessage.getSkuId()).build(),
+//                        MapUtil.builder(new HashMap<String, Object>()).put("buyCount", buyCount).build());
 
             } else {
                 log.error("商品SkuId为[" + goodsCompleteMessage.getGoodsId() + "的商品不存在，更新商品失败！");

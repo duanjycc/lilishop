@@ -641,22 +641,19 @@ public class GoodsSkuServiceImpl extends ServiceImpl<GoodsSkuMapper, GoodsSku> i
         searchParams.setMarketEnable(GoodsStatusEnum.UPPER.name());
         IPage<Goods> page = goodsService.queryByParams(searchParams);
 
-        IPage<GoodsSku> pageSku = this.page(PageUtil.initPage(searchParams), searchParams.queryWrapper());
-
         IPage<EsGoodsIndex> esGoodsIndexIPage = new Page<>(page.getCurrent(), page.getSize());
         esGoodsIndexIPage.setTotal(page.getTotal());
         esGoodsIndexIPage.setRecords(page.getRecords().stream().map(goods -> {
+            List<GoodsSku> lstGoods = this.list(new LambdaQueryWrapper<GoodsSku>().eq(GoodsSku::getGoodsId, goods.getId()));
             GoodsSku goodsSku = new GoodsSku();
-            for (GoodsSku goodsku : pageSku.getRecords()) {
-                if (goodsku.getGoodsId().equals(goods.getId())) {
-                    goodsSku = goodsku;
-                    break;
-                }
+            if (lstGoods != null) {
+                goodsSku = lstGoods.get(0);
             }
+            goodsSku.setBuyCount(goods.getBuyCount());
             EsGoodsIndex goodsIndex = new EsGoodsIndex(goodsSku);
             goodsIndex.setAuthFlag(goods.getAuthFlag());
             goodsIndex.setMarketEnable(goods.getMarketEnable());
-            this.settingUpGoodsIndexOtherParam(goodsIndex);
+           // this.settingUpGoodsIndexOtherParam(goodsIndex);
 
             if (goodsIndex.getMobileIntro() == null) {
                 goodsIndex.setMobileIntro("");

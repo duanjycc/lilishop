@@ -496,6 +496,7 @@ public enum ResultCode {
     DISTRIBUTIONVIP_ERROR(110003, "不能给自己做单"),
     DISTRIBUTION_ERRORW(110002, "邀请人已经在你区域"),
     SURRENDERSMALLPRICE_ERRORW(110004, "最少让利金额不能小于1元"),
+    SHANGJIAEMPTY_ERROR(110005, "没有选择店铺"),
 
     /**邀请相关*/
     INVITATION_NOT_EXIST_ERROR(120001, "会员未填写邀请人"),

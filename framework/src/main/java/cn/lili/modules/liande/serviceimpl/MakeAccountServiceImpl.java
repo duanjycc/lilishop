@@ -97,6 +97,9 @@ public class MakeAccountServiceImpl extends ServiceImpl<MakeAccountMapper, MakeA
         //当前登陆会员
         Member member = UserContext.getCurrentUser().getMember();
 
+        if (StringUtils.isEmpty(makeAccountDTO.getMerId())) {
+            throw new ServiceException(ResultCode.SHANGJIAEMPTY_ERROR);
+        }
         if(!matchPhoneNumber(makeAccountDTO.getVipPhone())){
             throw new ServiceException(ResultCode.TRANSFER_PHONE_ERROR);
         }

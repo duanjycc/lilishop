@@ -66,7 +66,6 @@ public class Goods extends BaseEntity {
     @ApiModelProperty(value = "计量单位")
     private String goodsUnit;
 
-
     @Length(max = 60, message = "商品卖点太长，不能超过60个字符")
     @ApiModelProperty(value = "卖点")
     private String sellingPoint;

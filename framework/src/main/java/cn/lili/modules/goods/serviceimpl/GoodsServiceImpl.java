@@ -263,7 +263,7 @@ public class GoodsServiceImpl extends ServiceImpl<GoodsMapper, Goods> implements
     @Override
     public IPage<Goods> queryByParams(GoodsSearchParams goodsSearchParams) {
         goodsSearchParams.setAuthFlag(GoodsAuthEnum.PASS.name());
-        goodsSearchParams.setMarketEnable(GoodsStatusEnum.UPPER.name());
+        //goodsSearchParams.setMarketEnable(GoodsStatusEnum.UPPER.name());
         return this.page(PageUtil.initPage(goodsSearchParams), goodsSearchParams.queryWrapper());
     }
 
